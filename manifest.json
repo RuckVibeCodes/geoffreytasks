@@ -1,0 +1,17 @@
+{
+  "name": "Geoffrey's Task Board",
+  "short_name": "Geoffrey",
+  "description": "Butler-themed task management for Master Matt",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#d4af37",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
