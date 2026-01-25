@@ -76,5 +76,36 @@ GRANT ALL ON ALL SEQUENCES IN SCHEMA geoffrey TO anon, authenticated;
 -- Note: You may need to add 'geoffrey' to your API exposed schemas in Supabase Dashboard
 -- Settings → API → Exposed schemas → Add 'geoffrey'
 
+-- Ideas table (Idea Pipeline)
+CREATE TABLE geoffrey.ideas (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT,
+  category TEXT DEFAULT 'app' CHECK (category IN ('app', 'content', 'business', 'feature', 'other')),
+  status TEXT DEFAULT 'new' CHECK (status IN ('new', 'exploring', 'planned', 'archived')),
+  notes TEXT, -- Extended documentation/notes
+  links TEXT[], -- Array of relevant URLs
+  priority TEXT DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  archived_at TIMESTAMPTZ,
+  source TEXT DEFAULT 'web' -- 'web', 'telegram', 'api'
+);
+
+-- Apply trigger to ideas
+CREATE TRIGGER ideas_updated_at
+  BEFORE UPDATE ON geoffrey.ideas
+  FOR EACH ROW
+  EXECUTE FUNCTION geoffrey.update_updated_at();
+
+-- Enable RLS for ideas
+ALTER TABLE geoffrey.ideas ENABLE ROW LEVEL SECURITY;
+
+-- Create policy for ideas
+CREATE POLICY "Allow all on ideas" ON geoffrey.ideas FOR ALL USING (true) WITH CHECK (true);
+
+-- Grant permissions for ideas
+GRANT ALL ON geoffrey.ideas TO anon, authenticated;
+
 -- Success message
 SELECT 'Geoffrey schema created successfully! 🎩' as status;

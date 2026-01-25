@@ -580,6 +580,311 @@
     .clear-completed-btn.visible { display: block; }
     .clear-completed-btn:hover { background: rgba(248, 81, 73, 0.2); border-color: var(--red); }
 
+    /* Main Navigation Tabs */
+    .main-nav {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 30px;
+    }
+
+    .main-nav-tab {
+      background: var(--bg-card);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      padding: 12px 32px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .main-nav-tab:hover { border-color: var(--gold); color: var(--gold); }
+
+    .main-nav-tab.active {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.1));
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .main-nav-tab .badge {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+    }
+
+    .main-nav-tab.active .badge {
+      background: var(--gold);
+      color: var(--bg-dark);
+    }
+
+    /* View containers */
+    .view-container { display: none; }
+    .view-container.active { display: block; }
+
+    /* Ideas Board */
+    .ideas-board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 1024px) { .ideas-board { grid-template-columns: 1fr; } }
+
+    .idea-column {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .idea-column.new .column-header { border-color: var(--blue); }
+    .idea-column.new .column-header h2 { color: var(--blue); }
+    .idea-column.exploring .column-header { border-color: var(--purple); }
+    .idea-column.exploring .column-header h2 { color: var(--purple); }
+    .idea-column.planned .column-header { border-color: var(--green); }
+    .idea-column.planned .column-header h2 { color: var(--green); }
+
+    /* Idea Cards */
+    .idea {
+      background: var(--bg-hover);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-left: 4px solid var(--blue);
+      position: relative;
+    }
+
+    .idea:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .idea.status-exploring { border-left-color: var(--purple); }
+    .idea.status-planned { border-left-color: var(--green); }
+
+    .idea-category {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--blue);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .idea.status-exploring .idea-category { color: var(--purple); }
+    .idea.status-planned .idea-category { color: var(--green); }
+
+    .idea-title {
+      font-size: 1rem;
+      margin-bottom: 8px;
+      color: var(--text);
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    .idea-description {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .idea-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .idea-has-notes {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--gold);
+    }
+
+    .idea-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      opacity: 0;
+      transition: all 0.2s ease;
+    }
+
+    .idea:hover .idea-actions { opacity: 1; }
+
+    /* Idea Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: var(--bg-card);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 16px;
+      max-width: 700px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalSlide 0.3s ease;
+    }
+
+    @keyframes modalSlide {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      color: var(--gold);
+      font-size: 1.2rem;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .modal-close:hover { background: rgba(255, 255, 255, 0.1); color: var(--text); }
+
+    .modal-body { padding: 24px; }
+
+    .modal-field {
+      margin-bottom: 20px;
+    }
+
+    .modal-field label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .modal-field input,
+    .modal-field select,
+    .modal-field textarea {
+      width: 100%;
+      padding: 12px;
+      background: var(--bg-hover);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+
+    .modal-field textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .modal-field input:focus,
+    .modal-field select:focus,
+    .modal-field textarea:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* Archive View */
+    .archive-toggle {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .archive-toggle button {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .archive-toggle button:hover { border-color: var(--gold); color: var(--gold); }
+
+    .archived-ideas {
+      display: none;
+      margin-top: 20px;
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .archived-ideas.visible { display: block; }
+
+    .archived-ideas h3 {
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      font-size: 1rem;
+    }
+
+    .archived-idea {
+      opacity: 0.6;
+      border-left-color: var(--text-muted) !important;
+    }
+
+    .archived-idea:hover { opacity: 0.8; }
+
+    /* Ideas Category Filter */
+    .idea-category-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
     /* Loading */
     .loading-overlay {
       position: fixed;
@@ -735,6 +1040,19 @@
       </div>
     </div>
 
+    <!-- Main Navigation -->
+    <div class="main-nav">
+      <button class="main-nav-tab active" data-view="tasks" onclick="switchView('tasks')">
+        📋 Tasks <span class="badge" id="tasks-badge">0</span>
+      </button>
+      <button class="main-nav-tab" data-view="ideas" onclick="switchView('ideas')">
+        💡 Ideas <span class="badge" id="ideas-badge">0</span>
+      </button>
+    </div>
+
+    <!-- Tasks View -->
+    <div id="tasks-view" class="view-container active">
+
     <div class="category-tabs">
       <button class="category-tab active" data-category="all" data-tooltip="Show all tasks regardless of category">🏠 All Tasks</button>
       <button class="category-tab" data-category="work" data-tooltip="9-5 job tasks — medical billing, company projects">💼 Work</button>
@@ -826,6 +1144,135 @@
       </div>
     </div>
 
+    </div><!-- End Tasks View -->
+
+    <!-- Ideas View -->
+    <div id="ideas-view" class="view-container">
+      
+      <div class="idea-category-tabs">
+        <button class="category-tab active" data-idea-category="all">💡 All Ideas</button>
+        <button class="category-tab" data-idea-category="app">📱 App</button>
+        <button class="category-tab" data-idea-category="content">🎬 Content</button>
+        <button class="category-tab" data-idea-category="business">💼 Business</button>
+        <button class="category-tab" data-idea-category="feature">⚙️ Feature</button>
+        <button class="category-tab" data-idea-category="other">📌 Other</button>
+      </div>
+
+      <div class="ideas-board">
+        <div class="idea-column new" data-idea-status="new">
+          <div class="column-header">
+            <h2>💡 New Ideas</h2>
+            <span class="count">0</span>
+          </div>
+          <div class="idea-list"></div>
+          <button class="add-task-btn" onclick="openIdeaModal()">+ Capture an idea</button>
+        </div>
+
+        <div class="idea-column exploring" data-idea-status="exploring">
+          <div class="column-header">
+            <h2>🔍 Exploring</h2>
+            <span class="count">0</span>
+          </div>
+          <div class="idea-list"></div>
+        </div>
+
+        <div class="idea-column planned" data-idea-status="planned">
+          <div class="column-header">
+            <h2>📅 Planned</h2>
+            <span class="count">0</span>
+          </div>
+          <div class="idea-list"></div>
+        </div>
+      </div>
+
+      <div class="archive-toggle">
+        <button onclick="toggleArchivedIdeas()">📦 Show Archived Ideas</button>
+      </div>
+
+      <div class="archived-ideas" id="archived-ideas">
+        <h3>📦 Archived Ideas</h3>
+        <div class="archived-idea-list"></div>
+      </div>
+
+      <!-- Ideas Stats -->
+      <div class="stats" style="margin-top: 40px;">
+        <div class="stat-card">
+          <div class="stat-icon">💡</div>
+          <div class="stat-value" id="total-ideas">0</div>
+          <div class="stat-label">Total Ideas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🔍</div>
+          <div class="stat-value" id="exploring-ideas">0</div>
+          <div class="stat-label">Exploring</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📅</div>
+          <div class="stat-value" id="planned-ideas">0</div>
+          <div class="stat-label">Planned</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📦</div>
+          <div class="stat-value" id="archived-ideas-count">0</div>
+          <div class="stat-label">Archived</div>
+        </div>
+      </div>
+
+    </div><!-- End Ideas View -->
+
+    <!-- Idea Modal -->
+    <div class="modal-overlay" id="idea-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 id="idea-modal-title">💡 New Idea</h2>
+          <button class="modal-close" onclick="closeIdeaModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="idea-id">
+          
+          <div class="modal-field">
+            <label>Title</label>
+            <input type="text" id="idea-title-input" placeholder="What's the idea?">
+          </div>
+          
+          <div class="modal-field">
+            <label>Description</label>
+            <textarea id="idea-description-input" placeholder="Brief description..."></textarea>
+          </div>
+          
+          <div class="modal-field" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div>
+              <label>Category</label>
+              <select id="idea-category-input">
+                <option value="app">📱 App</option>
+                <option value="content">🎬 Content</option>
+                <option value="business">💼 Business</option>
+                <option value="feature">⚙️ Feature</option>
+                <option value="other">📌 Other</option>
+              </select>
+            </div>
+            <div>
+              <label>Priority</label>
+              <select id="idea-priority-input">
+                <option value="low">🟢 Low</option>
+                <option value="medium" selected>🟡 Medium</option>
+                <option value="high">🔴 High</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="modal-field">
+            <label>Notes / Documentation</label>
+            <textarea id="idea-notes-input" placeholder="Add detailed notes, research, links, etc..." style="min-height: 200px;"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeIdeaModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveIdea()">Save Idea</button>
+        </div>
+      </div>
+    </div>
+
     <footer>
       <p>Crafted with reluctant excellence by <a href="#">Geoffrey</a> 🎩</p>
       <p style="margin-top: 5px; font-size: 0.8rem;">"One does not simply abandon a task list."</p>
@@ -875,7 +1322,12 @@
       async updateTask(id, updates) { return this.fetch(`tasks?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(updates) }); },
       async deleteTask(id) { return this.fetch(`tasks?id=eq.${id}`, { method: 'DELETE' }); },
       async getSettings(key) { const r = await this.fetch(`settings?key=eq.${key}`); return r?.[0]?.value; },
-      async updateSettings(key, value) { return this.fetch(`settings?key=eq.${key}`, { method: 'PATCH', body: JSON.stringify({ value, updated_at: new Date().toISOString() }) }); }
+      async updateSettings(key, value) { return this.fetch(`settings?key=eq.${key}`, { method: 'PATCH', body: JSON.stringify({ value, updated_at: new Date().toISOString() }) }); },
+      // Ideas
+      async getIdeas() { return this.fetch(`ideas?order=created_at.desc`); },
+      async createIdea(idea) { return this.fetch(`ideas`, { method: 'POST', body: JSON.stringify(idea) }); },
+      async updateIdea(id, updates) { return this.fetch(`ideas?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(updates) }); },
+      async deleteIdea(id) { return this.fetch(`ideas?id=eq.${id}`, { method: 'DELETE' }); }
     };
 
     // ===== QUOTES =====
@@ -907,19 +1359,26 @@
 
     // ===== STATE =====
     let tasks = [];
+    let ideas = [];
     let streak = 0;
     let lastCompletionDate = null;
     let currentFilter = 'all';
+    let currentIdeaFilter = 'all';
+    let currentView = 'tasks';
     let draggedTask = null;
+    let draggedIdea = null;
     let isOnline = true;
     let selectedTasks = new Set();
+    let editingIdeaId = null;
 
     // ===== INIT =====
     async function init() {
       document.getElementById('quote-text').textContent = geoffreyQuotes[Math.floor(Math.random() * geoffreyQuotes.length)];
       setupDragAndDrop();
+      setupIdeasDragAndDrop();
       setupKeyboardShortcuts();
       setupCategoryTabs();
+      setupIdeaCategoryTabs();
       
       try {
         await loadData();
@@ -928,10 +1387,12 @@
         console.error('Supabase error:', error);
         setConnectionStatus('disconnected');
         loadFromLocalStorage();
+        loadIdeasFromLocalStorage();
         showToast('⚠️', 'Offline Mode', 'Using local data. Changes won\'t sync.');
       }
       
       document.getElementById('loading').classList.add('hidden');
+      updateNavBadges();
     }
 
     function setConnectionStatus(status) {
@@ -948,6 +1409,17 @@
       if (streakData) { streak = streakData.current || 0; lastCompletionDate = streakData.last_completion_date; }
       renderTasks();
       saveToLocalStorage();
+      
+      // Load ideas (may fail if table doesn't exist yet)
+      try {
+        ideas = await supabase.getIdeas() || [];
+        renderIdeas();
+        saveIdeasToLocalStorage();
+      } catch (e) {
+        console.warn('Ideas table may not exist yet:', e);
+        loadIdeasFromLocalStorage();
+        renderIdeas();
+      }
     }
 
     function loadFromLocalStorage() {
@@ -1291,14 +1763,315 @@
       document.addEventListener('keydown', e => {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         if (e.key === 'n' || e.key === 'N') {
-          const btn = document.querySelector('.column.todo .add-task-btn');
-          if (!document.querySelector('.column.todo .add-task-form').classList.contains('active')) toggleForm(btn);
+          if (currentView === 'tasks') {
+            const btn = document.querySelector('.column.todo .add-task-btn');
+            if (!document.querySelector('.column.todo .add-task-form').classList.contains('active')) toggleForm(btn);
+          } else {
+            openIdeaModal();
+          }
         }
         if (e.key === 'r' || e.key === 'R') loadData().catch(() => loadFromLocalStorage());
+        if (e.key === 'Escape') closeIdeaModal();
       });
       document.querySelectorAll('.task-input').forEach(input => {
         input.addEventListener('keydown', e => {
           if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addTask(input.closest('.add-task-form').querySelector('.btn-primary')); }
+        });
+      });
+    }
+
+    // ===== VIEW SWITCHING =====
+    function switchView(view) {
+      currentView = view;
+      document.querySelectorAll('.main-nav-tab').forEach(t => t.classList.toggle('active', t.dataset.view === view));
+      document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+      document.getElementById(`${view}-view`).classList.add('active');
+    }
+
+    // ===== IDEAS FUNCTIONS =====
+    const ideaCategoryEmojis = { app: '📱', content: '🎬', business: '💼', feature: '⚙️', other: '📌' };
+
+    function getFilteredIdeas() {
+      const nonArchived = ideas.filter(i => i.status !== 'archived');
+      return currentIdeaFilter === 'all' ? nonArchived : nonArchived.filter(i => i.category === currentIdeaFilter);
+    }
+
+    function getArchivedIdeas() {
+      return ideas.filter(i => i.status === 'archived');
+    }
+
+    function createIdeaElement(idea) {
+      const div = document.createElement('div');
+      div.className = `idea status-${idea.status}` + (idea.status === 'archived' ? ' archived-idea' : '');
+      div.dataset.id = idea.id;
+      div.draggable = true;
+
+      const hasNotes = idea.notes && idea.notes.trim().length > 0;
+      const notesIndicator = hasNotes ? `<span class="idea-has-notes">📝 Has notes</span>` : '';
+
+      div.innerHTML = `
+        <div class="idea-category">${ideaCategoryEmojis[idea.category] || '📌'} ${idea.category}</div>
+        <div class="idea-title">${escapeHtml(idea.title)}</div>
+        ${idea.description ? `<div class="idea-description">${escapeHtml(idea.description)}</div>` : ''}
+        <div class="idea-meta">
+          ${notesIndicator}
+          <span class="task-priority priority-${idea.priority}">${idea.priority}</span>
+        </div>
+        <div class="idea-actions">
+          <button onclick="openIdeaModal('${idea.id}')">✏️ Edit</button>
+          <button onclick="moveIdea('${idea.id}', 'prev')">◀️</button>
+          <button onclick="moveIdea('${idea.id}', 'next')">▶️</button>
+          ${idea.status !== 'archived' ? `<button onclick="archiveIdea('${idea.id}')">📦</button>` : `<button onclick="restoreIdea('${idea.id}')">♻️</button>`}
+          <button class="delete" onclick="deleteIdea('${idea.id}')">🗑️</button>
+        </div>
+      `;
+
+      div.addEventListener('click', e => {
+        if (!e.target.closest('.idea-actions')) openIdeaModal(idea.id);
+      });
+
+      div.addEventListener('dragstart', e => { draggedIdea = e.target; e.target.classList.add('dragging'); });
+      div.addEventListener('dragend', e => { e.target.classList.remove('dragging'); document.querySelectorAll('.idea-column').forEach(c => c.classList.remove('drag-over')); draggedIdea = null; });
+
+      return div;
+    }
+
+    function renderIdeas() {
+      const filtered = getFilteredIdeas();
+      
+      document.querySelectorAll('.idea-column').forEach(col => {
+        const status = col.dataset.ideaStatus;
+        const list = col.querySelector('.idea-list');
+        const statusIdeas = filtered.filter(i => i.status === status);
+        
+        col.querySelector('.count').textContent = statusIdeas.length;
+        list.innerHTML = statusIdeas.length === 0 
+          ? `<div class="empty-state"><div class="icon">💭</div><p>No ideas here yet</p></div>`
+          : '';
+        statusIdeas.forEach(i => list.appendChild(createIdeaElement(i)));
+      });
+
+      // Render archived
+      const archived = getArchivedIdeas();
+      const archivedList = document.querySelector('.archived-idea-list');
+      archivedList.innerHTML = archived.length === 0 
+        ? `<div class="empty-state"><p>No archived ideas</p></div>`
+        : '';
+      archived.forEach(i => archivedList.appendChild(createIdeaElement(i)));
+
+      updateIdeasStats();
+      updateNavBadges();
+    }
+
+    function updateIdeasStats() {
+      const active = ideas.filter(i => i.status !== 'archived');
+      document.getElementById('total-ideas').textContent = active.length;
+      document.getElementById('exploring-ideas').textContent = ideas.filter(i => i.status === 'exploring').length;
+      document.getElementById('planned-ideas').textContent = ideas.filter(i => i.status === 'planned').length;
+      document.getElementById('archived-ideas-count').textContent = ideas.filter(i => i.status === 'archived').length;
+    }
+
+    function updateNavBadges() {
+      document.getElementById('tasks-badge').textContent = tasks.filter(t => t.status !== 'done').length;
+      document.getElementById('ideas-badge').textContent = ideas.filter(i => i.status !== 'archived').length;
+    }
+
+    function openIdeaModal(id = null) {
+      editingIdeaId = id;
+      const modal = document.getElementById('idea-modal');
+      const title = document.getElementById('idea-modal-title');
+      
+      if (id) {
+        const idea = ideas.find(i => i.id === id);
+        if (!idea) return;
+        title.textContent = '✏️ Edit Idea';
+        document.getElementById('idea-id').value = id;
+        document.getElementById('idea-title-input').value = idea.title || '';
+        document.getElementById('idea-description-input').value = idea.description || '';
+        document.getElementById('idea-category-input').value = idea.category || 'app';
+        document.getElementById('idea-priority-input').value = idea.priority || 'medium';
+        document.getElementById('idea-notes-input').value = idea.notes || '';
+      } else {
+        title.textContent = '💡 New Idea';
+        document.getElementById('idea-id').value = '';
+        document.getElementById('idea-title-input').value = '';
+        document.getElementById('idea-description-input').value = '';
+        document.getElementById('idea-category-input').value = 'app';
+        document.getElementById('idea-priority-input').value = 'medium';
+        document.getElementById('idea-notes-input').value = '';
+      }
+      
+      modal.classList.add('active');
+      document.getElementById('idea-title-input').focus();
+    }
+
+    function closeIdeaModal() {
+      document.getElementById('idea-modal').classList.remove('active');
+      editingIdeaId = null;
+    }
+
+    async function saveIdea() {
+      const id = document.getElementById('idea-id').value;
+      const ideaData = {
+        title: document.getElementById('idea-title-input').value.trim(),
+        description: document.getElementById('idea-description-input').value.trim(),
+        category: document.getElementById('idea-category-input').value,
+        priority: document.getElementById('idea-priority-input').value,
+        notes: document.getElementById('idea-notes-input').value.trim()
+      };
+
+      if (!ideaData.title) {
+        showToast('⚠️', 'Missing Title', 'Every idea needs at least a title, sir.');
+        return;
+      }
+
+      try {
+        if (id) {
+          // Update existing
+          if (isOnline) await supabase.updateIdea(id, ideaData);
+          const idx = ideas.findIndex(i => i.id === id);
+          if (idx !== -1) ideas[idx] = { ...ideas[idx], ...ideaData };
+          showToast('✏️', 'Idea Updated', 'Your idea has been refined.');
+        } else {
+          // Create new
+          ideaData.status = 'new';
+          ideaData.source = 'web';
+          if (isOnline) {
+            const [created] = await supabase.createIdea(ideaData);
+            ideas.unshift(created);
+          } else {
+            ideaData.id = 'local-' + Date.now();
+            ideaData.created_at = new Date().toISOString();
+            ideas.unshift(ideaData);
+          }
+          showToast('💡', 'Idea Captured', 'Another spark of brilliance preserved.');
+        }
+        
+        saveIdeasToLocalStorage();
+        renderIdeas();
+        closeIdeaModal();
+      } catch (e) {
+        console.error(e);
+        showToast('❌', 'Error', 'Failed to save idea.');
+      }
+    }
+
+    async function moveIdea(id, dir) {
+      const idea = ideas.find(i => i.id === id);
+      if (!idea) return;
+      
+      const statuses = ['new', 'exploring', 'planned'];
+      const idx = statuses.indexOf(idea.status);
+      let newStatus;
+      
+      if (dir === 'next' && idx < 2) newStatus = statuses[idx + 1];
+      else if (dir === 'prev' && idx > 0) newStatus = statuses[idx - 1];
+      else return;
+
+      try {
+        if (isOnline && !idea.id.startsWith('local-')) await supabase.updateIdea(id, { status: newStatus });
+        idea.status = newStatus;
+        saveIdeasToLocalStorage();
+        renderIdeas();
+        showToast('➡️', 'Idea Moved', `Moved to ${newStatus}.`);
+      } catch (e) {
+        showToast('❌', 'Error', 'Failed to move idea.');
+      }
+    }
+
+    async function archiveIdea(id) {
+      const idea = ideas.find(i => i.id === id);
+      if (!idea) return;
+      
+      try {
+        const updates = { status: 'archived', archived_at: new Date().toISOString() };
+        if (isOnline && !idea.id.startsWith('local-')) await supabase.updateIdea(id, updates);
+        idea.status = 'archived';
+        idea.archived_at = updates.archived_at;
+        saveIdeasToLocalStorage();
+        renderIdeas();
+        showToast('📦', 'Idea Archived', 'Safely stored for later consideration.');
+      } catch (e) {
+        showToast('❌', 'Error', 'Failed to archive idea.');
+      }
+    }
+
+    async function restoreIdea(id) {
+      const idea = ideas.find(i => i.id === id);
+      if (!idea) return;
+      
+      try {
+        if (isOnline && !idea.id.startsWith('local-')) await supabase.updateIdea(id, { status: 'new', archived_at: null });
+        idea.status = 'new';
+        idea.archived_at = null;
+        saveIdeasToLocalStorage();
+        renderIdeas();
+        showToast('♻️', 'Idea Restored', 'Back in the pipeline.');
+      } catch (e) {
+        showToast('❌', 'Error', 'Failed to restore idea.');
+      }
+    }
+
+    async function deleteIdea(id) {
+      if (!confirm('Permanently delete this idea?')) return;
+      
+      try {
+        if (isOnline && !id.startsWith('local-')) await supabase.deleteIdea(id);
+        ideas = ideas.filter(i => i.id !== id);
+        saveIdeasToLocalStorage();
+        renderIdeas();
+        showToast('🗑️', 'Idea Deleted', 'Gone forever.');
+      } catch (e) {
+        showToast('❌', 'Error', 'Failed to delete idea.');
+      }
+    }
+
+    function toggleArchivedIdeas() {
+      const el = document.getElementById('archived-ideas');
+      el.classList.toggle('visible');
+    }
+
+    function saveIdeasToLocalStorage() {
+      localStorage.setItem('geoffrey-ideas', JSON.stringify(ideas));
+    }
+
+    function loadIdeasFromLocalStorage() {
+      ideas = JSON.parse(localStorage.getItem('geoffrey-ideas') || '[]');
+    }
+
+    // Setup Ideas drag and drop
+    function setupIdeasDragAndDrop() {
+      document.querySelectorAll('.idea-column').forEach(col => {
+        col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('drag-over'); });
+        col.addEventListener('dragleave', e => { if (!col.contains(e.relatedTarget)) col.classList.remove('drag-over'); });
+        col.addEventListener('drop', async e => {
+          e.preventDefault();
+          col.classList.remove('drag-over');
+          if (draggedIdea) {
+            const idea = ideas.find(i => i.id === draggedIdea.dataset.id);
+            if (idea && idea.status !== col.dataset.ideaStatus) {
+              try {
+                if (isOnline && !idea.id.startsWith('local-')) await supabase.updateIdea(idea.id, { status: col.dataset.ideaStatus });
+                idea.status = col.dataset.ideaStatus;
+                saveIdeasToLocalStorage();
+                renderIdeas();
+              } catch (e) {
+                showToast('❌', 'Error', 'Failed to move idea.');
+              }
+            }
+          }
+        });
+      });
+    }
+
+    // Setup Ideas category tabs
+    function setupIdeaCategoryTabs() {
+      document.querySelectorAll('.idea-category-tabs .category-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.idea-category-tabs .category-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          currentIdeaFilter = tab.dataset.ideaCategory;
+          renderIdeas();
         });
       });
     }
