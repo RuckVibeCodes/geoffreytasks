@@ -525,6 +525,91 @@
 
     .shortcut-hint kbd { background: var(--bg-hover); padding: 3px 8px; border-radius: 4px; font-family: monospace; }
 
+    /* Custom Tooltips */
+    [data-tooltip] {
+      position: relative;
+      cursor: help;
+    }
+
+    [data-tooltip]::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-card);
+      border: 1px solid var(--gold);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: normal;
+      text-transform: none;
+      letter-spacing: normal;
+      white-space: nowrap;
+      max-width: 280px;
+      white-space: normal;
+      text-align: center;
+      line-height: 1.4;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+    }
+
+    [data-tooltip]::before {
+      content: '';
+      position: absolute;
+      bottom: calc(100% + 4px);
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: var(--gold);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+      z-index: 1001;
+    }
+
+    [data-tooltip]:hover::after,
+    [data-tooltip]:hover::before {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Tooltip position variants */
+    [data-tooltip-pos="bottom"]::after {
+      bottom: auto;
+      top: calc(100% + 10px);
+    }
+
+    [data-tooltip-pos="bottom"]::before {
+      bottom: auto;
+      top: calc(100% + 4px);
+      border-top-color: transparent;
+      border-bottom-color: var(--gold);
+    }
+
+    [data-tooltip-pos="left"]::after {
+      bottom: auto;
+      top: 50%;
+      left: auto;
+      right: calc(100% + 10px);
+      transform: translateY(-50%);
+    }
+
+    [data-tooltip-pos="left"]::before {
+      bottom: auto;
+      top: 50%;
+      left: auto;
+      right: calc(100% + 4px);
+      transform: translateY(-50%);
+      border-top-color: transparent;
+      border-left-color: var(--gold);
+    }
+
     @media (max-width: 768px) {
       .shortcut-hint { display: none; }
       h1 { font-size: 2rem; }
@@ -538,7 +623,7 @@
     <p class="loading-text">Geoffrey is preparing the board...</p>
   </div>
 
-  <div class="connection-status disconnected" id="connection-status">
+  <div class="connection-status disconnected" id="connection-status" data-tooltip="Shows sync status with Supabase cloud database. Green = synced, Orange = syncing, Red = offline (using local storage)" data-tooltip-pos="bottom">
     <span class="status-dot"></span>
     <span class="status-text">Offline</span>
   </div>
@@ -552,7 +637,7 @@
       <p class="subtitle">Maintaining order in the chaos, one task at a time</p>
     </header>
 
-    <div class="geoffrey-says">
+    <div class="geoffrey-says" data-tooltip="Geoffrey's daily wisdom — refreshes each time you load the page" data-tooltip-pos="bottom">
       <div class="geoffrey-avatar">🧐</div>
       <div class="geoffrey-quote">
         <span id="quote-text">Loading wisdom...</span>
@@ -561,21 +646,21 @@
     </div>
 
     <div class="category-tabs">
-      <button class="category-tab active" data-category="all">🏠 All Tasks</button>
-      <button class="category-tab" data-category="work">💼 Work</button>
-      <button class="category-tab" data-category="hustle">🚀 Side Hustle</button>
-      <button class="category-tab" data-category="personal">🧘 Personal</button>
-      <button class="category-tab" data-category="urgent">🔥 Urgent</button>
+      <button class="category-tab active" data-category="all" data-tooltip="Show all tasks regardless of category">🏠 All Tasks</button>
+      <button class="category-tab" data-category="work" data-tooltip="9-5 job tasks — medical billing, company projects">💼 Work</button>
+      <button class="category-tab" data-category="hustle" data-tooltip="Side projects — apps, content, revenue streams">🚀 Side Hustle</button>
+      <button class="category-tab" data-category="personal" data-tooltip="Life stuff — gym, errands, self-care">🧘 Personal</button>
+      <button class="category-tab" data-category="urgent" data-tooltip="Drop everything — needs immediate attention">🔥 Urgent</button>
     </div>
 
     <div class="board">
       <div class="column todo" data-status="todo">
-        <div class="column-header">
+        <div class="column-header" data-tooltip="Tasks waiting to be started. Drag to In Progress when you begin work.">
           <h2>📋 Awaiting Action</h2>
-          <span class="count">0</span>
+          <span class="count" data-tooltip="Number of pending tasks" data-tooltip-pos="left">0</span>
         </div>
         <div class="task-list"></div>
-        <button class="add-task-btn" onclick="toggleForm(this)">+ Add a task, sir</button>
+        <button class="add-task-btn" onclick="toggleForm(this)" data-tooltip="Click to add a new task, or press 'N' on your keyboard">+ Add a task, sir</button>
         <div class="add-task-form">
           <textarea class="task-input" placeholder="What requires attention, Master Matt?"></textarea>
           <div class="form-row">
@@ -603,39 +688,39 @@
       </div>
 
       <div class="column in-progress" data-status="in-progress">
-        <div class="column-header">
+        <div class="column-header" data-tooltip="Tasks currently being worked on. Geoffrey auto-moves tasks here when he starts working.">
           <h2>⚡ In Progress</h2>
-          <span class="count">0</span>
+          <span class="count" data-tooltip="Active tasks" data-tooltip-pos="left">0</span>
         </div>
         <div class="task-list"></div>
       </div>
 
       <div class="column done" data-status="done">
-        <div class="column-header">
+        <div class="column-header" data-tooltip="Completed tasks. Drag here or use arrow buttons to mark done. Triggers confetti! 🎉">
           <h2>✨ Accomplished</h2>
-          <span class="count">0</span>
+          <span class="count" data-tooltip="Completed tasks" data-tooltip-pos="left">0</span>
         </div>
         <div class="task-list"></div>
       </div>
     </div>
 
     <div class="stats">
-      <div class="stat-card">
+      <div class="stat-card" data-tooltip="All tasks ever created (todo + in-progress + done)">
         <div class="stat-icon">📊</div>
         <div class="stat-value" id="total-tasks">0</div>
         <div class="stat-label">Total Tasks</div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" data-tooltip="Tasks you've crushed. The number that actually matters.">
         <div class="stat-icon">🏆</div>
         <div class="stat-value" id="completed-tasks">0</div>
         <div class="stat-label">Completed</div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" data-tooltip="Completed ÷ Total × 100. Aim for progress, not perfection.">
         <div class="stat-icon">📈</div>
         <div class="stat-value" id="completion-rate">0%</div>
         <div class="stat-label">Success Rate</div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" data-tooltip="Consecutive days completing at least one task. Don't break the chain!">
         <div class="stat-icon">🔥</div>
         <div class="stat-value" id="streak">0</div>
         <div class="stat-label">Day Streak</div>
@@ -656,8 +741,8 @@
     </div>
   </div>
 
-  <div class="shortcut-hint">
-    <kbd>N</kbd> New task &nbsp;|&nbsp; <kbd>R</kbd> Refresh
+  <div class="shortcut-hint" data-tooltip="Keyboard shortcuts work when not typing in a field">
+    <kbd>N</kbd> New task &nbsp;|&nbsp; <kbd>R</kbd> Refresh &nbsp;|&nbsp; <kbd>?</kbd> Help
   </div>
 
   <script>
