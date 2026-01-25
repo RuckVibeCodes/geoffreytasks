@@ -490,6 +490,96 @@
     .empty-state .icon { font-size: 3rem; margin-bottom: 15px; opacity: 0.5; }
     .empty-state p { font-style: italic; }
 
+    /* Bulk Actions */
+    .bulk-actions {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.05));
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 12px;
+      margin-bottom: 15px;
+      animation: slideDown 0.3s ease;
+    }
+
+    .bulk-actions.active { display: flex; }
+
+    .bulk-actions .selected-count {
+      font-size: 0.85rem;
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    .bulk-actions .bulk-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--bg-hover);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+    }
+
+    .bulk-actions .bulk-btn:hover {
+      background: rgba(212, 175, 55, 0.2);
+      border-color: var(--gold);
+    }
+
+    .bulk-actions .bulk-btn.danger:hover {
+      background: rgba(248, 81, 73, 0.2);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .bulk-actions .select-all-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    /* Task checkbox */
+    .task-checkbox {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: var(--gold);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .task:hover .task-checkbox,
+    .task-checkbox:checked { opacity: 1; }
+
+    .task.selected {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.3);
+    }
+
+    .clear-completed-btn {
+      width: 100%;
+      padding: 10px;
+      background: rgba(248, 81, 73, 0.1);
+      border: 1px dashed rgba(248, 81, 73, 0.3);
+      border-radius: 8px;
+      color: var(--red);
+      cursor: pointer;
+      font-size: 0.85rem;
+      margin-top: 12px;
+      transition: all 0.3s;
+      display: none;
+    }
+
+    .clear-completed-btn.visible { display: block; }
+    .clear-completed-btn:hover { background: rgba(248, 81, 73, 0.2); border-color: var(--red); }
+
     /* Loading */
     .loading-overlay {
       position: fixed;
@@ -700,7 +790,16 @@
           <h2>✨ Accomplished</h2>
           <span class="count" data-tooltip="Completed tasks" data-tooltip-pos="left">0</span>
         </div>
+        <div class="bulk-actions" id="bulk-actions">
+          <label class="select-all-label">
+            <input type="checkbox" id="select-all-done" onchange="toggleSelectAll(this.checked)">
+            Select All
+          </label>
+          <span class="selected-count"><span id="selected-count">0</span> selected</span>
+          <button class="bulk-btn danger" onclick="bulkDeleteSelected()">🗑️ Delete Selected</button>
+        </div>
         <div class="task-list"></div>
+        <button class="clear-completed-btn" id="clear-completed" onclick="clearAllCompleted()">🧹 Clear All Completed Tasks</button>
       </div>
     </div>
 
@@ -813,6 +912,7 @@
     let currentFilter = 'all';
     let draggedTask = null;
     let isOnline = true;
+    let selectedTasks = new Set();
 
     // ===== INIT =====
     async function init() {
@@ -898,15 +998,17 @@
 
     function createTaskElement(task) {
       const div = document.createElement('div');
-      div.className = 'task' + (task.status === 'done' ? ' completed' : '');
+      div.className = 'task' + (task.status === 'done' ? ' completed' : '') + (selectedTasks.has(task.id) ? ' selected' : '');
       div.draggable = true;
       div.dataset.id = task.id;
       
       const dueInfo = formatDueDate(task.due_date);
       const dueHtml = dueInfo ? `<span class="task-due ${dueInfo.className}">📅 ${dueInfo.text}</span>` : '';
       const srcIcon = { telegram: '💬', api: '🔌' }[task.source] || '🌐';
+      const checkboxHtml = task.status === 'done' ? `<input type="checkbox" class="task-checkbox" ${selectedTasks.has(task.id) ? 'checked' : ''} onclick="toggleTaskSelection('${task.id}', this.checked)" title="Select for bulk action">` : '';
 
       div.innerHTML = `
+        ${checkboxHtml}
         <div class="task-category">${getCategoryEmoji(task.category)} ${task.category}</div>
         <div class="task-title">${escapeHtml(task.title)}</div>
         <div class="task-meta">
@@ -939,6 +1041,95 @@
         statusTasks.forEach(t => list.appendChild(createTaskElement(t)));
       });
       updateCounts();
+      updateBulkActionsUI();
+    }
+
+    // ===== BULK ACTIONS =====
+    function toggleTaskSelection(id, isSelected) {
+      if (isSelected) {
+        selectedTasks.add(id);
+      } else {
+        selectedTasks.delete(id);
+      }
+      updateBulkActionsUI();
+      // Update visual state without full re-render
+      const taskEl = document.querySelector(`.task[data-id="${id}"]`);
+      if (taskEl) taskEl.classList.toggle('selected', isSelected);
+    }
+
+    function toggleSelectAll(isSelected) {
+      const doneTasks = getFilteredTasks().filter(t => t.status === 'done');
+      if (isSelected) {
+        doneTasks.forEach(t => selectedTasks.add(t.id));
+      } else {
+        doneTasks.forEach(t => selectedTasks.delete(t.id));
+      }
+      renderTasks();
+    }
+
+    function updateBulkActionsUI() {
+      const doneTasks = getFilteredTasks().filter(t => t.status === 'done');
+      const bulkActions = document.getElementById('bulk-actions');
+      const clearBtn = document.getElementById('clear-completed');
+      const selectAllCheckbox = document.getElementById('select-all-done');
+      const selectedCountEl = document.getElementById('selected-count');
+      
+      // Filter selectedTasks to only include done tasks
+      const validSelected = [...selectedTasks].filter(id => doneTasks.some(t => t.id === id));
+      selectedTasks = new Set(validSelected);
+      
+      // Update UI
+      selectedCountEl.textContent = selectedTasks.size;
+      bulkActions.classList.toggle('active', selectedTasks.size > 0);
+      clearBtn.classList.toggle('visible', doneTasks.length > 0);
+      
+      // Update select all checkbox state
+      if (selectAllCheckbox) {
+        selectAllCheckbox.checked = doneTasks.length > 0 && selectedTasks.size === doneTasks.length;
+        selectAllCheckbox.indeterminate = selectedTasks.size > 0 && selectedTasks.size < doneTasks.length;
+      }
+    }
+
+    async function bulkDeleteSelected() {
+      if (selectedTasks.size === 0) return;
+      const count = selectedTasks.size;
+      if (!confirm(`Delete ${count} completed task${count > 1 ? 's' : ''}? This cannot be undone.`)) return;
+      
+      try {
+        const idsToDelete = [...selectedTasks];
+        for (const id of idsToDelete) {
+          if (isOnline && !id.startsWith('local-')) await supabase.deleteTask(id);
+        }
+        tasks = tasks.filter(t => !selectedTasks.has(t.id));
+        selectedTasks.clear();
+        saveToLocalStorage();
+        renderTasks();
+        showToast('🗑️', 'Tasks Deleted', `${count} task${count > 1 ? 's' : ''} removed. The clutter has been addressed.`);
+      } catch (e) {
+        console.error(e);
+        showToast('❌', 'Error', 'Failed to delete some tasks.');
+      }
+    }
+
+    async function clearAllCompleted() {
+      const doneTasks = getFilteredTasks().filter(t => t.status === 'done');
+      if (doneTasks.length === 0) return;
+      if (!confirm(`Clear all ${doneTasks.length} completed task${doneTasks.length > 1 ? 's' : ''}? This cannot be undone.`)) return;
+      
+      try {
+        for (const task of doneTasks) {
+          if (isOnline && !task.id.startsWith('local-')) await supabase.deleteTask(task.id);
+        }
+        const doneIds = new Set(doneTasks.map(t => t.id));
+        tasks = tasks.filter(t => !doneIds.has(t.id));
+        selectedTasks.clear();
+        saveToLocalStorage();
+        renderTasks();
+        showToast('🧹', 'All Cleared', `${doneTasks.length} completed task${doneTasks.length > 1 ? 's' : ''} swept away. A fresh slate, sir.`);
+      } catch (e) {
+        console.error(e);
+        showToast('❌', 'Error', 'Failed to clear completed tasks.');
+      }
     }
 
     // ===== TASK OPS =====
