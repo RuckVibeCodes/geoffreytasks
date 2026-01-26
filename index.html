@@ -1010,6 +1010,437 @@
       h1 { font-size: 2rem; }
       .logo { font-size: 3rem; }
     }
+
+    /* ===== NOTES VIEW ===== */
+    .notes-filters {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .notes-list {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .note-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      border-left: 4px solid var(--gold);
+      transition: all 0.2s ease;
+    }
+
+    .note-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .note-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      gap: 10px;
+    }
+
+    .note-title {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .note-badges {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+
+    .badge-pill {
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-project {
+      background: rgba(88, 166, 255, 0.2);
+      color: var(--blue);
+    }
+
+    .badge-project.project-klass { background: rgba(163, 113, 247, 0.2); color: var(--purple); }
+    .badge-project.project-touchgrass { background: rgba(63, 185, 80, 0.2); color: var(--green); }
+    .badge-project.project-timeslot { background: rgba(210, 153, 34, 0.2); color: var(--orange); }
+    .badge-project.project-general { background: rgba(139, 148, 158, 0.2); color: var(--text-muted); }
+
+    .badge-type {
+      background: rgba(212, 175, 55, 0.15);
+      color: var(--gold);
+    }
+
+    .note-content-preview {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .note-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .note-actions {
+      display: flex;
+      gap: 6px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .note-card:hover .note-actions { opacity: 1; }
+
+    .note-actions button {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: all 0.2s;
+    }
+
+    .note-actions button:hover {
+      background: rgba(212, 175, 55, 0.2);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .note-actions button.delete:hover {
+      background: rgba(248, 81, 73, 0.2);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .add-note-form {
+      max-width: 900px;
+      margin: 0 auto 20px;
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      display: none;
+      animation: slideDown 0.3s ease;
+    }
+
+    .add-note-form.active { display: block; }
+
+    .add-note-btn {
+      max-width: 900px;
+      margin: 0 auto 20px;
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 2px dashed rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.95rem;
+    }
+
+    .add-note-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(212, 175, 55, 0.05);
+    }
+
+    /* ===== PIPELINE VIEW ===== */
+    .pipeline-board {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 1200px) { .pipeline-board { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) { .pipeline-board { grid-template-columns: 1fr; } }
+
+    .pipeline-column {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.3s;
+    }
+
+    .pipeline-column.drag-over {
+      border-color: var(--gold);
+      box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+    }
+
+    .pipeline-column.status-idea .column-header { border-color: var(--blue); }
+    .pipeline-column.status-idea .column-header h2 { color: var(--blue); }
+    .pipeline-column.status-draft .column-header { border-color: var(--orange); }
+    .pipeline-column.status-draft .column-header h2 { color: var(--orange); }
+    .pipeline-column.status-ready .column-header { border-color: var(--purple); }
+    .pipeline-column.status-ready .column-header h2 { color: var(--purple); }
+    .pipeline-column.status-published .column-header { border-color: var(--green); }
+    .pipeline-column.status-published .column-header h2 { color: var(--green); }
+
+    .pipeline-card {
+      background: var(--bg-hover);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      cursor: grab;
+      transition: all 0.2s ease;
+      border-left: 4px solid var(--gold);
+      position: relative;
+    }
+
+    .pipeline-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .pipeline-card.dragging { opacity: 0.5; transform: rotate(3deg); cursor: grabbing; }
+
+    .pipeline-card-type {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--blue);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .pipeline-card-title {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .pipeline-card-meta {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .pipeline-card-platform {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      background: rgba(212, 175, 55, 0.15);
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    .pipeline-card-project {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      background: rgba(88, 166, 255, 0.15);
+      color: var(--blue);
+      font-weight: 500;
+    }
+
+    .pipeline-card-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .pipeline-card:hover .pipeline-card-actions { opacity: 1; }
+
+    .pipeline-card-actions button {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: all 0.2s;
+    }
+
+    .pipeline-card-actions button:hover {
+      background: rgba(212, 175, 55, 0.2);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .pipeline-card-actions button.delete:hover {
+      background: rgba(248, 81, 73, 0.2);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .pipeline-list {
+      min-height: 100px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .pipeline-list::-webkit-scrollbar { width: 6px; }
+    .pipeline-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 3px; }
+
+    .add-pipeline-form {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 15px;
+      display: none;
+      animation: slideDown 0.3s ease;
+    }
+
+    .add-pipeline-form.active { display: block; }
+
+    /* ===== TODAY VIEW ===== */
+    .today-view {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .today-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .today-date {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: var(--gold);
+      margin-bottom: 5px;
+    }
+
+    .today-subtitle {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .today-summary {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+
+    @media (max-width: 768px) { .today-summary { grid-template-columns: repeat(2, 1fr); } }
+
+    .today-stat {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.3s;
+    }
+
+    .today-stat:hover {
+      transform: translateY(-3px);
+      border-color: rgba(212, 175, 55, 0.3);
+    }
+
+    .today-stat-value {
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--gold);
+      font-family: 'Playfair Display', serif;
+    }
+
+    .today-stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+
+    .today-section {
+      margin-bottom: 24px;
+    }
+
+    .today-section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .today-section-header h3 {
+      font-size: 1rem;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .today-section-header .section-count {
+      background: rgba(212, 175, 55, 0.2);
+      color: var(--gold);
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .today-item {
+      background: var(--bg-card);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-left: 3px solid var(--gold);
+      transition: all 0.2s;
+    }
+
+    .today-item:hover {
+      transform: translateX(4px);
+    }
+
+    .today-item-icon { font-size: 1.2rem; flex-shrink: 0; }
+    .today-item-title { flex: 1; font-size: 0.9rem; color: var(--text); }
+    .today-item-badge {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+    .today-item-time { font-size: 0.75rem; color: var(--text-muted); flex-shrink: 0; }
+
+    .today-empty {
+      text-align: center;
+      padding: 30px 20px;
+      color: var(--text-muted);
+      font-style: italic;
+      font-size: 0.9rem;
+    }
+
+    .today-empty .icon { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.5; }
   </style>
 </head>
 <body>
@@ -1047,6 +1478,15 @@
       </button>
       <button class="main-nav-tab" data-view="ideas" onclick="switchView('ideas')">
         💡 Ideas <span class="badge" id="ideas-badge">0</span>
+      </button>
+      <button class="main-nav-tab" data-view="notes" onclick="switchView('notes')">
+        📝 Notes <span class="badge" id="notes-badge">0</span>
+      </button>
+      <button class="main-nav-tab" data-view="pipeline" onclick="switchView('pipeline')">
+        📤 Pipeline <span class="badge" id="pipeline-badge">0</span>
+      </button>
+      <button class="main-nav-tab" data-view="today" onclick="switchView('today')">
+        📅 Today
       </button>
     </div>
 
@@ -1220,6 +1660,217 @@
 
     </div><!-- End Ideas View -->
 
+    <!-- Notes View -->
+    <div id="notes-view" class="view-container">
+      
+      <div class="notes-filters">
+        <button class="category-tab active" data-note-project="all">📝 All Notes</button>
+        <button class="category-tab" data-note-project="KLASS">🟣 KLASS</button>
+        <button class="category-tab" data-note-project="TouchGrass">🟢 TouchGrass</button>
+        <button class="category-tab" data-note-project="Timeslot">🟠 Timeslot</button>
+        <button class="category-tab" data-note-project="general">⚪ General</button>
+      </div>
+
+      <div class="notes-filters">
+        <button class="category-tab active" data-note-type="all">🏷️ All Types</button>
+        <button class="category-tab" data-note-type="note">📝 Note</button>
+        <button class="category-tab" data-note-type="decision">⚖️ Decision</button>
+        <button class="category-tab" data-note-type="learning">🎓 Learning</button>
+        <button class="category-tab" data-note-type="research">🔬 Research</button>
+        <button class="category-tab" data-note-type="reference">📚 Reference</button>
+      </div>
+
+      <button class="add-note-btn" onclick="toggleNoteForm()">+ Capture a note, sir</button>
+      
+      <div class="add-note-form" id="add-note-form">
+        <input type="text" id="note-title-input" placeholder="Note title..." style="margin-bottom:10px;">
+        <textarea id="note-content-input" placeholder="Content (optional)..." style="resize:vertical;height:80px;margin-bottom:10px;width:100%;padding:12px;background:var(--bg-hover);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text);font-family:inherit;font-size:0.95rem;"></textarea>
+        <div class="form-row">
+          <select id="note-project-select">
+            <option value="general">⚪ General</option>
+            <option value="KLASS">🟣 KLASS</option>
+            <option value="TouchGrass">🟢 TouchGrass</option>
+            <option value="Timeslot">🟠 Timeslot</option>
+          </select>
+          <select id="note-type-select">
+            <option value="note">📝 Note</option>
+            <option value="decision">⚖️ Decision</option>
+            <option value="learning">🎓 Learning</option>
+            <option value="research">🔬 Research</option>
+            <option value="reference">📚 Reference</option>
+          </select>
+        </div>
+        <div class="form-buttons" style="margin-top:10px;">
+          <button class="btn btn-secondary" onclick="toggleNoteForm()">Cancel</button>
+          <button class="btn btn-primary" onclick="addNote()">Save Note</button>
+        </div>
+      </div>
+
+      <div class="notes-list" id="notes-list"></div>
+
+      <!-- Notes Stats -->
+      <div class="stats" style="margin-top: 40px;">
+        <div class="stat-card">
+          <div class="stat-icon">📝</div>
+          <div class="stat-value" id="total-notes">0</div>
+          <div class="stat-label">Total Notes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⚖️</div>
+          <div class="stat-value" id="decision-notes">0</div>
+          <div class="stat-label">Decisions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🎓</div>
+          <div class="stat-value" id="learning-notes">0</div>
+          <div class="stat-label">Learnings</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🔬</div>
+          <div class="stat-value" id="research-notes">0</div>
+          <div class="stat-label">Research</div>
+        </div>
+      </div>
+
+    </div><!-- End Notes View -->
+
+    <!-- Pipeline View -->
+    <div id="pipeline-view" class="view-container">
+
+      <div class="pipeline-board">
+        <div class="pipeline-column status-idea" data-pipeline-status="idea">
+          <div class="column-header">
+            <h2>💡 Idea</h2>
+            <span class="count">0</span>
+          </div>
+          <div class="pipeline-list"></div>
+          <button class="add-task-btn" onclick="togglePipelineForm(this)">+ Add content idea</button>
+          <div class="add-pipeline-form">
+            <input type="text" class="pipeline-title-input" placeholder="Content title..." style="margin-bottom:10px;width:100%;padding:12px;background:var(--bg-card);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text);font-family:inherit;font-size:0.95rem;">
+            <div class="form-row">
+              <select class="pipeline-type-select">
+                <option value="blog">📝 Blog Post</option>
+                <option value="video">🎬 Video</option>
+                <option value="tweet">🐦 Tweet/Thread</option>
+                <option value="newsletter">📧 Newsletter</option>
+                <option value="tutorial">📖 Tutorial</option>
+                <option value="podcast">🎙️ Podcast</option>
+                <option value="other">📌 Other</option>
+              </select>
+              <select class="pipeline-platform-select">
+                <option value="twitter">🐦 Twitter/X</option>
+                <option value="youtube">📺 YouTube</option>
+                <option value="blog">📝 Blog</option>
+                <option value="substack">📧 Substack</option>
+                <option value="tiktok">🎵 TikTok</option>
+                <option value="instagram">📸 Instagram</option>
+                <option value="linkedin">💼 LinkedIn</option>
+                <option value="other">📌 Other</option>
+              </select>
+            </div>
+            <div class="form-row" style="margin-top:10px;">
+              <select class="pipeline-project-select">
+                <option value="">No Project</option>
+                <option value="KLASS">🟣 KLASS</option>
+                <option value="TouchGrass">🟢 TouchGrass</option>
+                <option value="Timeslot">🟠 Timeslot</option>
+                <option value="general">⚪ General</option>
+              </select>
+              <div></div>
+            </div>
+            <div class="form-buttons" style="margin-top:10px;">
+              <button class="btn btn-secondary" onclick="togglePipelineForm(this)">Cancel</button>
+              <button class="btn btn-primary" onclick="addPipelineItem(this)">Add Content</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="pipeline-column status-draft" data-pipeline-status="draft">
+          <div class="column-header">
+            <h2>✍️ Draft</h2>
+            <span class="count">0</span>
+          </div>
+          <div class="pipeline-list"></div>
+        </div>
+
+        <div class="pipeline-column status-ready" data-pipeline-status="ready">
+          <div class="column-header">
+            <h2>🚀 Ready</h2>
+            <span class="count">0</span>
+          </div>
+          <div class="pipeline-list"></div>
+        </div>
+
+        <div class="pipeline-column status-published" data-pipeline-status="published">
+          <div class="column-header">
+            <h2>✅ Published</h2>
+            <span class="count">0</span>
+          </div>
+          <div class="pipeline-list"></div>
+        </div>
+      </div>
+
+      <!-- Pipeline Stats -->
+      <div class="stats" style="margin-top: 40px;">
+        <div class="stat-card">
+          <div class="stat-icon">📤</div>
+          <div class="stat-value" id="total-pipeline">0</div>
+          <div class="stat-label">Total Content</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✍️</div>
+          <div class="stat-value" id="draft-pipeline">0</div>
+          <div class="stat-label">In Draft</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🚀</div>
+          <div class="stat-value" id="ready-pipeline">0</div>
+          <div class="stat-label">Ready</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-value" id="published-pipeline">0</div>
+          <div class="stat-label">Published</div>
+        </div>
+      </div>
+
+    </div><!-- End Pipeline View -->
+
+    <!-- Today View -->
+    <div id="today-view" class="view-container">
+      <div class="today-view">
+        <div class="today-header">
+          <div class="today-date" id="today-date"></div>
+          <div class="today-subtitle">Your daily command center, sir</div>
+        </div>
+
+        <div class="today-summary">
+          <div class="today-stat">
+            <div class="today-stat-value" id="today-completed">0</div>
+            <div class="today-stat-label">✅ Completed</div>
+          </div>
+          <div class="today-stat">
+            <div class="today-stat-value" id="today-in-progress">0</div>
+            <div class="today-stat-label">⚡ In Progress</div>
+          </div>
+          <div class="today-stat">
+            <div class="today-stat-value" id="today-notes-count">0</div>
+            <div class="today-stat-label">📝 Notes</div>
+          </div>
+          <div class="today-stat">
+            <div class="today-stat-value" id="today-ideas-count">0</div>
+            <div class="today-stat-label">💡 Ideas</div>
+          </div>
+          <div class="today-stat">
+            <div class="today-stat-value" id="today-content-count">0</div>
+            <div class="today-stat-label">📤 Content</div>
+          </div>
+        </div>
+
+        <div id="today-sections"></div>
+      </div>
+    </div><!-- End Today View -->
+
     <!-- Idea Modal -->
     <div class="modal-overlay" id="idea-modal">
       <div class="modal">
@@ -1327,7 +1978,17 @@
       async getIdeas() { return this.fetch(`ideas?order=created_at.desc`); },
       async createIdea(idea) { return this.fetch(`ideas`, { method: 'POST', body: JSON.stringify(idea) }); },
       async updateIdea(id, updates) { return this.fetch(`ideas?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(updates) }); },
-      async deleteIdea(id) { return this.fetch(`ideas?id=eq.${id}`, { method: 'DELETE' }); }
+      async deleteIdea(id) { return this.fetch(`ideas?id=eq.${id}`, { method: 'DELETE' }); },
+      // Notes
+      async getNotes() { return this.fetch(`notes?order=created_at.desc`); },
+      async createNote(note) { return this.fetch(`notes`, { method: 'POST', body: JSON.stringify(note) }); },
+      async updateNote(id, updates) { return this.fetch(`notes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(updates) }); },
+      async deleteNote(id) { return this.fetch(`notes?id=eq.${id}`, { method: 'DELETE' }); },
+      // Content Pipeline
+      async getPipeline() { return this.fetch(`content_pipeline?order=created_at.desc`); },
+      async createPipelineItem(item) { return this.fetch(`content_pipeline`, { method: 'POST', body: JSON.stringify(item) }); },
+      async updatePipelineItem(id, updates) { return this.fetch(`content_pipeline?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(updates) }); },
+      async deletePipelineItem(id) { return this.fetch(`content_pipeline?id=eq.${id}`, { method: 'DELETE' }); }
     };
 
     // ===== QUOTES =====
@@ -1370,15 +2031,22 @@
     let isOnline = true;
     let selectedTasks = new Set();
     let editingIdeaId = null;
+    let notes = [];
+    let pipelineItems = [];
+    let currentNoteProjectFilter = 'all';
+    let currentNoteTypeFilter = 'all';
+    let draggedPipelineCard = null;
 
     // ===== INIT =====
     async function init() {
       document.getElementById('quote-text').textContent = geoffreyQuotes[Math.floor(Math.random() * geoffreyQuotes.length)];
       setupDragAndDrop();
       setupIdeasDragAndDrop();
+      setupPipelineDragAndDrop();
       setupKeyboardShortcuts();
       setupCategoryTabs();
       setupIdeaCategoryTabs();
+      setupNoteFilterTabs();
       
       try {
         await loadData();
@@ -1419,6 +2087,28 @@
         console.warn('Ideas table may not exist yet:', e);
         loadIdeasFromLocalStorage();
         renderIdeas();
+      }
+      
+      // Load notes
+      try {
+        notes = await supabase.getNotes() || [];
+        renderNotes();
+        localStorage.setItem('geoffrey-notes', JSON.stringify(notes));
+      } catch (e) {
+        console.warn('Notes table may not exist yet:', e);
+        notes = JSON.parse(localStorage.getItem('geoffrey-notes') || '[]');
+        renderNotes();
+      }
+
+      // Load pipeline
+      try {
+        pipelineItems = await supabase.getPipeline() || [];
+        renderPipeline();
+        localStorage.setItem('geoffrey-pipeline', JSON.stringify(pipelineItems));
+      } catch (e) {
+        console.warn('Pipeline table may not exist yet:', e);
+        pipelineItems = JSON.parse(localStorage.getItem('geoffrey-pipeline') || '[]');
+        renderPipeline();
       }
     }
 
@@ -1786,6 +2476,7 @@
       document.querySelectorAll('.main-nav-tab').forEach(t => t.classList.toggle('active', t.dataset.view === view));
       document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
       document.getElementById(`${view}-view`).classList.add('active');
+      if (view === 'today') renderToday();
     }
 
     // ===== IDEAS FUNCTIONS =====
@@ -1874,6 +2565,8 @@
     function updateNavBadges() {
       document.getElementById('tasks-badge').textContent = tasks.filter(t => t.status !== 'done').length;
       document.getElementById('ideas-badge').textContent = ideas.filter(i => i.status !== 'archived').length;
+      document.getElementById('notes-badge').textContent = notes.length;
+      document.getElementById('pipeline-badge').textContent = pipelineItems.filter(p => p.status !== 'published').length;
     }
 
     function openIdeaModal(id = null) {
@@ -2073,6 +2766,427 @@
           currentIdeaFilter = tab.dataset.ideaCategory;
           renderIdeas();
         });
+      });
+    }
+
+    // ===== NOTES FUNCTIONS =====
+    const noteTypeEmojis = { note: '📝', decision: '⚖️', learning: '🎓', research: '🔬', reference: '📚' };
+    const projectEmojis = { KLASS: '🟣', TouchGrass: '🟢', Timeslot: '🟠', general: '⚪' };
+
+    function setupNoteFilterTabs() {
+      document.querySelectorAll('[data-note-project]').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('[data-note-project]').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          currentNoteProjectFilter = tab.dataset.noteProject;
+          renderNotes();
+        });
+      });
+      document.querySelectorAll('[data-note-type]').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('[data-note-type]').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          currentNoteTypeFilter = tab.dataset.noteType;
+          renderNotes();
+        });
+      });
+    }
+
+    function getFilteredNotes() {
+      let filtered = notes;
+      if (currentNoteProjectFilter !== 'all') filtered = filtered.filter(n => n.project === currentNoteProjectFilter);
+      if (currentNoteTypeFilter !== 'all') filtered = filtered.filter(n => n.type === currentNoteTypeFilter);
+      return filtered;
+    }
+
+    function toggleNoteForm() {
+      const form = document.getElementById('add-note-form');
+      form.classList.toggle('active');
+      if (form.classList.contains('active')) document.getElementById('note-title-input').focus();
+    }
+
+    function createNoteElement(note) {
+      const div = document.createElement('div');
+      div.className = 'note-card';
+      div.dataset.id = note.id;
+
+      const projectClass = note.project ? `project-${note.project.toLowerCase()}` : 'project-general';
+      const projectLabel = note.project || 'general';
+      const typeLabel = note.type || 'note';
+      const timeAgo = getTimeAgo(note.created_at);
+      const contentPreview = note.content ? `<div class="note-content-preview">${escapeHtml(note.content)}</div>` : '';
+
+      div.innerHTML = `
+        <div class="note-header">
+          <div class="note-title">${escapeHtml(note.title)}</div>
+          <div class="note-badges">
+            <span class="badge-pill badge-project ${projectClass}">${projectEmojis[projectLabel] || '⚪'} ${projectLabel}</span>
+            <span class="badge-pill badge-type">${noteTypeEmojis[typeLabel] || '📝'} ${typeLabel}</span>
+          </div>
+        </div>
+        ${contentPreview}
+        <div class="note-meta">
+          <span>${timeAgo}</span>
+          <div class="note-actions">
+            <button onclick="editNote('${note.id}')">✏️ Edit</button>
+            <button class="delete" onclick="deleteNote('${note.id}')">🗑️ Delete</button>
+          </div>
+        </div>
+      `;
+      return div;
+    }
+
+    function getTimeAgo(dateStr) {
+      if (!dateStr) return '';
+      const diff = Date.now() - new Date(dateStr).getTime();
+      const mins = Math.floor(diff / 60000);
+      if (mins < 1) return 'Just now';
+      if (mins < 60) return `${mins}m ago`;
+      const hours = Math.floor(mins / 60);
+      if (hours < 24) return `${hours}h ago`;
+      const days = Math.floor(hours / 24);
+      if (days < 7) return `${days}d ago`;
+      return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    function renderNotes() {
+      const filtered = getFilteredNotes();
+      const list = document.getElementById('notes-list');
+      
+      if (filtered.length === 0) {
+        list.innerHTML = `<div class="empty-state"><div class="icon">📝</div><p>No notes yet. Capture your first thought, sir.</p></div>`;
+      } else {
+        list.innerHTML = '';
+        filtered.forEach(n => list.appendChild(createNoteElement(n)));
+      }
+
+      // Update stats
+      document.getElementById('total-notes').textContent = notes.length;
+      document.getElementById('decision-notes').textContent = notes.filter(n => n.type === 'decision').length;
+      document.getElementById('learning-notes').textContent = notes.filter(n => n.type === 'learning').length;
+      document.getElementById('research-notes').textContent = notes.filter(n => n.type === 'research').length;
+      updateNavBadges();
+    }
+
+    async function addNote() {
+      const title = document.getElementById('note-title-input').value.trim();
+      if (!title) { showToast('⚠️', 'Missing Title', 'Every note needs a title, sir.'); return; }
+      
+      const noteData = {
+        title,
+        content: document.getElementById('note-content-input').value.trim(),
+        project: document.getElementById('note-project-select').value,
+        type: document.getElementById('note-type-select').value,
+        source: 'web'
+      };
+
+      try {
+        if (isOnline) {
+          const [created] = await supabase.createNote(noteData);
+          notes.unshift(created);
+        } else {
+          noteData.id = 'local-' + Date.now();
+          noteData.created_at = new Date().toISOString();
+          notes.unshift(noteData);
+        }
+        localStorage.setItem('geoffrey-notes', JSON.stringify(notes));
+        renderNotes();
+        document.getElementById('note-title-input').value = '';
+        document.getElementById('note-content-input').value = '';
+        toggleNoteForm();
+        showToast('📝', 'Note Captured', 'Your thought has been preserved for posterity.');
+      } catch (e) {
+        console.error(e);
+        showToast('❌', 'Error', 'Failed to save note.');
+      }
+    }
+
+    async function editNote(id) {
+      const note = notes.find(n => n.id === id);
+      if (!note) return;
+      const newTitle = prompt('Edit note title:', note.title);
+      if (newTitle?.trim()) {
+        try {
+          if (isOnline && !id.startsWith('local-')) await supabase.updateNote(id, { title: newTitle.trim() });
+          note.title = newTitle.trim();
+          localStorage.setItem('geoffrey-notes', JSON.stringify(notes));
+          renderNotes();
+        } catch (e) { showToast('❌', 'Error', 'Failed to update note.'); }
+      }
+    }
+
+    async function deleteNote(id) {
+      if (!confirm('Delete this note?')) return;
+      try {
+        if (isOnline && !id.startsWith('local-')) await supabase.deleteNote(id);
+        notes = notes.filter(n => n.id !== id);
+        localStorage.setItem('geoffrey-notes', JSON.stringify(notes));
+        renderNotes();
+        showToast('🗑️', 'Note Deleted', 'Gone, but the wisdom remains.');
+      } catch (e) { showToast('❌', 'Error', 'Failed to delete note.'); }
+    }
+
+    // ===== PIPELINE FUNCTIONS =====
+    const contentTypeEmojis = { blog: '📝', video: '🎬', tweet: '🐦', newsletter: '📧', tutorial: '📖', podcast: '🎙️', other: '📌' };
+    const platformEmojis = { twitter: '🐦', youtube: '📺', blog: '📝', substack: '📧', tiktok: '🎵', instagram: '📸', linkedin: '💼', other: '📌' };
+    const pipelineStatuses = ['idea', 'draft', 'ready', 'published'];
+
+    function togglePipelineForm(btn) {
+      const col = btn.closest('.pipeline-column');
+      const form = col.querySelector('.add-pipeline-form');
+      const addBtn = col.querySelector('.add-task-btn');
+      form.classList.toggle('active');
+      addBtn.style.display = form.classList.contains('active') ? 'none' : 'block';
+      if (form.classList.contains('active')) form.querySelector('.pipeline-title-input').focus();
+    }
+
+    function createPipelineElement(item) {
+      const div = document.createElement('div');
+      div.className = 'pipeline-card';
+      div.draggable = true;
+      div.dataset.id = item.id;
+
+      const typeEmoji = contentTypeEmojis[item.content_type] || '📌';
+      const platformEmoji = platformEmojis[item.platform] || '📌';
+      const projectHtml = item.project ? `<span class="pipeline-card-project">${projectEmojis[item.project] || '⚪'} ${item.project}</span>` : '';
+
+      div.innerHTML = `
+        <div class="pipeline-card-type">${typeEmoji} ${item.content_type || 'content'}</div>
+        <div class="pipeline-card-title">${escapeHtml(item.title)}</div>
+        <div class="pipeline-card-meta">
+          <span class="pipeline-card-platform">${platformEmoji} ${item.platform || 'unset'}</span>
+          ${projectHtml}
+        </div>
+        <div class="pipeline-card-actions">
+          <button onclick="movePipeline('${item.id}', 'prev')">◀️</button>
+          <button onclick="movePipeline('${item.id}', 'next')">▶️</button>
+          <button class="delete" onclick="deletePipelineItem('${item.id}')">🗑️</button>
+        </div>
+      `;
+
+      div.addEventListener('dragstart', e => { draggedPipelineCard = e.target; e.target.classList.add('dragging'); });
+      div.addEventListener('dragend', e => { e.target.classList.remove('dragging'); document.querySelectorAll('.pipeline-column').forEach(c => c.classList.remove('drag-over')); draggedPipelineCard = null; });
+
+      return div;
+    }
+
+    function renderPipeline() {
+      document.querySelectorAll('.pipeline-column').forEach(col => {
+        const status = col.dataset.pipelineStatus;
+        const list = col.querySelector('.pipeline-list');
+        const items = pipelineItems.filter(p => p.status === status);
+        
+        col.querySelector('.count').textContent = items.length;
+        if (items.length === 0) {
+          list.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>Nothing here yet</p></div>`;
+        } else {
+          list.innerHTML = '';
+          items.forEach(item => list.appendChild(createPipelineElement(item)));
+        }
+      });
+
+      // Update stats
+      document.getElementById('total-pipeline').textContent = pipelineItems.length;
+      document.getElementById('draft-pipeline').textContent = pipelineItems.filter(p => p.status === 'draft').length;
+      document.getElementById('ready-pipeline').textContent = pipelineItems.filter(p => p.status === 'ready').length;
+      document.getElementById('published-pipeline').textContent = pipelineItems.filter(p => p.status === 'published').length;
+      updateNavBadges();
+    }
+
+    async function addPipelineItem(btn) {
+      const form = btn.closest('.add-pipeline-form');
+      const title = form.querySelector('.pipeline-title-input').value.trim();
+      if (!title) { showToast('⚠️', 'Missing Title', 'Content needs a title, sir.'); return; }
+
+      const item = {
+        title,
+        content_type: form.querySelector('.pipeline-type-select').value,
+        platform: form.querySelector('.pipeline-platform-select').value,
+        project: form.querySelector('.pipeline-project-select').value || null,
+        status: 'idea',
+        source: 'web'
+      };
+
+      btn.disabled = true;
+      try {
+        if (isOnline) {
+          const [created] = await supabase.createPipelineItem(item);
+          pipelineItems.unshift(created);
+        } else {
+          item.id = 'local-' + Date.now();
+          item.created_at = new Date().toISOString();
+          pipelineItems.unshift(item);
+        }
+        localStorage.setItem('geoffrey-pipeline', JSON.stringify(pipelineItems));
+        renderPipeline();
+        form.querySelector('.pipeline-title-input').value = '';
+        togglePipelineForm(btn);
+        showToast('📤', 'Content Added', 'Into the pipeline it goes.');
+      } catch (e) {
+        console.error(e);
+        showToast('❌', 'Error', 'Failed to save content item.');
+      }
+      btn.disabled = false;
+    }
+
+    async function movePipeline(id, dir) {
+      const item = pipelineItems.find(p => p.id === id);
+      if (!item) return;
+      const idx = pipelineStatuses.indexOf(item.status);
+      let newStatus;
+      if (dir === 'next' && idx < pipelineStatuses.length - 1) newStatus = pipelineStatuses[idx + 1];
+      else if (dir === 'prev' && idx > 0) newStatus = pipelineStatuses[idx - 1];
+      else return;
+
+      try {
+        const updates = { status: newStatus };
+        if (newStatus === 'published') updates.published_at = new Date().toISOString();
+        if (isOnline && !item.id.startsWith('local-')) await supabase.updatePipelineItem(id, updates);
+        item.status = newStatus;
+        if (updates.published_at) item.published_at = updates.published_at;
+        localStorage.setItem('geoffrey-pipeline', JSON.stringify(pipelineItems));
+        renderPipeline();
+        const statusLabels = { idea: 'Idea', draft: 'Draft', ready: 'Ready', published: 'Published' };
+        showToast('➡️', 'Content Moved', `Moved to ${statusLabels[newStatus]}.`);
+        if (newStatus === 'published') createConfetti();
+      } catch (e) {
+        showToast('❌', 'Error', 'Failed to move content.');
+      }
+    }
+
+    async function deletePipelineItem(id) {
+      if (!confirm('Delete this content item?')) return;
+      try {
+        if (isOnline && !id.startsWith('local-')) await supabase.deletePipelineItem(id);
+        pipelineItems = pipelineItems.filter(p => p.id !== id);
+        localStorage.setItem('geoffrey-pipeline', JSON.stringify(pipelineItems));
+        renderPipeline();
+        showToast('🗑️', 'Content Deleted', 'Removed from the pipeline.');
+      } catch (e) { showToast('❌', 'Error', 'Failed to delete content item.'); }
+    }
+
+    function setupPipelineDragAndDrop() {
+      document.querySelectorAll('.pipeline-column').forEach(col => {
+        col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('drag-over'); });
+        col.addEventListener('dragleave', e => { if (!col.contains(e.relatedTarget)) col.classList.remove('drag-over'); });
+        col.addEventListener('drop', async e => {
+          e.preventDefault();
+          col.classList.remove('drag-over');
+          if (draggedPipelineCard) {
+            const item = pipelineItems.find(p => p.id === draggedPipelineCard.dataset.id);
+            const newStatus = col.dataset.pipelineStatus;
+            if (item && item.status !== newStatus) {
+              try {
+                const updates = { status: newStatus };
+                if (newStatus === 'published') updates.published_at = new Date().toISOString();
+                if (isOnline && !item.id.startsWith('local-')) await supabase.updatePipelineItem(item.id, updates);
+                item.status = newStatus;
+                if (updates.published_at) item.published_at = updates.published_at;
+                localStorage.setItem('geoffrey-pipeline', JSON.stringify(pipelineItems));
+                renderPipeline();
+                if (newStatus === 'published') createConfetti();
+              } catch (e) {
+                showToast('❌', 'Error', 'Failed to move content.');
+              }
+            }
+          }
+        });
+      });
+    }
+
+    // ===== TODAY VIEW FUNCTIONS =====
+    function renderToday() {
+      const today = new Date();
+      const todayStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('today-date').textContent = todayStr;
+
+      const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
+
+      // Filter items created/completed today
+      const completedToday = tasks.filter(t => t.status === 'done' && t.completed_at && t.completed_at >= todayStart);
+      const inProgress = tasks.filter(t => t.status === 'in-progress');
+      const notesToday = notes.filter(n => n.created_at && n.created_at >= todayStart);
+      const ideasToday = ideas.filter(i => i.created_at && i.created_at >= todayStart);
+      const contentToday = pipelineItems.filter(p => p.created_at && p.created_at >= todayStart);
+
+      // Update summary stats
+      document.getElementById('today-completed').textContent = completedToday.length;
+      document.getElementById('today-in-progress').textContent = inProgress.length;
+      document.getElementById('today-notes-count').textContent = notesToday.length;
+      document.getElementById('today-ideas-count').textContent = ideasToday.length;
+      document.getElementById('today-content-count').textContent = contentToday.length;
+
+      // Build sections
+      const sectionsContainer = document.getElementById('today-sections');
+      sectionsContainer.innerHTML = '';
+
+      // Helper to build a section
+      function buildSection(title, emoji, items, renderFn) {
+        const section = document.createElement('div');
+        section.className = 'today-section';
+        section.innerHTML = `
+          <div class="today-section-header">
+            <h3>${emoji} ${title}</h3>
+            <span class="section-count">${items.length}</span>
+          </div>
+        `;
+        if (items.length === 0) {
+          section.innerHTML += `<div class="today-empty"><div class="icon">${emoji}</div>Nothing here today... yet.</div>`;
+        } else {
+          items.forEach(item => {
+            section.innerHTML += renderFn(item);
+          });
+        }
+        sectionsContainer.appendChild(section);
+      }
+
+      buildSection('Completed Tasks', '✅', completedToday, task => {
+        const time = task.completed_at ? new Date(task.completed_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '';
+        return `<div class="today-item">
+          <span class="today-item-icon">✅</span>
+          <span class="today-item-title">${escapeHtml(task.title)}</span>
+          <span class="today-item-badge badge-pill" style="background:rgba(${task.category === 'urgent' ? '248,81,73' : '212,175,55'},0.2);color:${task.category === 'urgent' ? 'var(--red)' : 'var(--gold)'};">${getCategoryEmoji(task.category)} ${task.category}</span>
+          <span class="today-item-time">${time}</span>
+        </div>`;
+      });
+
+      buildSection('In Progress', '⚡', inProgress, task => {
+        return `<div class="today-item" style="border-left-color:var(--orange);">
+          <span class="today-item-icon">⚡</span>
+          <span class="today-item-title">${escapeHtml(task.title)}</span>
+          <span class="today-item-badge badge-pill" style="background:rgba(210,153,34,0.2);color:var(--orange);">${getCategoryEmoji(task.category)} ${task.category}</span>
+        </div>`;
+      });
+
+      buildSection('Notes Added', '📝', notesToday, note => {
+        const time = note.created_at ? new Date(note.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '';
+        const projectClass = note.project ? `project-${note.project.toLowerCase()}` : 'project-general';
+        return `<div class="today-item" style="border-left-color:var(--blue);">
+          <span class="today-item-icon">${noteTypeEmojis[note.type] || '📝'}</span>
+          <span class="today-item-title">${escapeHtml(note.title)}</span>
+          <span class="badge-pill badge-project ${projectClass}">${note.project || 'general'}</span>
+          <span class="today-item-time">${time}</span>
+        </div>`;
+      });
+
+      buildSection('Ideas Captured', '💡', ideasToday, idea => {
+        const time = idea.created_at ? new Date(idea.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '';
+        return `<div class="today-item" style="border-left-color:var(--purple);">
+          <span class="today-item-icon">${ideaCategoryEmojis[idea.category] || '💡'}</span>
+          <span class="today-item-title">${escapeHtml(idea.title)}</span>
+          <span class="today-item-badge badge-pill" style="background:rgba(163,113,247,0.2);color:var(--purple);">${idea.category}</span>
+          <span class="today-item-time">${time}</span>
+        </div>`;
+      });
+
+      buildSection('Content Pipeline', '📤', contentToday, item => {
+        const time = item.created_at ? new Date(item.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '';
+        return `<div class="today-item" style="border-left-color:var(--green);">
+          <span class="today-item-icon">${contentTypeEmojis[item.content_type] || '📤'}</span>
+          <span class="today-item-title">${escapeHtml(item.title)}</span>
+          <span class="today-item-badge badge-pill" style="background:rgba(63,185,80,0.2);color:var(--green);">${item.status}</span>
+          <span class="today-item-time">${time}</span>
+        </div>`;
       });
     }
 
