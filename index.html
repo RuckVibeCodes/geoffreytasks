@@ -163,8 +163,14 @@
       justify-content: center;
       gap: 10px;
       margin-bottom: 30px;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 4px 0;
     }
+
+    .category-tabs::-webkit-scrollbar { display: none; }
 
     .category-tab {
       background: var(--bg-card);
@@ -175,6 +181,8 @@
       transition: all 0.3s ease;
       font-size: 0.9rem;
       color: var(--text-muted);
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .category-tab:hover { border-color: var(--gold); color: var(--gold); }
@@ -586,21 +594,34 @@
       justify-content: center;
       gap: 8px;
       margin-bottom: 30px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--bg-dark);
+      padding: 12px 0 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
     }
+
+    .main-nav::-webkit-scrollbar { display: none; }
 
     .main-nav-tab {
       background: var(--bg-card);
       border: 2px solid rgba(255, 255, 255, 0.1);
-      padding: 12px 32px;
+      padding: 10px 20px;
       border-radius: 12px;
       cursor: pointer;
       transition: all 0.3s ease;
-      font-size: 1rem;
+      font-size: 0.9rem;
       font-weight: 500;
       color: var(--text-muted);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .main-nav-tab:hover { border-color: var(--gold); color: var(--gold); }
@@ -624,8 +645,72 @@
     }
 
     /* View containers */
-    .view-container { display: none; }
+    .view-container { display: none; animation: fadeIn 0.3s ease; }
     .view-container.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Mobile bottom nav */
+    @media (max-width: 768px) {
+      .main-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: auto;
+        margin: 0;
+        padding: 8px 10px;
+        background: var(--bg-card);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: none;
+        border-radius: 0;
+        justify-content: space-around;
+        gap: 4px;
+        z-index: 100;
+      }
+
+      .main-nav-tab {
+        flex-direction: column;
+        padding: 6px 10px;
+        font-size: 0.65rem;
+        border: none;
+        background: transparent;
+        gap: 2px;
+        border-radius: 8px;
+      }
+
+      .main-nav-tab .tab-emoji {
+        font-size: 1.3rem;
+      }
+
+      .main-nav-tab .tab-label {
+        font-size: 0.6rem;
+      }
+
+      .main-nav-tab:hover { border-color: transparent; }
+
+      .main-nav-tab.active {
+        background: rgba(212, 175, 55, 0.15);
+        border-color: transparent;
+      }
+
+      .main-nav-tab .badge {
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        font-size: 0.6rem;
+        padding: 1px 5px;
+        min-width: 16px;
+        text-align: center;
+      }
+
+      .container {
+        padding-bottom: 80px;
+      }
+    }
 
     /* Ideas Board */
     .ideas-board {
@@ -882,8 +967,14 @@
       justify-content: center;
       gap: 10px;
       margin-bottom: 20px;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 4px 0;
     }
+
+    .idea-category-tabs::-webkit-scrollbar { display: none; }
 
     /* Loading */
     .loading-overlay {
@@ -1007,8 +1098,20 @@
 
     @media (max-width: 768px) {
       .shortcut-hint { display: none; }
-      h1 { font-size: 2rem; }
-      .logo { font-size: 3rem; }
+      h1 { font-size: 1.5rem; }
+      .logo { font-size: 2.5rem; }
+      .subtitle { font-size: 0.8rem; }
+      header { padding: 20px 10px; }
+      .geoffrey-says { margin: 10px auto 15px; padding: 12px 16px; font-size: 0.85rem; }
+      .container { padding: 10px; }
+      .column { padding: 14px; }
+      .board { gap: 16px; }
+      .notes-filters .category-tab,
+      .idea-category-tabs .category-tab,
+      .category-tabs .category-tab {
+        padding: 8px 14px;
+        font-size: 0.8rem;
+      }
     }
 
     /* ===== NOTES VIEW ===== */
@@ -1017,8 +1120,14 @@
       justify-content: center;
       gap: 10px;
       margin-bottom: 20px;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 4px 0;
     }
+
+    .notes-filters::-webkit-scrollbar { display: none; }
 
     .notes-list {
       max-width: 900px;
@@ -1474,19 +1583,19 @@
     <!-- Main Navigation -->
     <div class="main-nav">
       <button class="main-nav-tab active" data-view="tasks" onclick="switchView('tasks')">
-        📋 Tasks <span class="badge" id="tasks-badge">0</span>
+        <span class="tab-emoji">📋</span> <span class="tab-label">Tasks</span> <span class="badge" id="tasks-badge">0</span>
       </button>
       <button class="main-nav-tab" data-view="ideas" onclick="switchView('ideas')">
-        💡 Ideas <span class="badge" id="ideas-badge">0</span>
+        <span class="tab-emoji">💡</span> <span class="tab-label">Ideas</span> <span class="badge" id="ideas-badge">0</span>
       </button>
       <button class="main-nav-tab" data-view="notes" onclick="switchView('notes')">
-        📝 Notes <span class="badge" id="notes-badge">0</span>
+        <span class="tab-emoji">📝</span> <span class="tab-label">Notes</span> <span class="badge" id="notes-badge">0</span>
       </button>
       <button class="main-nav-tab" data-view="pipeline" onclick="switchView('pipeline')">
-        📤 Pipeline <span class="badge" id="pipeline-badge">0</span>
+        <span class="tab-emoji">📤</span> <span class="tab-label">Pipeline</span> <span class="badge" id="pipeline-badge">0</span>
       </button>
       <button class="main-nav-tab" data-view="today" onclick="switchView('today')">
-        📅 Today
+        <span class="tab-emoji">📅</span> <span class="tab-label">Today</span>
       </button>
     </div>
 
