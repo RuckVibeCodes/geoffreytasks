@@ -1551,6 +1551,256 @@
     }
 
     .today-empty .icon { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.5; }
+
+    /* ===== DOCS VIEW ===== */
+    .docs-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 24px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 1024px) {
+      .docs-layout { grid-template-columns: 1fr; }
+    }
+
+    .docs-sidebar {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      position: sticky;
+      top: 20px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+    }
+
+    .docs-sidebar h3 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .docs-search {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--bg-hover);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+    }
+
+    .docs-search:focus { outline: none; border-color: var(--gold); }
+    .docs-search::placeholder { color: var(--text-muted); }
+
+    .docs-category-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+
+    .docs-cat-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: all 0.2s;
+    }
+
+    .docs-cat-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .docs-cat-btn.active {
+      background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+      color: var(--bg-dark);
+      border-color: transparent;
+      font-weight: 600;
+    }
+
+    .docs-project-list { list-style: none; }
+
+    .docs-project-item {
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .docs-project-item:hover { background: var(--bg-hover); color: var(--text); }
+    .docs-project-item.active { background: rgba(212, 175, 55, 0.15); color: var(--gold); }
+
+    .docs-project-item .doc-count {
+      font-size: 0.75rem;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .docs-main { min-height: 400px; }
+
+    .docs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .doc-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-left: 4px solid var(--gold);
+    }
+
+    .doc-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      border-color: rgba(212, 175, 55, 0.3);
+    }
+
+    .doc-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .doc-card-title { font-size: 1rem; font-weight: 500; color: var(--text); line-height: 1.4; }
+
+    .doc-card-category {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .doc-cat-project { background: rgba(163, 113, 247, 0.2); color: var(--purple); }
+    .doc-cat-journal { background: rgba(88, 166, 255, 0.2); color: var(--blue); }
+    .doc-cat-resource { background: rgba(63, 185, 80, 0.2); color: var(--green); }
+    .doc-cat-idea { background: rgba(210, 153, 34, 0.2); color: var(--orange); }
+    .doc-cat-content { background: rgba(248, 81, 73, 0.2); color: var(--red); }
+    .doc-cat-area { background: rgba(212, 175, 55, 0.2); color: var(--gold); }
+    .doc-cat-other { background: rgba(255, 255, 255, 0.1); color: var(--text-muted); }
+
+    .doc-card-project { font-size: 0.8rem; color: var(--gold); margin-bottom: 8px; }
+
+    .doc-card-preview {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .doc-card-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .docs-empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+
+    .docs-empty .icon { font-size: 4rem; margin-bottom: 15px; opacity: 0.5; }
+    .docs-empty p { font-style: italic; font-size: 1.1rem; }
+
+    /* Doc Reader Modal */
+    .doc-reader-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      display: none;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+
+    .doc-reader-overlay.active { display: block; }
+
+    .doc-reader {
+      max-width: 850px;
+      margin: 40px auto;
+      background: var(--bg-card);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      border-radius: 16px;
+      overflow: hidden;
+      animation: modalSlide 0.3s ease;
+    }
+
+    .doc-reader-header {
+      padding: 24px 30px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.08), transparent);
+    }
+
+    .doc-reader-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--gold); }
+    .doc-reader-meta { font-size: 0.85rem; color: var(--text-muted); margin-top: 6px; }
+
+    .doc-reader-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 8px;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .doc-reader-close:hover { background: rgba(255, 255, 255, 0.1); color: var(--text); }
+
+    .doc-reader-content {
+      padding: 30px;
+      line-height: 1.8;
+      font-size: 1rem;
+      color: var(--text);
+    }
+
+    .doc-reader-content h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--gold); margin: 24px 0 16px; }
+    .doc-reader-content h2 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--gold-light); margin: 20px 0 12px; border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 8px; }
+    .doc-reader-content h3 { font-size: 1.15rem; color: var(--text); margin: 18px 0 10px; }
+    .doc-reader-content p { margin-bottom: 14px; }
+    .doc-reader-content ul, .doc-reader-content ol { margin: 12px 0; padding-left: 24px; }
+    .doc-reader-content li { margin-bottom: 6px; }
+    .doc-reader-content code { background: var(--bg-hover); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; color: var(--gold-light); }
+    .doc-reader-content pre { background: var(--bg-hover); padding: 16px; border-radius: 8px; overflow-x: auto; margin: 16px 0; }
+    .doc-reader-content pre code { background: none; padding: 0; }
+    .doc-reader-content blockquote { border-left: 3px solid var(--gold); padding-left: 16px; margin: 16px 0; color: var(--text-muted); font-style: italic; }
+    .doc-reader-content a { color: var(--gold); text-decoration: underline; }
+    .doc-reader-content a:hover { color: var(--gold-light); }
+    .doc-reader-content table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    .doc-reader-content th, .doc-reader-content td { padding: 10px 14px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: left; }
+    .doc-reader-content th { background: var(--bg-hover); color: var(--gold); font-weight: 600; }
+    .doc-reader-content img { max-width: 100%; border-radius: 8px; }
+    .doc-reader-content hr { border: none; border-top: 1px solid rgba(255, 255, 255, 0.1); margin: 24px 0; }
   </style>
 </head>
 <body>
@@ -1597,6 +1847,9 @@
       </button>
       <button class="main-nav-tab" data-view="today" onclick="switchView('today')">
         <span class="tab-emoji">📅</span> <span class="tab-label">Today</span>
+      </button>
+      <button class="main-nav-tab" data-view="docs" onclick="switchView('docs')">
+        <span class="tab-emoji">📚</span> <span class="tab-label">Docs</span> <span class="badge" id="docs-badge">0</span>
       </button>
     </div>
 
@@ -1981,6 +2234,47 @@
       </div>
     </div><!-- End Today View -->
 
+    <!-- Docs View -->
+    <div id="docs-view" class="view-container">
+      <div class="docs-layout">
+        <aside class="docs-sidebar">
+          <h3>📚 Library</h3>
+          <input type="text" class="docs-search" id="docs-search" placeholder="Search documents..." oninput="filterDocs()">
+          
+          <div class="docs-category-filters" id="docs-cat-filters">
+            <button class="docs-cat-btn active" data-doc-cat="all" onclick="setDocCategory('all', this)">All</button>
+            <button class="docs-cat-btn" data-doc-cat="project" onclick="setDocCategory('project', this)">Projects</button>
+            <button class="docs-cat-btn" data-doc-cat="journal" onclick="setDocCategory('journal', this)">Journal</button>
+            <button class="docs-cat-btn" data-doc-cat="resource" onclick="setDocCategory('resource', this)">Resources</button>
+            <button class="docs-cat-btn" data-doc-cat="idea" onclick="setDocCategory('idea', this)">Ideas</button>
+            <button class="docs-cat-btn" data-doc-cat="content" onclick="setDocCategory('content', this)">Content</button>
+            <button class="docs-cat-btn" data-doc-cat="area" onclick="setDocCategory('area', this)">Areas</button>
+          </div>
+
+          <h3 style="margin-top: 8px;">📁 Projects</h3>
+          <ul class="docs-project-list" id="docs-project-list"></ul>
+        </aside>
+
+        <div class="docs-main">
+          <div class="docs-grid" id="docs-grid"></div>
+        </div>
+      </div>
+    </div><!-- End Docs View -->
+
+    <!-- Doc Reader Modal -->
+    <div class="doc-reader-overlay" id="doc-reader">
+      <div class="doc-reader">
+        <div class="doc-reader-header">
+          <div>
+            <div class="doc-reader-title" id="doc-reader-title">Document Title</div>
+            <div class="doc-reader-meta" id="doc-reader-meta">Project · Category · Updated</div>
+          </div>
+          <button class="doc-reader-close" onclick="closeDocReader()">×</button>
+        </div>
+        <div class="doc-reader-content" id="doc-reader-content"></div>
+      </div>
+    </div>
+
     <!-- Idea Modal -->
     <div class="modal-overlay" id="idea-modal">
       <div class="modal">
@@ -2219,6 +2513,17 @@
         console.warn('Pipeline table may not exist yet:', e);
         pipelineItems = JSON.parse(localStorage.getItem('geoffrey-pipeline') || '[]');
         renderPipeline();
+      }
+
+      // Load documents (Second Brain)
+      try {
+        documents = await supabase.getDocuments() || [];
+        renderDocs();
+        localStorage.setItem('geoffrey-docs', JSON.stringify(documents));
+      } catch (e) {
+        console.warn('Documents table may not exist yet:', e);
+        documents = JSON.parse(localStorage.getItem('geoffrey-docs') || '[]');
+        renderDocs();
       }
     }
 
@@ -2571,7 +2876,10 @@
           }
         }
         if (e.key === 'r' || e.key === 'R') loadData().catch(() => loadFromLocalStorage());
-        if (e.key === 'Escape') closeIdeaModal();
+        if (e.key === 'Escape') {
+          if (document.getElementById('doc-reader').classList.contains('active')) closeDocReader();
+          else closeIdeaModal();
+        }
       });
       document.querySelectorAll('.task-input').forEach(input => {
         input.addEventListener('keydown', e => {
@@ -2677,6 +2985,7 @@
       document.getElementById('ideas-badge').textContent = ideas.filter(i => i.status !== 'archived').length;
       document.getElementById('notes-badge').textContent = notes.length;
       document.getElementById('pipeline-badge').textContent = pipelineItems.filter(p => p.status !== 'published').length;
+      document.getElementById('docs-badge').textContent = documents.length;
     }
 
     function openIdeaModal(id = null) {
@@ -3299,6 +3608,149 @@
         </div>`;
       });
     }
+
+    // ===== DOCUMENTS (SECOND BRAIN) =====
+    let documents = [];
+    let docCategoryFilter = 'all';
+    let docProjectFilter = null;
+    let docSearchQuery = '';
+
+    supabase.getDocuments = async function() {
+      return this.fetch('documents?select=id,title,content,folder,project,file_path,category,updated_at&order=updated_at.desc');
+    };
+
+    function getFilteredDocs() {
+      let filtered = documents;
+      if (docCategoryFilter !== 'all') filtered = filtered.filter(d => d.category === docCategoryFilter);
+      if (docProjectFilter) filtered = filtered.filter(d => d.project === docProjectFilter);
+      if (docSearchQuery) {
+        const q = docSearchQuery.toLowerCase();
+        filtered = filtered.filter(d =>
+          d.title.toLowerCase().includes(q) ||
+          d.content.toLowerCase().includes(q) ||
+          (d.project && d.project.toLowerCase().includes(q)) ||
+          d.folder.toLowerCase().includes(q)
+        );
+      }
+      return filtered;
+    }
+
+    function getDocCategoryClass(cat) { return 'doc-cat-' + (cat || 'other'); }
+
+    function getDocCategoryEmoji(cat) {
+      return { project: '📂', journal: '📖', resource: '📚', idea: '💡', content: '🎬', area: '🏷️' }[cat] || '📄';
+    }
+
+    function getDocPreview(content) {
+      return content
+        .replace(/^#{1,6}\s+/gm, '')
+        .replace(/\*\*(.+?)\*\*/g, '$1')
+        .replace(/\*(.+?)\*/g, '$1')
+        .replace(/`(.+?)`/g, '$1')
+        .replace(/\[(.+?)\]\(.+?\)/g, '$1')
+        .replace(/^[-*+]\s+/gm, '')
+        .replace(/\n+/g, ' ')
+        .trim()
+        .slice(0, 200);
+    }
+
+    function formatDocDate(dateStr) {
+      if (!dateStr) return '';
+      return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function renderDocs() {
+      const filtered = getFilteredDocs();
+      const grid = document.getElementById('docs-grid');
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="docs-empty" style="grid-column: 1 / -1;">
+            <div class="icon">📚</div>
+            <p>${documents.length === 0 ? 'The library awaits its first volumes, sir. Run sync-docs to populate.' : 'No documents match your search, sir.'}</p>
+          </div>`;
+      } else {
+        grid.innerHTML = filtered.map(doc => `
+          <div class="doc-card" onclick="openDocReader('${doc.id}')">
+            <div class="doc-card-header">
+              <div class="doc-card-title">${escapeHtml(doc.title)}</div>
+              <span class="doc-card-category ${getDocCategoryClass(doc.category)}">${doc.category}</span>
+            </div>
+            ${doc.project ? `<div class="doc-card-project">📁 ${escapeHtml(doc.project)}</div>` : ''}
+            <div class="doc-card-preview">${escapeHtml(getDocPreview(doc.content))}</div>
+            <div class="doc-card-meta">
+              <span>${getDocCategoryEmoji(doc.category)} ${escapeHtml(doc.folder)}</span>
+              <span>📅 ${formatDocDate(doc.updated_at)}</span>
+            </div>
+          </div>`).join('');
+      }
+
+      renderDocProjectList();
+      document.getElementById('docs-badge').textContent = documents.length;
+    }
+
+    function renderDocProjectList() {
+      const projectCounts = {};
+      documents.forEach(d => { if (d.project) projectCounts[d.project] = (projectCounts[d.project] || 0) + 1; });
+      const projects = Object.keys(projectCounts).sort();
+      const list = document.getElementById('docs-project-list');
+
+      list.innerHTML = `
+        <li class="docs-project-item ${!docProjectFilter ? 'active' : ''}" onclick="setDocProject(null, this)">
+          <span>All Projects</span>
+          <span class="doc-count">${documents.filter(d => d.project).length}</span>
+        </li>
+        ${projects.map(p => `
+          <li class="docs-project-item ${docProjectFilter === p ? 'active' : ''}" onclick="setDocProject('${escapeHtml(p)}', this)">
+            <span>📁 ${escapeHtml(p)}</span>
+            <span class="doc-count">${projectCounts[p]}</span>
+          </li>`).join('')}`;
+    }
+
+    function setDocCategory(cat, btn) {
+      docCategoryFilter = cat;
+      document.querySelectorAll('.docs-cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderDocs();
+    }
+
+    function setDocProject(project, el) {
+      docProjectFilter = project;
+      document.querySelectorAll('.docs-project-item').forEach(i => i.classList.remove('active'));
+      if (el) el.classList.add('active');
+      renderDocs();
+    }
+
+    function filterDocs() {
+      docSearchQuery = document.getElementById('docs-search').value;
+      renderDocs();
+    }
+
+    function openDocReader(docId) {
+      const doc = documents.find(d => d.id === docId);
+      if (!doc) return;
+
+      document.getElementById('doc-reader-title').textContent = doc.title;
+      document.getElementById('doc-reader-meta').textContent =
+        [doc.project && ('📁 ' + doc.project), getDocCategoryEmoji(doc.category) + ' ' + doc.category, '📅 ' + formatDocDate(doc.updated_at)].filter(Boolean).join(' · ');
+
+      const rendered = typeof marked !== 'undefined'
+        ? (typeof marked.parse === 'function' ? marked.parse(doc.content) : marked(doc.content))
+        : doc.content.replace(/\n/g, '<br>');
+      document.getElementById('doc-reader-content').innerHTML = rendered;
+
+      document.getElementById('doc-reader').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDocReader() {
+      document.getElementById('doc-reader').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('doc-reader').addEventListener('click', function(e) {
+      if (e.target === this) closeDocReader();
+    });
 
     init();
   </script>
