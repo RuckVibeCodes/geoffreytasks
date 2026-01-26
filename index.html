@@ -1751,6 +1751,16 @@
       animation: modalSlide 0.3s ease;
     }
 
+    @media (max-width: 768px) {
+      .doc-reader { margin: 10px; border-radius: 12px; }
+      .doc-reader-header { padding: 16px; }
+      .doc-reader-content { padding: 16px; overflow-x: hidden; }
+      .doc-reader-title { font-size: 1.2rem !important; }
+      .doc-reader-content h1 { font-size: 1.4rem; }
+      .doc-reader-content h2 { font-size: 1.15rem; }
+      .doc-reader-content th, .doc-reader-content td { padding: 6px 8px; font-size: 0.8rem; }
+    }
+
     .doc-reader-header {
       padding: 24px 30px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -1796,8 +1806,9 @@
     .doc-reader-content blockquote { border-left: 3px solid var(--gold); padding-left: 16px; margin: 16px 0; color: var(--text-muted); font-style: italic; }
     .doc-reader-content a { color: var(--gold); text-decoration: underline; }
     .doc-reader-content a:hover { color: var(--gold-light); }
-    .doc-reader-content table { width: 100%; border-collapse: collapse; margin: 16px 0; }
-    .doc-reader-content th, .doc-reader-content td { padding: 10px 14px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: left; }
+    .doc-reader-content .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 16px 0; max-width: 100%; }
+    .doc-reader-content table { min-width: 500px; border-collapse: collapse; margin: 0; }
+    .doc-reader-content th, .doc-reader-content td { padding: 10px 14px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: left; white-space: nowrap; }
     .doc-reader-content th { background: var(--bg-hover); color: var(--gold); font-weight: 600; }
     .doc-reader-content img { max-width: 100%; border-radius: 8px; }
     .doc-reader-content hr { border: none; border-top: 1px solid rgba(255, 255, 255, 0.1); margin: 24px 0; }
@@ -3734,9 +3745,13 @@
       document.getElementById('doc-reader-meta').textContent =
         [doc.project && ('📁 ' + doc.project), getDocCategoryEmoji(doc.category) + ' ' + doc.category, '📅 ' + formatDocDate(doc.updated_at)].filter(Boolean).join(' · ');
 
-      const rendered = typeof marked !== 'undefined'
+      let rendered = typeof marked !== 'undefined'
         ? (typeof marked.parse === 'function' ? marked.parse(doc.content) : marked(doc.content))
         : doc.content.replace(/\n/g, '<br>');
+
+      // Wrap tables in scrollable container for mobile
+      rendered = rendered.replace(/<table>/g, '<div class="table-wrapper"><table>').replace(/<\/table>/g, '</table></div>');
+
       document.getElementById('doc-reader-content').innerHTML = rendered;
 
       document.getElementById('doc-reader').classList.add('active');
