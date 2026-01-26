@@ -1569,7 +1569,7 @@
 
     .today-header {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
     }
 
     .today-date {
@@ -1584,63 +1584,154 @@
       font-style: italic;
     }
 
-    .today-summary {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 16px;
-      margin-bottom: 30px;
-    }
-
-    @media (max-width: 768px) { .today-summary { grid-template-columns: repeat(2, 1fr); } }
-
-    .today-stat {
+    /* Daily Progress Bar */
+    .today-progress {
       background: rgba(15, 20, 35, 0.55);
       backdrop-filter: var(--glass-blur);
       -webkit-backdrop-filter: var(--glass-blur);
       border-radius: var(--glass-radius-sm);
-      padding: 16px;
-      text-align: center;
+      padding: 16px 20px;
+      margin-bottom: 20px;
       border: 1px solid var(--glass-border);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .today-progress-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .today-progress-label .progress-pct {
+      color: var(--gold);
+      font-family: 'Playfair Display', serif;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .today-progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .today-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-light));
+      border-radius: 10px;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .today-progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .today-progress.complete .today-progress-fill {
+      background: linear-gradient(90deg, var(--green), #4ade80);
+    }
+
+    .today-celebration {
+      text-align: center;
+      padding: 8px;
+      color: var(--gold);
+      font-style: italic;
+      font-size: 0.9rem;
+      animation: fadeIn 0.5s ease;
+      display: none;
+    }
+
+    .today-celebration.visible { display: block; }
+
+    /* Quick Add Bar */
+    .today-quick-add {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .today-quick-add input {
+      flex: 1;
+      padding: 14px 18px;
+      background: rgba(15, 20, 35, 0.5);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--glass-radius-pill);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 1rem;
       transition: all 0.3s ease;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.06);
     }
 
-    .today-stat:hover {
-      transform: translateY(-3px);
-      border-color: rgba(212, 175, 55, 0.3);
-      box-shadow: 0 8px 32px rgba(212, 175, 55, 0.1);
-    }
-
-    .today-stat-value {
-      font-size: 2rem;
-      font-weight: 600;
-      color: var(--gold);
-      font-family: 'Playfair Display', serif;
-    }
-
-    .today-stat-label {
-      font-size: 0.75rem;
+    .today-quick-add input::placeholder {
       color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-top: 4px;
+      font-style: italic;
     }
 
+    .today-quick-add input:focus {
+      outline: none;
+      border-color: rgba(212, 175, 55, 0.5);
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15), 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .today-quick-add button {
+      padding: 14px 24px;
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(170, 140, 44, 0.2));
+      color: var(--gold);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: var(--glass-radius-pill);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 4px 16px rgba(212, 175, 55, 0.15);
+      white-space: nowrap;
+    }
+
+    .today-quick-add button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(212, 175, 55, 0.25);
+      border-color: rgba(212, 175, 55, 0.5);
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.4), rgba(170, 140, 44, 0.3));
+    }
+
+    /* Today Sections */
     .today-section {
-      margin-bottom: 24px;
+      margin-bottom: 28px;
     }
 
     .today-section-header {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 12px;
-      padding-bottom: 8px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .today-section-header h3 {
-      font-size: 1rem;
+      font-size: 1.05rem;
       color: var(--text);
       font-weight: 600;
     }
@@ -1648,42 +1739,229 @@
     .today-section-header .section-count {
       background: rgba(212, 175, 55, 0.2);
       color: var(--gold);
-      padding: 2px 8px;
+      padding: 2px 10px;
       border-radius: 10px;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       font-weight: 600;
     }
 
-    .today-item {
-      background: rgba(15, 20, 35, 0.5);
-      backdrop-filter: blur(12px) saturate(1.3);
-      -webkit-backdrop-filter: blur(12px) saturate(1.3);
-      border-radius: 12px;
-      padding: 12px 16px;
-      margin-bottom: 8px;
+    /* My Day Checklist Items */
+    .checklist-item {
       display: flex;
       align-items: center;
-      gap: 12px;
-      border-left: 3px solid var(--gold);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-left: 3px solid var(--gold);
+      gap: 14px;
+      padding: 14px 16px;
+      margin-bottom: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      transition: all 0.25s ease;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .checklist-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .checklist-item:active {
+      transform: scale(0.98);
+    }
+
+    .checklist-checkbox {
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .checklist-checkbox::after {
+      content: '✓';
+      font-size: 14px;
+      color: transparent;
+      transition: all 0.3s ease;
+      font-weight: bold;
+    }
+
+    .checklist-item.completed .checklist-checkbox {
+      background: var(--green);
+      border-color: var(--green);
+      box-shadow: 0 0 12px rgba(63, 185, 80, 0.3);
+    }
+
+    .checklist-item.completed .checklist-checkbox::after {
+      color: #fff;
+    }
+
+    .checklist-item-title {
+      flex: 1;
+      font-size: 0.95rem;
+      color: var(--text);
+      transition: all 0.3s ease;
+      line-height: 1.3;
+    }
+
+    .checklist-item.completed .checklist-item-title {
+      text-decoration: line-through;
+      color: var(--text-muted);
+      opacity: 0.6;
+    }
+
+    .checklist-item.high-priority .checklist-item-title::before {
+      content: '! ';
+      color: var(--red);
+      font-weight: 700;
+    }
+
+    .checklist-item-delete {
+      opacity: 0;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 4px 8px;
+      border-radius: 8px;
       transition: all 0.2s;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      flex-shrink: 0;
     }
 
-    .today-item:hover {
-      transform: translateX(4px);
+    .checklist-item:hover .checklist-item-delete { opacity: 0.6; }
+    .checklist-item-delete:hover { opacity: 1 !important; color: var(--red); background: rgba(248, 81, 73, 0.1); }
+
+    /* Scheduled Task Items */
+    .scheduled-task-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      background: rgba(20, 27, 45, 0.6);
+      backdrop-filter: blur(12px) saturate(1.3);
+      -webkit-backdrop-filter: blur(12px) saturate(1.3);
+      border-radius: var(--glass-radius-sm);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-left: 4px solid var(--gold);
+      transition: all 0.25s ease;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     }
 
-    .today-item-icon { font-size: 1.2rem; flex-shrink: 0; }
-    .today-item-title { flex: 1; font-size: 0.9rem; color: var(--text); }
-    .today-item-badge {
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 0.7rem;
+    .scheduled-task-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .scheduled-task-item:active {
+      transform: scale(0.98);
+    }
+
+    .scheduled-task-item.completed {
+      opacity: 0.6;
+    }
+
+    .scheduled-task-item.completed .scheduled-task-title {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .scheduled-task-checkbox {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      border: 2px solid rgba(212, 175, 55, 0.4);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .scheduled-task-checkbox::after {
+      content: '✓';
+      font-size: 16px;
+      color: transparent;
+      transition: all 0.3s ease;
+      font-weight: bold;
+    }
+
+    .scheduled-task-item.completed .scheduled-task-checkbox {
+      background: var(--green);
+      border-color: var(--green);
+      box-shadow: 0 0 12px rgba(63, 185, 80, 0.3);
+    }
+
+    .scheduled-task-item.completed .scheduled-task-checkbox::after {
+      color: #fff;
+    }
+
+    .scheduled-task-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .scheduled-task-title {
+      font-size: 0.95rem;
       font-weight: 500;
+      color: var(--text);
+      transition: all 0.3s ease;
+      line-height: 1.3;
     }
-    .today-item-time { font-size: 0.75rem; color: var(--text-muted); flex-shrink: 0; }
+
+    .scheduled-task-meta {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .scheduled-task-meta .badge-pill {
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    /* Today Section Separator */
+    .today-section-separator {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), transparent);
+      margin: 30px 0;
+    }
+
+    /* Clear Completed in Today */
+    .today-clear-btn {
+      width: 100%;
+      padding: 12px;
+      background: rgba(248, 81, 73, 0.06);
+      border: 1px dashed rgba(248, 81, 73, 0.2);
+      border-radius: 12px;
+      color: rgba(248, 81, 73, 0.7);
+      cursor: pointer;
+      font-size: 0.85rem;
+      margin-top: 10px;
+      transition: all 0.3s;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+    }
+
+    .today-clear-btn.visible { display: block; }
+    .today-clear-btn:hover { background: rgba(248, 81, 73, 0.15); border-color: var(--red); color: var(--red); }
 
     .today-empty {
       text-align: center;
@@ -1694,6 +1972,30 @@
     }
 
     .today-empty .icon { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.5; }
+
+    /* Check animation */
+    @keyframes checkBounce {
+      0% { transform: scale(1); }
+      30% { transform: scale(1.3); }
+      60% { transform: scale(0.9); }
+      100% { transform: scale(1); }
+    }
+
+    .check-animate {
+      animation: checkBounce 0.4s ease;
+    }
+
+    @media (max-width: 768px) {
+      .today-quick-add button span.btn-text { display: none; }
+      .today-quick-add button span.btn-icon { display: inline; }
+      .today-quick-add button { padding: 14px 18px; }
+      .checklist-checkbox { width: 28px; height: 28px; min-width: 28px; }
+      .checklist-checkbox::after { font-size: 16px; }
+      .scheduled-task-checkbox { width: 32px; height: 32px; min-width: 32px; }
+      .scheduled-task-checkbox::after { font-size: 18px; }
+      .checklist-item { padding: 16px; gap: 16px; min-height: 52px; }
+      .scheduled-task-item { padding: 16px; gap: 16px; min-height: 56px; }
+    }
 
     /* ===== DOCS VIEW ===== */
     .docs-layout {
@@ -2439,33 +2741,36 @@
       <div class="today-view">
         <div class="today-header">
           <div class="today-date" id="today-date"></div>
-          <div class="today-subtitle">Your daily command center, sir</div>
+          <div class="today-subtitle">Your daily checklist, sir</div>
         </div>
 
-        <div class="today-summary">
-          <div class="today-stat">
-            <div class="today-stat-value" id="today-completed">0</div>
-            <div class="today-stat-label">✅ Completed</div>
+        <!-- Progress Bar -->
+        <div class="today-progress" id="today-progress">
+          <div class="today-progress-label">
+            <span>Today's Progress</span>
+            <span class="progress-pct" id="today-progress-text">0/0 (0%)</span>
           </div>
-          <div class="today-stat">
-            <div class="today-stat-value" id="today-in-progress">0</div>
-            <div class="today-stat-label">⚡ In Progress</div>
+          <div class="today-progress-bar">
+            <div class="today-progress-fill" id="today-progress-fill" style="width: 0%"></div>
           </div>
-          <div class="today-stat">
-            <div class="today-stat-value" id="today-notes-count">0</div>
-            <div class="today-stat-label">📝 Notes</div>
-          </div>
-          <div class="today-stat">
-            <div class="today-stat-value" id="today-ideas-count">0</div>
-            <div class="today-stat-label">💡 Ideas</div>
-          </div>
-          <div class="today-stat">
-            <div class="today-stat-value" id="today-content-count">0</div>
-            <div class="today-stat-label">📤 Content</div>
+          <div class="today-celebration" id="today-celebration">
+            🎩 Impeccable work, sir. Every item vanquished. Geoffrey approves. 🏆
           </div>
         </div>
 
-        <div id="today-sections"></div>
+        <!-- Quick Add Bar -->
+        <div class="today-quick-add">
+          <input type="text" id="today-quick-input" placeholder="What's on your plate today?" autocomplete="off">
+          <button onclick="addChecklistItem()"><span class="btn-icon" style="display:none;">+</span><span class="btn-text">+ Add</span></button>
+        </div>
+
+        <!-- My Day Section -->
+        <div id="today-myday-section" class="today-section"></div>
+
+        <div class="today-section-separator"></div>
+
+        <!-- Scheduled Tasks Section -->
+        <div id="today-scheduled-section" class="today-section"></div>
       </div>
     </div><!-- End Today View -->
 
@@ -2801,11 +3106,13 @@
     }
 
     function getFilteredTasks() {
-      return currentFilter === 'all' ? tasks : tasks.filter(t => t.category === currentFilter);
+      // Exclude checklist items from the main kanban board — they only appear in Today view
+      const nonChecklist = tasks.filter(t => t.category !== 'checklist');
+      return currentFilter === 'all' ? nonChecklist : nonChecklist.filter(t => t.category === currentFilter);
     }
 
     function getCategoryEmoji(cat) {
-      return { work: '💼', hustle: '🚀', personal: '🧘', urgent: '🔥' }[cat] || '📌';
+      return { work: '💼', hustle: '🚀', personal: '🧘', urgent: '🔥', checklist: '📋' }[cat] || '📌';
     }
 
     function formatDueDate(d) {
@@ -3228,7 +3535,7 @@
     }
 
     function updateNavBadges() {
-      document.getElementById('tasks-badge').textContent = tasks.filter(t => t.status !== 'done').length;
+      document.getElementById('tasks-badge').textContent = tasks.filter(t => t.status !== 'done' && t.category !== 'checklist').length;
       document.getElementById('ideas-badge').textContent = ideas.filter(i => i.status !== 'archived').length;
       document.getElementById('notes-badge').textContent = notes.length;
       document.getElementById('pipeline-badge').textContent = pipelineItems.filter(p => p.status !== 'published').length;
@@ -3766,94 +4073,292 @@
       const todayStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
       document.getElementById('today-date').textContent = todayStr;
 
-      const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
+      const todayISO = today.toISOString().split('T')[0]; // YYYY-MM-DD
 
-      // Filter items created/completed today
-      const completedToday = tasks.filter(t => t.status === 'done' && t.completed_at && t.completed_at >= todayStart);
-      const inProgress = tasks.filter(t => t.status === 'in-progress');
-      const notesToday = notes.filter(n => n.created_at && n.created_at >= todayStart);
-      const ideasToday = ideas.filter(i => i.created_at && i.created_at >= todayStart);
-      const contentToday = pipelineItems.filter(p => p.created_at && p.created_at >= todayStart);
+      // My Day: checklist items for today
+      const myDayItems = tasks.filter(t => t.category === 'checklist' && t.scheduled_date && t.scheduled_date.startsWith(todayISO));
+      const myDayDone = myDayItems.filter(t => t.status === 'done').length;
+      const myDayTotal = myDayItems.length;
 
-      // Update summary stats
-      document.getElementById('today-completed').textContent = completedToday.length;
-      document.getElementById('today-in-progress').textContent = inProgress.length;
-      document.getElementById('today-notes-count').textContent = notesToday.length;
-      document.getElementById('today-ideas-count').textContent = ideasToday.length;
-      document.getElementById('today-content-count').textContent = contentToday.length;
+      // Scheduled: non-checklist tasks with scheduled_date=today or due_date=today (exclude checklist)
+      const scheduledItems = tasks.filter(t => t.category !== 'checklist' && (
+        (t.scheduled_date && t.scheduled_date.startsWith(todayISO)) ||
+        (t.due_date && t.due_date.startsWith(todayISO))
+      ));
+      const scheduledDone = scheduledItems.filter(t => t.status === 'done').length;
+      const scheduledTotal = scheduledItems.length;
 
-      // Build sections
-      const sectionsContainer = document.getElementById('today-sections');
-      sectionsContainer.innerHTML = '';
+      // Overall progress
+      const totalItems = myDayTotal + scheduledTotal;
+      const totalDone = myDayDone + scheduledDone;
+      const pct = totalItems > 0 ? Math.round((totalDone / totalItems) * 100) : 0;
 
-      // Helper to build a section
-      function buildSection(title, emoji, items, renderFn) {
-        const section = document.createElement('div');
-        section.className = 'today-section';
-        section.innerHTML = `
-          <div class="today-section-header">
-            <h3>${emoji} ${title}</h3>
-            <span class="section-count">${items.length}</span>
-          </div>
-        `;
-        if (items.length === 0) {
-          section.innerHTML += `<div class="today-empty"><div class="icon">${emoji}</div>Nothing here today... yet.</div>`;
-        } else {
-          items.forEach(item => {
-            section.innerHTML += renderFn(item);
-          });
-        }
-        sectionsContainer.appendChild(section);
+      document.getElementById('today-progress-text').textContent = `${totalDone}/${totalItems} (${pct}%)`;
+      document.getElementById('today-progress-fill').style.width = `${pct}%`;
+
+      const progressEl = document.getElementById('today-progress');
+      const celebrationEl = document.getElementById('today-celebration');
+      if (totalItems > 0 && totalDone === totalItems) {
+        progressEl.classList.add('complete');
+        celebrationEl.classList.add('visible');
+      } else {
+        progressEl.classList.remove('complete');
+        celebrationEl.classList.remove('visible');
       }
 
-      buildSection('Completed Tasks', '✅', completedToday, task => {
-        const time = task.completed_at ? new Date(task.completed_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '';
-        return `<div class="today-item">
-          <span class="today-item-icon">✅</span>
-          <span class="today-item-title">${escapeHtml(task.title)}</span>
-          <span class="today-item-badge badge-pill" style="background:rgba(${task.category === 'urgent' ? '248,81,73' : '212,175,55'},0.2);color:${task.category === 'urgent' ? 'var(--red)' : 'var(--gold)'};">${getCategoryEmoji(task.category)} ${task.category}</span>
-          <span class="today-item-time">${time}</span>
-        </div>`;
+      // Setup quick-add input
+      const quickInput = document.getElementById('today-quick-input');
+      if (!quickInput._listenerAttached) {
+        quickInput.addEventListener('keydown', e => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            addChecklistItem();
+          }
+        });
+        quickInput._listenerAttached = true;
+      }
+
+      // === Render My Day Section ===
+      const myDaySection = document.getElementById('today-myday-section');
+      myDaySection.innerHTML = `
+        <div class="today-section-header">
+          <h3>📋 My Day</h3>
+          <span class="section-count">${myDayDone}/${myDayTotal}</span>
+        </div>
+      `;
+
+      if (myDayTotal === 0) {
+        myDaySection.innerHTML += `<div class="today-empty"><div class="icon">📋</div>Your day is a blank canvas. Add something above!</div>`;
+      } else {
+        // Render uncompleted first, then completed
+        const myDaySorted = [...myDayItems].sort((a, b) => {
+          if (a.status === 'done' && b.status !== 'done') return 1;
+          if (a.status !== 'done' && b.status === 'done') return -1;
+          return 0;
+        });
+
+        myDaySorted.forEach(item => {
+          const isDone = item.status === 'done';
+          const isHigh = item.priority === 'high';
+          const div = document.createElement('div');
+          div.className = `checklist-item${isDone ? ' completed' : ''}${isHigh ? ' high-priority' : ''}`;
+          div.onclick = (e) => {
+            if (e.target.classList.contains('checklist-item-delete')) return;
+            toggleChecklistItem(item.id);
+          };
+          div.innerHTML = `
+            <div class="checklist-checkbox"></div>
+            <span class="checklist-item-title">${escapeHtml(item.title)}</span>
+            <button class="checklist-item-delete" onclick="event.stopPropagation(); deleteChecklistItem('${item.id}')" title="Remove">✕</button>
+          `;
+          myDaySection.appendChild(div);
+        });
+
+        // Clear completed button
+        if (myDayDone > 0) {
+          const clearBtn = document.createElement('button');
+          clearBtn.className = 'today-clear-btn visible';
+          clearBtn.textContent = `🧹 Clear ${myDayDone} completed item${myDayDone > 1 ? 's' : ''}`;
+          clearBtn.onclick = () => clearCompletedChecklist();
+          myDaySection.appendChild(clearBtn);
+        }
+      }
+
+      // === Render Scheduled Tasks Section ===
+      const scheduledSection = document.getElementById('today-scheduled-section');
+      scheduledSection.innerHTML = `
+        <div class="today-section-header">
+          <h3>🎯 Scheduled Tasks</h3>
+          <span class="section-count">${scheduledDone}/${scheduledTotal}</span>
+        </div>
+      `;
+
+      if (scheduledTotal === 0) {
+        scheduledSection.innerHTML += `<div class="today-empty"><div class="icon">🎯</div>No tasks scheduled for today. Check the backlog?</div>`;
+      } else {
+        // Uncompleted first, then completed
+        const scheduledSorted = [...scheduledItems].sort((a, b) => {
+          if (a.status === 'done' && b.status !== 'done') return 1;
+          if (a.status !== 'done' && b.status === 'done') return -1;
+          // Sort by priority: high > medium > low
+          const prioOrder = { high: 0, medium: 1, low: 2 };
+          return (prioOrder[a.priority] || 1) - (prioOrder[b.priority] || 1);
+        });
+
+        scheduledSorted.forEach(task => {
+          const isDone = task.status === 'done';
+          const div = document.createElement('div');
+          div.className = `scheduled-task-item${isDone ? ' completed' : ''}`;
+          div.onclick = (e) => {
+            toggleScheduledTask(task.id);
+          };
+
+          const catEmoji = getCategoryEmoji(task.category);
+          const prioClass = `priority-${task.priority}`;
+          const projectBadge = task.project ? `<span class="badge-pill" style="background:rgba(88,166,255,0.2);color:var(--blue);">${escapeHtml(task.project)}</span>` : '';
+
+          div.innerHTML = `
+            <div class="scheduled-task-checkbox"></div>
+            <div class="scheduled-task-info">
+              <div class="scheduled-task-title">${escapeHtml(task.title)}</div>
+              <div class="scheduled-task-meta">
+                <span class="badge-pill" style="background:rgba(${task.category === 'urgent' ? '248,81,73' : '163,113,247'},0.2);color:${task.category === 'urgent' ? 'var(--red)' : 'var(--purple)'};">${catEmoji} ${task.category}</span>
+                <span class="badge-pill ${prioClass}">${task.priority}</span>
+                ${projectBadge}
+              </div>
+            </div>
+          `;
+          scheduledSection.appendChild(div);
+        });
+      }
+    }
+
+    // ===== TODAY VIEW ACTIONS =====
+    async function addChecklistItem() {
+      const input = document.getElementById('today-quick-input');
+      let title = input.value.trim();
+      if (!title) return;
+
+      // "!" prefix = high priority
+      let priority = 'medium';
+      if (title.startsWith('!')) {
+        priority = 'high';
+        title = title.slice(1).trim();
+      }
+      if (!title) return;
+
+      const todayISO = new Date().toISOString().split('T')[0];
+      const task = {
+        title,
+        category: 'checklist',
+        priority,
+        status: 'todo',
+        scheduled_date: todayISO,
+        source: 'web'
+      };
+
+      input.value = '';
+      input.focus();
+
+      try {
+        if (isOnline) {
+          const [created] = await supabase.createTask(task);
+          tasks.unshift(created);
+        } else {
+          task.id = 'local-' + Date.now();
+          task.created_at = new Date().toISOString();
+          tasks.unshift(task);
+        }
+        saveToLocalStorage();
+        renderToday();
+        updateNavBadges();
+      } catch (e) {
+        console.error(e);
+        showToast('❌', 'Error', 'Failed to add checklist item.');
+      }
+    }
+
+    async function toggleChecklistItem(id) {
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+
+      const newStatus = task.status === 'done' ? 'todo' : 'done';
+      const updates = {
+        status: newStatus,
+        completed_at: newStatus === 'done' ? new Date().toISOString() : null
+      };
+
+      // Animate the checkbox
+      const items = document.querySelectorAll('.checklist-item');
+      items.forEach(el => {
+        const checkbox = el.querySelector('.checklist-checkbox');
+        if (el.querySelector('.checklist-item-title')?.textContent === task.title) {
+          checkbox.classList.add('check-animate');
+          setTimeout(() => checkbox.classList.remove('check-animate'), 400);
+        }
       });
 
-      buildSection('In Progress', '⚡', inProgress, task => {
-        return `<div class="today-item" style="border-left-color:var(--orange);">
-          <span class="today-item-icon">⚡</span>
-          <span class="today-item-title">${escapeHtml(task.title)}</span>
-          <span class="today-item-badge badge-pill" style="background:rgba(210,153,34,0.2);color:var(--orange);">${getCategoryEmoji(task.category)} ${task.category}</span>
-        </div>`;
+      try {
+        if (isOnline && !id.startsWith('local-')) await supabase.updateTask(id, updates);
+        task.status = newStatus;
+        task.completed_at = updates.completed_at;
+        saveToLocalStorage();
+        // Small delay so animation plays before re-render
+        setTimeout(() => renderToday(), 200);
+      } catch (e) {
+        console.error(e);
+        showToast('❌', 'Error', 'Failed to update item.');
+      }
+    }
+
+    async function toggleScheduledTask(id) {
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+
+      const newStatus = task.status === 'done' ? 'todo' : 'done';
+      const updates = {
+        status: newStatus,
+        completed_at: newStatus === 'done' ? new Date().toISOString() : null
+      };
+
+      // Animate
+      const items = document.querySelectorAll('.scheduled-task-item');
+      items.forEach(el => {
+        const checkbox = el.querySelector('.scheduled-task-checkbox');
+        if (el.querySelector('.scheduled-task-title')?.textContent === task.title) {
+          checkbox.classList.add('check-animate');
+          setTimeout(() => checkbox.classList.remove('check-animate'), 400);
+        }
       });
 
-      buildSection('Notes Added', '📝', notesToday, note => {
-        const time = note.created_at ? new Date(note.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '';
-        const projectClass = note.project ? `project-${note.project.toLowerCase()}` : 'project-general';
-        return `<div class="today-item" style="border-left-color:var(--blue);">
-          <span class="today-item-icon">${noteTypeEmojis[note.type] || '📝'}</span>
-          <span class="today-item-title">${escapeHtml(note.title)}</span>
-          <span class="badge-pill badge-project ${projectClass}">${note.project || 'general'}</span>
-          <span class="today-item-time">${time}</span>
-        </div>`;
-      });
+      try {
+        if (isOnline && !id.startsWith('local-')) await supabase.updateTask(id, updates);
+        task.status = newStatus;
+        task.completed_at = updates.completed_at;
+        if (newStatus === 'done') await celebrateCompletion();
+        saveToLocalStorage();
+        setTimeout(() => {
+          renderToday();
+          renderTasks();
+          updateNavBadges();
+        }, 200);
+      } catch (e) {
+        console.error(e);
+        showToast('❌', 'Error', 'Failed to update task.');
+      }
+    }
 
-      buildSection('Ideas Captured', '💡', ideasToday, idea => {
-        const time = idea.created_at ? new Date(idea.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '';
-        return `<div class="today-item" style="border-left-color:var(--purple);">
-          <span class="today-item-icon">${ideaCategoryEmojis[idea.category] || '💡'}</span>
-          <span class="today-item-title">${escapeHtml(idea.title)}</span>
-          <span class="today-item-badge badge-pill" style="background:rgba(163,113,247,0.2);color:var(--purple);">${idea.category}</span>
-          <span class="today-item-time">${time}</span>
-        </div>`;
-      });
+    async function deleteChecklistItem(id) {
+      try {
+        if (isOnline && !id.startsWith('local-')) await supabase.deleteTask(id);
+        tasks = tasks.filter(t => t.id !== id);
+        saveToLocalStorage();
+        renderToday();
+        updateNavBadges();
+      } catch (e) {
+        console.error(e);
+        showToast('❌', 'Error', 'Failed to delete item.');
+      }
+    }
 
-      buildSection('Content Pipeline', '📤', contentToday, item => {
-        const time = item.created_at ? new Date(item.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '';
-        return `<div class="today-item" style="border-left-color:var(--green);">
-          <span class="today-item-icon">${contentTypeEmojis[item.content_type] || '📤'}</span>
-          <span class="today-item-title">${escapeHtml(item.title)}</span>
-          <span class="today-item-badge badge-pill" style="background:rgba(63,185,80,0.2);color:var(--green);">${item.status}</span>
-          <span class="today-item-time">${time}</span>
-        </div>`;
-      });
+    async function clearCompletedChecklist() {
+      const todayISO = new Date().toISOString().split('T')[0];
+      const completedChecklist = tasks.filter(t => t.category === 'checklist' && t.status === 'done' && t.scheduled_date && t.scheduled_date.startsWith(todayISO));
+      if (completedChecklist.length === 0) return;
+
+      try {
+        for (const task of completedChecklist) {
+          if (isOnline && !task.id.startsWith('local-')) await supabase.deleteTask(task.id);
+        }
+        const removeIds = new Set(completedChecklist.map(t => t.id));
+        tasks = tasks.filter(t => !removeIds.has(t.id));
+        saveToLocalStorage();
+        renderToday();
+        showToast('🧹', 'Cleared', `${completedChecklist.length} completed item${completedChecklist.length > 1 ? 's' : ''} swept away.`);
+      } catch (e) {
+        console.error(e);
+        showToast('❌', 'Error', 'Failed to clear completed items.');
+      }
     }
 
     // ===== DOCUMENTS (SECOND BRAIN) =====
