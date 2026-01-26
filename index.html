@@ -2039,9 +2039,14 @@
     <p class="loading-text">Geoffrey is preparing the board...</p>
   </div>
 
-  <div class="connection-status disconnected" id="connection-status" data-tooltip="Shows sync status with Supabase cloud database. Green = synced, Orange = syncing, Red = offline (using local storage)" data-tooltip-pos="bottom">
-    <span class="status-dot"></span>
-    <span class="status-text">Offline</span>
+  <div style="position:fixed;top:10px;right:10px;display:flex;gap:8px;z-index:100;align-items:center;">
+    <button id="refresh-btn" onclick="refreshAll()" style="background:rgba(15,20,35,0.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);color:var(--gold);padding:8px 14px;border-radius:20px;cursor:pointer;font-size:0.85rem;display:flex;align-items:center;gap:6px;transition:all 0.3s;box-shadow:0 4px 15px rgba(0,0,0,0.2);" onmouseover="this.style.borderColor='var(--gold)';this.style.boxShadow='0 4px 20px rgba(212,175,55,0.2)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.boxShadow='0 4px 15px rgba(0,0,0,0.2)'">
+      <span id="refresh-icon" style="display:inline-block;transition:transform 0.5s;">🔄</span> Refresh
+    </button>
+    <div class="connection-status disconnected" id="connection-status" data-tooltip="Sync status" data-tooltip-pos="bottom" style="position:static;">
+      <span class="status-dot"></span>
+      <span class="status-text">Offline</span>
+    </div>
   </div>
 
   <div class="bg-pattern"></div>
@@ -2702,6 +2707,18 @@
       el.className = `connection-status ${status}`;
       el.querySelector('.status-text').textContent = { connected: '☁️ Synced', disconnected: '📴 Offline', syncing: '🔄 Syncing...' }[status];
       isOnline = status === 'connected';
+    }
+
+    async function refreshAll() {
+      const icon = document.getElementById('refresh-icon');
+      icon.style.transform = 'rotate(360deg)';
+      setTimeout(() => icon.style.transform = '', 500);
+      try {
+        await loadData();
+        showToast('🔄', 'Refreshed', 'All data synced from the cloud, sir.');
+      } catch(e) {
+        showToast('❌', 'Refresh Failed', 'Could not reach the cloud.');
+      }
     }
 
     async function loadData() {
