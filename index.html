@@ -4073,7 +4073,7 @@
       const todayStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
       document.getElementById('today-date').textContent = todayStr;
 
-      const todayISO = today.toISOString().split('T')[0]; // YYYY-MM-DD
+      const todayISO = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`; // YYYY-MM-DD local
 
       // My Day: checklist items for today
       const myDayItems = tasks.filter(t => t.category === 'checklist' && t.scheduled_date && t.scheduled_date.startsWith(todayISO));
@@ -4227,7 +4227,7 @@
       }
       if (!title) return;
 
-      const todayISO = new Date().toISOString().split('T')[0];
+      const _d = new Date(); const todayISO = `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;
       const task = {
         title,
         category: 'checklist',
@@ -4342,7 +4342,7 @@
     }
 
     async function clearCompletedChecklist() {
-      const todayISO = new Date().toISOString().split('T')[0];
+      const _d = new Date(); const todayISO = `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;
       const completedChecklist = tasks.filter(t => t.category === 'checklist' && t.status === 'done' && t.scheduled_date && t.scheduled_date.startsWith(todayISO));
       if (completedChecklist.length === 0) return;
 
