@@ -4707,6 +4707,12 @@
         : notes.find(n => n.id === id);
       if (!item) return;
       
+      // For documents, use the modal reader (better mobile experience)
+      if (type === 'document') {
+        openDocReader(id);
+        return;
+      }
+      
       selectedBrainItem = { ...item, _type: type };
       
       // Update active state in list
