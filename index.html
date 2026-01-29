@@ -4731,6 +4731,11 @@
         ? (typeof marked.parse === 'function' ? marked.parse(content) : marked(content))
         : content.replace(/\n/g, '<br>');
       document.getElementById('brain-markdown').innerHTML = rendered;
+      
+      // On mobile, auto-scroll to the content panel
+      if (window.innerWidth <= 1024) {
+        document.querySelector('.brain-content')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
 
     function updateBrainStats() {
