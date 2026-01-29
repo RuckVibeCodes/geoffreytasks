@@ -1997,103 +1997,31 @@
       .scheduled-task-item { padding: 16px; gap: 16px; min-height: 56px; }
     }
 
-    /* ===== DOCS VIEW ===== */
-    .docs-layout {
-      display: grid;
-      grid-template-columns: 260px 1fr;
-      gap: 24px;
-      margin-top: 20px;
-    }
-
-    @media (max-width: 1024px) {
-      .docs-layout { grid-template-columns: 1fr; }
-      .docs-sidebar {
-        position: relative !important;
-        top: auto !important;
-        max-height: none !important;
-        overflow-y: visible !important;
-      }
-      .docs-project-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-      }
-      .docs-project-item {
-        padding: 6px 12px;
-        font-size: 0.8rem;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 20px;
-      }
-      .docs-project-item.active {
-        border-color: var(--gold);
-      }
-      .docs-grid {
-        grid-template-columns: 1fr !important;
-      }
-    }
-
-    .docs-sidebar {
-      background: rgba(15, 20, 35, 0.55);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border-radius: var(--glass-radius);
-      padding: 20px;
-      border: 1px solid var(--glass-border);
-      position: sticky;
-      top: 20px;
-      max-height: calc(100vh - 40px);
-      overflow-y: auto;
-      box-shadow: var(--glass-shadow);
-    }
-
-    .docs-sidebar h3 {
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: var(--gold);
-      margin-bottom: 16px;
-    }
-
-    .docs-search {
-      width: 100%;
-      padding: 10px 14px;
-      background: rgba(10, 14, 23, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.9rem;
-      margin-bottom: 16px;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-      transition: all 0.2s ease;
-    }
-
-    .docs-search:focus { outline: none; border-color: rgba(212, 175, 55, 0.5); box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15), inset 0 2px 4px rgba(0, 0, 0, 0.2); }
-    .docs-search::placeholder { color: var(--text-muted); }
-
-    .docs-category-filters {
+    /* ===== BRAIN CATEGORY FILTERS ===== */
+    .brain-category-filters {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 20px;
+      gap: 8px;
+      margin-bottom: 16px;
+      justify-content: center;
     }
 
-    .docs-cat-btn {
+    .brain-cat-btn {
       background: rgba(255, 255, 255, 0.04);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       border: 1px solid var(--glass-border);
       color: var(--text-muted);
-      padding: 6px 12px;
+      padding: 8px 14px;
       border-radius: var(--glass-radius-pill);
       cursor: pointer;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       transition: all 0.2s;
+      white-space: nowrap;
     }
 
-    .docs-cat-btn:hover { border-color: rgba(212, 175, 55, 0.3); color: var(--gold); }
-    .docs-cat-btn.active {
+    .brain-cat-btn:hover { border-color: rgba(212, 175, 55, 0.3); color: var(--gold); }
+    .brain-cat-btn.active {
       background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(212, 175, 55, 0.1));
       color: var(--gold);
       border-color: rgba(212, 175, 55, 0.4);
@@ -2101,113 +2029,22 @@
       box-shadow: 0 2px 12px rgba(212, 175, 55, 0.15);
     }
 
-    .docs-project-list { list-style: none; }
-
-    .docs-project-item {
-      padding: 8px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      transition: all 0.2s;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    @media (max-width: 768px) {
+      .brain-category-filters {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        padding: 4px 0;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .brain-category-filters::-webkit-scrollbar { display: none; }
+      .brain-cat-btn {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+        flex-shrink: 0;
+      }
     }
-
-    .docs-project-item:hover { background: var(--bg-hover); color: var(--text); }
-    .docs-project-item.active { background: rgba(212, 175, 55, 0.15); color: var(--gold); }
-
-    .docs-project-item .doc-count {
-      font-size: 0.75rem;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 2px 8px;
-      border-radius: 10px;
-    }
-
-    .docs-main { min-height: 400px; }
-
-    .docs-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 16px;
-    }
-
-    .doc-card {
-      background: rgba(15, 20, 35, 0.55);
-      backdrop-filter: blur(12px) saturate(1.3);
-      -webkit-backdrop-filter: blur(12px) saturate(1.3);
-      border-radius: var(--glass-radius-sm);
-      padding: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-left: 4px solid var(--gold);
-      cursor: pointer;
-      transition: all 0.25s ease;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-    }
-
-    .doc-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 40px rgba(212, 175, 55, 0.1);
-      border-color: rgba(255, 255, 255, 0.12);
-    }
-
-    .doc-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 8px;
-    }
-
-    .doc-card-title { font-size: 1rem; font-weight: 500; color: var(--text); line-height: 1.4; }
-
-    .doc-card-category {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-weight: 600;
-      flex-shrink: 0;
-    }
-
-    .doc-cat-project { background: rgba(163, 113, 247, 0.2); color: var(--purple); }
-    .doc-cat-journal { background: rgba(88, 166, 255, 0.2); color: var(--blue); }
-    .doc-cat-resource { background: rgba(63, 185, 80, 0.2); color: var(--green); }
-    .doc-cat-idea { background: rgba(210, 153, 34, 0.2); color: var(--orange); }
-    .doc-cat-content { background: rgba(248, 81, 73, 0.2); color: var(--red); }
-    .doc-cat-area { background: rgba(212, 175, 55, 0.2); color: var(--gold); }
-    .doc-cat-other { background: rgba(255, 255, 255, 0.1); color: var(--text-muted); }
-
-    .doc-card-project { font-size: 0.8rem; color: var(--gold); margin-bottom: 8px; }
-
-    .doc-card-preview {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      line-height: 1.5;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      margin-bottom: 12px;
-    }
-
-    .doc-card-meta {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .docs-empty {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--text-muted);
-    }
-
-    .docs-empty .icon { font-size: 4rem; margin-bottom: 15px; opacity: 0.5; }
-    .docs-empty p { font-style: italic; font-size: 1.1rem; }
 
     /* Doc Reader Modal */
     .doc-reader-overlay {
@@ -2670,11 +2507,8 @@
       <button class="main-nav-tab" data-view="today" onclick="switchView('today')">
         <span class="tab-emoji">📅</span> <span class="tab-label">Today</span>
       </button>
-      <button class="main-nav-tab" data-view="docs" onclick="switchView('docs')">
-        <span class="tab-emoji">📚</span> <span class="tab-label">Docs</span> <span class="badge" id="docs-badge">0</span>
-      </button>
       <button class="main-nav-tab" data-view="brain" onclick="switchView('brain')">
-        <span class="tab-emoji">🧠</span> <span class="tab-label">Second Brain</span>
+        <span class="tab-emoji">🧠</span> <span class="tab-label">Second Brain</span> <span class="badge" id="brain-badge">0</span>
       </button>
     </div>
 
@@ -3062,38 +2896,20 @@
       </div>
     </div><!-- End Today View -->
 
-    <!-- Docs View -->
-    <div id="docs-view" class="view-container">
-      <div class="docs-layout">
-        <aside class="docs-sidebar">
-          <h3>📚 Library</h3>
-          <input type="text" class="docs-search" id="docs-search" placeholder="Search documents..." oninput="filterDocs()">
-          
-          <div class="docs-category-filters" id="docs-cat-filters">
-            <button class="docs-cat-btn active" data-doc-cat="all" onclick="setDocCategory('all', this)">All</button>
-            <button class="docs-cat-btn" data-doc-cat="project" onclick="setDocCategory('project', this)">Projects</button>
-            <button class="docs-cat-btn" data-doc-cat="journal" onclick="setDocCategory('journal', this)">Journal</button>
-            <button class="docs-cat-btn" data-doc-cat="resource" onclick="setDocCategory('resource', this)">Resources</button>
-            <button class="docs-cat-btn" data-doc-cat="idea" onclick="setDocCategory('idea', this)">Ideas</button>
-            <button class="docs-cat-btn" data-doc-cat="content" onclick="setDocCategory('content', this)">Content</button>
-            <button class="docs-cat-btn" data-doc-cat="area" onclick="setDocCategory('area', this)">Areas</button>
-          </div>
-
-          <h3 style="margin-top: 8px;">📁 Projects</h3>
-          <ul class="docs-project-list" id="docs-project-list"></ul>
-        </aside>
-
-        <div class="docs-main">
-          <div class="docs-grid" id="docs-grid"></div>
-        </div>
-      </div>
-    </div><!-- End Docs View -->
-
     <!-- Second Brain View -->
     <div id="brain-view" class="view-container">
       <div class="brain-header">
         <div class="brain-search-container">
           <input type="text" id="brain-search" class="brain-search" placeholder="🔍 Search your knowledge base..." oninput="filterBrain()">
+        </div>
+        <div class="brain-category-filters" id="brain-cat-filters">
+          <button class="brain-cat-btn active" data-brain-cat="all" onclick="setBrainCategory('all', this)">All</button>
+          <button class="brain-cat-btn" data-brain-cat="project" onclick="setBrainCategory('project', this)">📂 Projects</button>
+          <button class="brain-cat-btn" data-brain-cat="journal" onclick="setBrainCategory('journal', this)">📖 Journal</button>
+          <button class="brain-cat-btn" data-brain-cat="resource" onclick="setBrainCategory('resource', this)">📚 Resources</button>
+          <button class="brain-cat-btn" data-brain-cat="idea" onclick="setBrainCategory('idea', this)">💡 Ideas</button>
+          <button class="brain-cat-btn" data-brain-cat="content" onclick="setBrainCategory('content', this)">🎬 Content</button>
+          <button class="brain-cat-btn" data-brain-cat="area" onclick="setBrainCategory('area', this)">🏷️ Areas</button>
         </div>
         <div class="brain-filters">
           <select id="brain-type-filter" class="brain-filter-select" onchange="filterBrain()">
@@ -3103,9 +2919,6 @@
           </select>
           <select id="brain-project-filter" class="brain-filter-select" onchange="filterBrain()">
             <option value="all">🏷️ All Projects</option>
-          </select>
-          <select id="brain-category-filter" class="brain-filter-select" onchange="filterBrain()">
-            <option value="all">📂 All Categories</option>
           </select>
         </div>
       </div>
@@ -3432,12 +3245,12 @@
       // Load documents (Second Brain)
       try {
         documents = await supabase.getDocuments() || [];
-        renderDocs();
+        initBrain();
         localStorage.setItem('geoffrey-docs', JSON.stringify(documents));
       } catch (e) {
         console.warn('Documents table may not exist yet:', e);
         documents = JSON.parse(localStorage.getItem('geoffrey-docs') || '[]');
-        renderDocs();
+        initBrain();
       }
     }
 
@@ -3902,7 +3715,7 @@
       document.getElementById('ideas-badge').textContent = ideas.filter(i => i.status !== 'archived').length;
       document.getElementById('notes-badge').textContent = notes.length;
       document.getElementById('pipeline-badge').textContent = pipelineItems.filter(p => p.status !== 'published').length;
-      document.getElementById('docs-badge').textContent = documents.length;
+      document.getElementById('brain-badge').textContent = documents.length + notes.length;
     }
 
     function openIdeaModal(id = null) {
@@ -4726,47 +4539,14 @@
 
     // ===== DOCUMENTS (SECOND BRAIN) =====
     let documents = [];
-    let docCategoryFilter = 'all';
-    let docProjectFilter = null;
-    let docSearchQuery = '';
+    let brainQuickCategoryFilter = 'all';
 
     supabase.getDocuments = async function() {
       return this.fetch('documents?select=id,title,content,folder,project,file_path,category,updated_at&order=updated_at.desc');
     };
 
-    function getFilteredDocs() {
-      let filtered = documents;
-      if (docCategoryFilter !== 'all') filtered = filtered.filter(d => d.category === docCategoryFilter);
-      if (docProjectFilter) filtered = filtered.filter(d => d.project === docProjectFilter);
-      if (docSearchQuery) {
-        const q = docSearchQuery.toLowerCase();
-        filtered = filtered.filter(d =>
-          d.title.toLowerCase().includes(q) ||
-          d.content.toLowerCase().includes(q) ||
-          (d.project && d.project.toLowerCase().includes(q)) ||
-          d.folder.toLowerCase().includes(q)
-        );
-      }
-      return filtered;
-    }
-
-    function getDocCategoryClass(cat) { return 'doc-cat-' + (cat || 'other'); }
-
     function getDocCategoryEmoji(cat) {
       return { project: '📂', journal: '📖', resource: '📚', idea: '💡', content: '🎬', area: '🏷️' }[cat] || '📄';
-    }
-
-    function getDocPreview(content) {
-      return content
-        .replace(/^#{1,6}\s+/gm, '')
-        .replace(/\*\*(.+?)\*\*/g, '$1')
-        .replace(/\*(.+?)\*/g, '$1')
-        .replace(/`(.+?)`/g, '$1')
-        .replace(/\[(.+?)\]\(.+?\)/g, '$1')
-        .replace(/^[-*+]\s+/gm, '')
-        .replace(/\n+/g, ' ')
-        .trim()
-        .slice(0, 200);
     }
 
     function formatDocDate(dateStr) {
@@ -4774,71 +4554,11 @@
       return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     }
 
-    function renderDocs() {
-      const filtered = getFilteredDocs();
-      const grid = document.getElementById('docs-grid');
-
-      if (filtered.length === 0) {
-        grid.innerHTML = `
-          <div class="docs-empty" style="grid-column: 1 / -1;">
-            <div class="icon">📚</div>
-            <p>${documents.length === 0 ? 'The library awaits its first volumes, sir. Run sync-docs to populate.' : 'No documents match your search, sir.'}</p>
-          </div>`;
-      } else {
-        grid.innerHTML = filtered.map(doc => `
-          <div class="doc-card" onclick="openDocReader('${doc.id}')">
-            <div class="doc-card-header">
-              <div class="doc-card-title">${escapeHtml(doc.title)}</div>
-              <span class="doc-card-category ${getDocCategoryClass(doc.category)}">${doc.category}</span>
-            </div>
-            ${doc.project ? `<div class="doc-card-project">📁 ${escapeHtml(doc.project)}</div>` : ''}
-            <div class="doc-card-preview">${escapeHtml(getDocPreview(doc.content))}</div>
-            <div class="doc-card-meta">
-              <span>${getDocCategoryEmoji(doc.category)} ${escapeHtml(doc.folder)}</span>
-              <span>📅 ${formatDocDate(doc.updated_at)}</span>
-            </div>
-          </div>`).join('');
-      }
-
-      renderDocProjectList();
-      document.getElementById('docs-badge').textContent = documents.length;
-    }
-
-    function renderDocProjectList() {
-      const projectCounts = {};
-      documents.forEach(d => { if (d.project) projectCounts[d.project] = (projectCounts[d.project] || 0) + 1; });
-      const projects = Object.keys(projectCounts).sort();
-      const list = document.getElementById('docs-project-list');
-
-      list.innerHTML = `
-        <li class="docs-project-item ${!docProjectFilter ? 'active' : ''}" onclick="setDocProject(null, this)">
-          <span>All Projects</span>
-          <span class="doc-count">${documents.filter(d => d.project).length}</span>
-        </li>
-        ${projects.map(p => `
-          <li class="docs-project-item ${docProjectFilter === p ? 'active' : ''}" onclick="setDocProject('${escapeHtml(p)}', this)">
-            <span>📁 ${escapeHtml(p)}</span>
-            <span class="doc-count">${projectCounts[p]}</span>
-          </li>`).join('')}`;
-    }
-
-    function setDocCategory(cat, btn) {
-      docCategoryFilter = cat;
-      document.querySelectorAll('.docs-cat-btn').forEach(b => b.classList.remove('active'));
+    function setBrainCategory(cat, btn) {
+      brainQuickCategoryFilter = cat;
+      document.querySelectorAll('.brain-cat-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      renderDocs();
-    }
-
-    function setDocProject(project, el) {
-      docProjectFilter = project;
-      document.querySelectorAll('.docs-project-item').forEach(i => i.classList.remove('active'));
-      if (el) el.classList.add('active');
-      renderDocs();
-    }
-
-    function filterDocs() {
-      docSearchQuery = document.getElementById('docs-search').value;
-      renderDocs();
+      renderBrainList();
     }
 
     function openDocReader(docId) {
@@ -4874,7 +4594,6 @@
     // ===== SECOND BRAIN FUNCTIONS =====
     let brainTypeFilter = 'all';
     let brainProjectFilter = 'all';
-    let brainCategoryFilter = 'all';
     let brainSearchQuery = '';
     let selectedBrainItem = null;
 
@@ -4896,9 +4615,9 @@
         items = items.filter(i => i.project === brainProjectFilter);
       }
       
-      // Apply category filter
-      if (brainCategoryFilter !== 'all') {
-        items = items.filter(i => (i._type === 'document' ? i.category : i.type) === brainCategoryFilter);
+      // Apply quick category filter (from the button bar)
+      if (brainQuickCategoryFilter !== 'all') {
+        items = items.filter(i => (i._type === 'document' ? i.category : i.type) === brainQuickCategoryFilter);
       }
       
       // Apply search
@@ -4919,15 +4638,12 @@
 
     function populateBrainFilters() {
       const projects = new Set();
-      const categories = new Set();
       
       documents.forEach(d => {
         if (d.project) projects.add(d.project);
-        if (d.category) categories.add(d.category);
       });
       notes.forEach(n => {
         if (n.project) projects.add(n.project);
-        if (n.type) categories.add(n.type);
       });
       
       // Populate project filter
@@ -4936,21 +4652,12 @@
       [...projects].sort().forEach(p => {
         projectSelect.innerHTML += `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`;
       });
-      
-      // Populate category filter
-      const categorySelect = document.getElementById('brain-category-filter');
-      categorySelect.innerHTML = '<option value="all">📂 All Categories</option>';
-      [...categories].sort().forEach(c => {
-        const emoji = noteTypeEmojis[c] || getDocCategoryEmoji(c) || '📁';
-        categorySelect.innerHTML += `<option value="${escapeHtml(c)}">${emoji} ${escapeHtml(c)}</option>`;
-      });
     }
 
     function filterBrain() {
       brainSearchQuery = document.getElementById('brain-search').value;
       brainTypeFilter = document.getElementById('brain-type-filter').value;
       brainProjectFilter = document.getElementById('brain-project-filter').value;
-      brainCategoryFilter = document.getElementById('brain-category-filter').value;
       renderBrainList();
     }
 
