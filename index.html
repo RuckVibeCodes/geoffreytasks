@@ -2333,6 +2333,291 @@
       background: rgba(212, 175, 55, 0.3);
       color: var(--text);
     }
+
+    /* ===== SECOND BRAIN VIEW ===== */
+    .brain-header {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .brain-search-container {
+      width: 100%;
+    }
+
+    .brain-search {
+      width: 100%;
+      padding: 14px 20px;
+      background: rgba(15, 20, 35, 0.5);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--glass-radius-pill);
+      color: var(--text);
+      font-size: 1rem;
+      font-family: inherit;
+      transition: all 0.3s;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .brain-search::placeholder {
+      color: var(--text-muted);
+    }
+
+    .brain-search:focus {
+      outline: none;
+      border-color: rgba(212, 175, 55, 0.5);
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15), 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .brain-filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .brain-filter-select {
+      padding: 10px 15px;
+      background: rgba(15, 20, 35, 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--glass-radius-sm);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .brain-filter-select:hover,
+    .brain-filter-select:focus {
+      border-color: rgba(212, 175, 55, 0.4);
+      outline: none;
+    }
+
+    .brain-container {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 24px;
+      min-height: 500px;
+    }
+
+    @media (max-width: 1024px) {
+      .brain-container {
+        grid-template-columns: 1fr;
+      }
+      .brain-filters {
+        flex-direction: column;
+      }
+      .brain-filter-select {
+        width: 100%;
+      }
+    }
+
+    .brain-sidebar {
+      background: rgba(15, 20, 35, 0.55);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-radius: var(--glass-radius);
+      border: 1px solid var(--glass-border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--glass-shadow);
+    }
+
+    .brain-sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .brain-sidebar-header h3 {
+      color: var(--gold);
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .brain-count {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+
+    .brain-list {
+      flex: 1;
+      overflow-y: auto;
+      max-height: 500px;
+    }
+
+    .brain-list::-webkit-scrollbar { width: 5px; }
+    .brain-list::-webkit-scrollbar-track { background: transparent; }
+    .brain-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 10px; }
+    .brain-list::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+    .brain-item {
+      padding: 14px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .brain-item:hover {
+      background: var(--bg-hover);
+    }
+
+    .brain-item.active {
+      background: rgba(212, 175, 55, 0.1);
+      border-left: 3px solid var(--gold);
+    }
+
+    .brain-item-type {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--purple);
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brain-item-type .project-tag {
+      color: var(--blue);
+      background: rgba(88, 166, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.65rem;
+    }
+
+    .brain-item-title {
+      font-size: 0.95rem;
+      color: var(--text);
+      margin-bottom: 6px;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    .brain-item-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      gap: 12px;
+    }
+
+    .brain-content {
+      background: rgba(15, 20, 35, 0.55);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-radius: var(--glass-radius);
+      border: 1px solid var(--glass-border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--glass-shadow);
+    }
+
+    .brain-content-header {
+      padding: 20px 25px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.06), rgba(15, 20, 35, 0.3));
+    }
+
+    .brain-content-header h2 {
+      font-family: 'Playfair Display', serif;
+      color: var(--gold);
+      font-size: 1.4rem;
+      margin-bottom: 8px;
+    }
+
+    .brain-doc-meta {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .brain-doc-meta span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .brain-markdown {
+      flex: 1;
+      padding: 25px;
+      overflow-y: auto;
+      max-height: 600px;
+      line-height: 1.8;
+    }
+
+    .brain-markdown::-webkit-scrollbar { width: 5px; }
+    .brain-markdown::-webkit-scrollbar-track { background: transparent; }
+    .brain-markdown::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 10px; }
+    .brain-markdown::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+    .brain-empty-content {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+
+    .brain-empty-content .icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    .brain-empty-content h3 {
+      color: var(--gold);
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+    }
+
+    .brain-empty-content .hint {
+      font-size: 0.85rem;
+      margin-top: 10px;
+      opacity: 0.7;
+    }
+
+    /* Brain Markdown Rendering Styles */
+    .brain-markdown h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--gold); margin: 24px 0 16px; }
+    .brain-markdown h2 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--gold-light); margin: 20px 0 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(212, 175, 55, 0.2); }
+    .brain-markdown h3 { font-size: 1.15rem; color: var(--text); margin: 18px 0 10px; }
+    .brain-markdown h4 { font-size: 1rem; color: var(--text); margin: 15px 0 8px; }
+    .brain-markdown p { margin: 12px 0; color: var(--text); }
+    .brain-markdown ul, .brain-markdown ol { margin: 12px 0; padding-left: 25px; }
+    .brain-markdown li { margin: 6px 0; color: var(--text); }
+    .brain-markdown code { background: var(--bg-hover); padding: 3px 7px; border-radius: 4px; font-family: 'SF Mono', Monaco, monospace; font-size: 0.85em; color: var(--gold-light); }
+    .brain-markdown pre { background: rgba(0, 0, 0, 0.3); padding: 15px 20px; border-radius: 8px; overflow-x: auto; margin: 15px 0; border: 1px solid rgba(255, 255, 255, 0.05); }
+    .brain-markdown pre code { background: none; padding: 0; color: var(--text); }
+    .brain-markdown blockquote { border-left: 3px solid var(--gold); padding-left: 15px; margin: 15px 0; color: var(--text-muted); font-style: italic; }
+    .brain-markdown a { color: var(--blue); text-decoration: none; }
+    .brain-markdown a:hover { text-decoration: underline; }
+    .brain-markdown hr { border: none; border-top: 1px solid rgba(255, 255, 255, 0.1); margin: 25px 0; }
+    .brain-markdown strong { color: var(--gold-light); }
+    .brain-markdown em { color: var(--text); }
+    .brain-markdown table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+    .brain-markdown th, .brain-markdown td { border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px 12px; text-align: left; }
+    .brain-markdown th { background: rgba(212, 175, 55, 0.1); color: var(--gold); font-weight: 600; }
+    .brain-markdown tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+    .brain-markdown img { max-width: 100%; border-radius: 8px; }
+
+    /* Search highlight */
+    .brain-search-highlight {
+      background: rgba(212, 175, 55, 0.3);
+      padding: 1px 3px;
+      border-radius: 3px;
+    }
   </style>
 </head>
 <body>
@@ -2387,6 +2672,9 @@
       </button>
       <button class="main-nav-tab" data-view="docs" onclick="switchView('docs')">
         <span class="tab-emoji">📚</span> <span class="tab-label">Docs</span> <span class="badge" id="docs-badge">0</span>
+      </button>
+      <button class="main-nav-tab" data-view="brain" onclick="switchView('brain')">
+        <span class="tab-emoji">🧠</span> <span class="tab-label">Second Brain</span>
       </button>
     </div>
 
@@ -2800,6 +3088,80 @@
         </div>
       </div>
     </div><!-- End Docs View -->
+
+    <!-- Second Brain View -->
+    <div id="brain-view" class="view-container">
+      <div class="brain-header">
+        <div class="brain-search-container">
+          <input type="text" id="brain-search" class="brain-search" placeholder="🔍 Search your knowledge base..." oninput="filterBrain()">
+        </div>
+        <div class="brain-filters">
+          <select id="brain-type-filter" class="brain-filter-select" onchange="filterBrain()">
+            <option value="all">📁 All Types</option>
+            <option value="documents">📄 Documents</option>
+            <option value="notes">📝 Notes</option>
+          </select>
+          <select id="brain-project-filter" class="brain-filter-select" onchange="filterBrain()">
+            <option value="all">🏷️ All Projects</option>
+          </select>
+          <select id="brain-category-filter" class="brain-filter-select" onchange="filterBrain()">
+            <option value="all">📂 All Categories</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="brain-container">
+        <div class="brain-sidebar">
+          <div class="brain-sidebar-header">
+            <h3>📚 Knowledge Base</h3>
+            <span class="brain-count" id="brain-item-count">0 items</span>
+          </div>
+          <div class="brain-list" id="brain-list">
+            <div class="empty-state">
+              <div class="icon">📭</div>
+              <p>Loading your knowledge...</p>
+            </div>
+          </div>
+        </div>
+        <div class="brain-content">
+          <div class="brain-content-header" id="brain-content-header">
+            <h2 id="brain-doc-title">Select a document</h2>
+            <div class="brain-doc-meta" id="brain-doc-meta"></div>
+          </div>
+          <div class="brain-markdown" id="brain-markdown">
+            <div class="brain-empty-content">
+              <div class="icon">📖</div>
+              <h3>Welcome to your Second Brain</h3>
+              <p>Select a document or note from the sidebar to view its contents.</p>
+              <p class="hint">Your documents, notes, decisions, and learnings — all in one place.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats" style="margin-top: 30px;">
+        <div class="stat-card" data-tooltip="Total documents synced from Second Brain">
+          <div class="stat-icon">📄</div>
+          <div class="stat-value" id="brain-docs-count">0</div>
+          <div class="stat-label">Documents</div>
+        </div>
+        <div class="stat-card" data-tooltip="Quick notes, decisions, and learnings">
+          <div class="stat-icon">📝</div>
+          <div class="stat-value" id="brain-notes-count">0</div>
+          <div class="stat-label">Notes</div>
+        </div>
+        <div class="stat-card" data-tooltip="Active projects tracked">
+          <div class="stat-icon">🚀</div>
+          <div class="stat-value" id="brain-projects-count">0</div>
+          <div class="stat-label">Projects</div>
+        </div>
+        <div class="stat-card" data-tooltip="Total knowledge items">
+          <div class="stat-icon">🧠</div>
+          <div class="stat-value" id="brain-total-count">0</div>
+          <div class="stat-label">Total Items</div>
+        </div>
+      </div>
+    </div><!-- End Second Brain View -->
 
     <!-- Doc Reader Modal -->
     <div class="doc-reader-overlay" id="doc-reader">
@@ -3449,6 +3811,7 @@
       document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
       document.getElementById(`${view}-view`).classList.add('active');
       if (view === 'today') renderToday();
+      if (view === 'brain') initBrain();
     }
 
     // ===== IDEAS FUNCTIONS =====
@@ -4507,6 +4870,175 @@
     document.getElementById('doc-reader').addEventListener('click', function(e) {
       if (e.target === this) closeDocReader();
     });
+
+    // ===== SECOND BRAIN FUNCTIONS =====
+    let brainTypeFilter = 'all';
+    let brainProjectFilter = 'all';
+    let brainCategoryFilter = 'all';
+    let brainSearchQuery = '';
+    let selectedBrainItem = null;
+
+    function getBrainItems() {
+      let items = [];
+      
+      // Add documents
+      if (brainTypeFilter === 'all' || brainTypeFilter === 'documents') {
+        items = items.concat(documents.map(d => ({ ...d, _type: 'document' })));
+      }
+      
+      // Add notes
+      if (brainTypeFilter === 'all' || brainTypeFilter === 'notes') {
+        items = items.concat(notes.map(n => ({ ...n, _type: 'note' })));
+      }
+      
+      // Apply project filter
+      if (brainProjectFilter !== 'all') {
+        items = items.filter(i => i.project === brainProjectFilter);
+      }
+      
+      // Apply category filter
+      if (brainCategoryFilter !== 'all') {
+        items = items.filter(i => (i._type === 'document' ? i.category : i.type) === brainCategoryFilter);
+      }
+      
+      // Apply search
+      if (brainSearchQuery) {
+        const q = brainSearchQuery.toLowerCase();
+        items = items.filter(i => 
+          (i.title && i.title.toLowerCase().includes(q)) ||
+          (i.content && i.content.toLowerCase().includes(q)) ||
+          (i.project && i.project.toLowerCase().includes(q))
+        );
+      }
+      
+      // Sort by updated_at descending
+      items.sort((a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at));
+      
+      return items;
+    }
+
+    function populateBrainFilters() {
+      const projects = new Set();
+      const categories = new Set();
+      
+      documents.forEach(d => {
+        if (d.project) projects.add(d.project);
+        if (d.category) categories.add(d.category);
+      });
+      notes.forEach(n => {
+        if (n.project) projects.add(n.project);
+        if (n.type) categories.add(n.type);
+      });
+      
+      // Populate project filter
+      const projectSelect = document.getElementById('brain-project-filter');
+      projectSelect.innerHTML = '<option value="all">🏷️ All Projects</option>';
+      [...projects].sort().forEach(p => {
+        projectSelect.innerHTML += `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`;
+      });
+      
+      // Populate category filter
+      const categorySelect = document.getElementById('brain-category-filter');
+      categorySelect.innerHTML = '<option value="all">📂 All Categories</option>';
+      [...categories].sort().forEach(c => {
+        const emoji = noteTypeEmojis[c] || getDocCategoryEmoji(c) || '📁';
+        categorySelect.innerHTML += `<option value="${escapeHtml(c)}">${emoji} ${escapeHtml(c)}</option>`;
+      });
+    }
+
+    function filterBrain() {
+      brainSearchQuery = document.getElementById('brain-search').value;
+      brainTypeFilter = document.getElementById('brain-type-filter').value;
+      brainProjectFilter = document.getElementById('brain-project-filter').value;
+      brainCategoryFilter = document.getElementById('brain-category-filter').value;
+      renderBrainList();
+    }
+
+    function highlightBrainSearch(text, query) {
+      if (!query || !text) return escapeHtml(text || '');
+      const escaped = escapeHtml(text);
+      const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      return escaped.replace(regex, '<span class="brain-search-highlight">$1</span>');
+    }
+
+    function renderBrainList() {
+      const items = getBrainItems();
+      const list = document.getElementById('brain-list');
+      document.getElementById('brain-item-count').textContent = `${items.length} item${items.length !== 1 ? 's' : ''}`;
+      
+      if (items.length === 0) {
+        list.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>${brainSearchQuery ? 'No matches found.' : 'No items yet.'}</p></div>`;
+        return;
+      }
+      
+      list.innerHTML = items.map(item => {
+        const typeIcon = item._type === 'document' ? '📄' : '📝';
+        const typeLabel = item._type === 'document' ? (item.category || 'document') : (item.type || 'note');
+        const date = new Date(item.updated_at || item.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const projectTag = item.project ? `<span class="project-tag">${escapeHtml(item.project)}</span>` : '';
+        const title = highlightBrainSearch(item.title || 'Untitled', brainSearchQuery);
+        const isActive = selectedBrainItem?.id === item.id && selectedBrainItem?._type === item._type ? 'active' : '';
+        
+        return `
+          <div class="brain-item ${isActive}" data-id="${item.id}" data-type="${item._type}" onclick="selectBrainItem('${item.id}', '${item._type}')">
+            <div class="brain-item-type">${typeIcon} ${typeLabel} ${projectTag}</div>
+            <div class="brain-item-title">${title}</div>
+            <div class="brain-item-meta">
+              <span>📅 ${date}</span>
+              ${item.folder ? `<span>📁 ${escapeHtml(item.folder.split('/').pop())}</span>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      updateBrainStats();
+    }
+
+    function selectBrainItem(id, type) {
+      const item = type === 'document' 
+        ? documents.find(d => d.id === id) 
+        : notes.find(n => n.id === id);
+      if (!item) return;
+      
+      selectedBrainItem = { ...item, _type: type };
+      
+      // Update active state in list
+      document.querySelectorAll('.brain-item').forEach(el => el.classList.remove('active'));
+      document.querySelector(`.brain-item[data-id="${id}"][data-type="${type}"]`)?.classList.add('active');
+      
+      // Update header
+      document.getElementById('brain-doc-title').textContent = item.title || 'Untitled';
+      
+      const meta = [];
+      if (item.project) meta.push(`<span>🏷️ ${escapeHtml(item.project)}</span>`);
+      if (type === 'document' && item.category) meta.push(`<span>📂 ${escapeHtml(item.category)}</span>`);
+      if (type === 'note' && item.type) meta.push(`<span>📝 ${escapeHtml(item.type)}</span>`);
+      const dateStr = item.updated_at || item.created_at;
+      if (dateStr) meta.push(`<span>📅 ${new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>`);
+      if (type === 'document' && item.folder) meta.push(`<span>📁 ${escapeHtml(item.folder)}</span>`);
+      document.getElementById('brain-doc-meta').innerHTML = meta.join('');
+      
+      // Render content
+      const content = item.content || '*No content available*';
+      const rendered = typeof marked !== 'undefined'
+        ? (typeof marked.parse === 'function' ? marked.parse(content) : marked(content))
+        : content.replace(/\n/g, '<br>');
+      document.getElementById('brain-markdown').innerHTML = rendered;
+    }
+
+    function updateBrainStats() {
+      document.getElementById('brain-docs-count').textContent = documents.length;
+      document.getElementById('brain-notes-count').textContent = notes.length;
+      const projects = new Set([...documents.map(d => d.project), ...notes.map(n => n.project)].filter(Boolean));
+      document.getElementById('brain-projects-count').textContent = projects.size;
+      document.getElementById('brain-total-count').textContent = documents.length + notes.length;
+    }
+
+    function initBrain() {
+      populateBrainFilters();
+      renderBrainList();
+      updateBrainStats();
+    }
 
     init();
   </script>
