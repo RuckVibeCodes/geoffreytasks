@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Geoffrey's Task Board</title>
+  <title>Geoffrey's Mission Control</title>
   <meta name="description" content="Butler-themed task management for Master Matt">
   <meta name="theme-color" content="#0d1117">
   <link rel="manifest" href="manifest.json">
@@ -135,6 +135,47 @@
       color: var(--text-muted);
       margin-top: 8px;
       font-style: italic;
+    }
+
+    /* Mission Statement Banner */
+    .mission-banner {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(212, 175, 55, 0.04));
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 2px solid rgba(212, 175, 55, 0.4);
+      border-radius: var(--glass-radius);
+      padding: 28px 36px;
+      margin: 30px auto;
+      max-width: 900px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(212, 175, 55, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .mission-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.85rem;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      margin-bottom: 14px;
+    }
+
+    .mission-statement {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    .mission-priority {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .mission-priority strong {
+      color: var(--green);
+      font-weight: 600;
     }
 
     /* Geoffrey's wisdom */
@@ -2478,9 +2519,20 @@
   <div class="container">
     <header>
       <div class="logo">🎩</div>
-      <h1>Geoffrey's Task Board</h1>
-      <p class="subtitle">Maintaining order in the chaos, one task at a time</p>
+      <h1>Geoffrey's Mission Control</h1>
+      <p class="subtitle">Every task moves us closer to freedom</p>
     </header>
+
+    <!-- Mission Statement Banner -->
+    <div class="mission-banner">
+      <div class="mission-title">🎯 MISSION STATEMENT</div>
+      <div class="mission-statement">
+        "Build $2-3k/month income streams so Matt can escape the 9-5 and pursue crypto projects full-time."
+      </div>
+      <div class="mission-priority">
+        <strong>Current Priority:</strong> Ship Timeslot → Get first paying customers → Prove revenue
+      </div>
+    </div>
 
     <div class="geoffrey-says" data-tooltip="Geoffrey's daily wisdom — refreshes each time you load the page" data-tooltip-pos="bottom">
       <div class="geoffrey-avatar">🧐</div>
