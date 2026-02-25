@@ -411,6 +411,7 @@
     }
     .brain-content::-webkit-scrollbar { width: 4px; }
     .brain-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .brain-back-btn { display: none; } /* shown only on mobile via media query */
     .brain-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--muted); gap: 12px; }
     .brain-empty .icon { font-size: 40px; opacity: .3; }
     .brain-markdown { font-size: 13px; line-height: 1.8; color: var(--text); }
@@ -621,6 +622,41 @@
       .view-header { margin-bottom: 12px; }
       .view-header h2 { font-size: 16px; }
 
+      /* Brain view — full-screen stacked on mobile */
+      #brain-view { flex-direction: column; }
+      .brain-sidebar {
+        width: 100%; border-right: none;
+        border-bottom: none; flex-shrink: 0;
+        max-height: 100%;
+      }
+      .brain-sidebar.hidden-mobile { display: none; }
+      .brain-content { display: none; padding: 16px; }
+      .brain-content.active-mobile {
+        display: block; min-height: 60vh;
+      }
+      .brain-back-btn {
+        display: flex; align-items: center; gap: 6px;
+        padding: 10px 14px; font-size: 12px;
+        color: var(--gold); cursor: pointer;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+      .brain-back-btn:hover { background: rgba(255,255,255,.02); }
+
+      /* Doc list items — show preview snippet */
+      .brain-doc-item .doc-preview {
+        font-size: 11px; color: var(--muted);
+        white-space: nowrap; overflow: hidden;
+        text-overflow: ellipsis; margin-top: 2px;
+        opacity: .7;
+      }
+
+      /* Agents — ensure scrollable */
+      #agents-view {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
       /* Modal full-screen on mobile */
       .modal-overlay { align-items: flex-end; }
       .modal {
@@ -738,12 +774,13 @@
 
   <!-- SECOND BRAIN -->
   <div id="brain-view" class="view">
-    <div class="brain-sidebar">
+    <div class="brain-sidebar" id="brain-sidebar">
       <div class="brain-search"><input type="text" id="brain-search" placeholder="Search documents…" oninput="filterBrainDocs(this.value)"></div>
       <div class="brain-doc-list" id="brain-doc-list"></div>
     </div>
     <div class="brain-content" id="brain-content">
-      <div class="brain-empty"><div class="icon">🧠</div><p>Select a document to read it</p></div>
+      <div class="brain-back-btn" id="brain-back" onclick="closeBrainDoc()">← Back to documents</div>
+      <div class="brain-empty" id="brain-empty"><div class="icon">🧠</div><p>Select a document to read it</p></div>
     </div>
   </div>
 
@@ -941,7 +978,9 @@
     if (diff < 60) return `${diff}s`;
     if (diff < 3600) return `${Math.floor(diff/60)}m`;
     if (diff < 86400) return `${Math.floor(diff/3600)}h`;
-    return `${Math.floor(diff/86400)}d`;
+    if (diff < 7 * 86400) return `${Math.floor(diff/86400)}d`;
+    // Older than 7 days — show actual date
+    return new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
 
   // ── TOAST ──
@@ -1133,7 +1172,7 @@
   }
   function buildActivityFromTasks() {
     const recent = [...tasks].sort((a,b) => new Date(b.updated_at||b.created_at) - new Date(a.updated_at||a.created_at)).slice(0, 20);
-    activityLog = recent.map(t => ({
+    const taskEntries = recent.map(t => ({
       icon: t.status === 'done' ? '✅' : t.status === 'in-progress' ? '🔄' : '📥',
       strong: t.title.length > 26 ? t.title.slice(0,26)+'…' : t.title,
       text: `→ ${t.status === 'in-progress' ? 'in progress' : t.status}`,
@@ -1141,6 +1180,13 @@
       isAgent: t.source === 'api' || t.source === 'telegram',
       source: t.source,
     }));
+    // Preserve real-time entries added this session, prepend them
+    const sessionEntries = activityLog.filter(a => a.isSession);
+    activityLog = [
+      ...sessionEntries,
+      { icon: '🎩', strong: 'Geoffrey', text: `→ board synced · ${tasks.length} tasks`, time: new Date().toISOString(), isSession: true },
+      ...taskEntries,
+    ];
     renderActivity();
   }
 
@@ -1323,12 +1369,23 @@
     const list = document.getElementById('brain-doc-list');
     if (!docs.length) { list.innerHTML = '<div style="padding:20px;color:var(--muted);font-size:12px">No documents found.</div>'; return; }
     list.innerHTML = docs.map((d,i) => {
-      const parts = (d.path||d.title||'').split('/');
-      const name = parts.pop().replace('.md','');
-      const project = parts.length ? parts.join(' / ') : 'General';
+      const fullPath = d.path || d.title || '';
+      const parts = fullPath.split('/');
+      const filename = parts.pop().replace(/\.md$/i, '');
+      // Reconstruct a meaningful display name
+      // If path has folders, use last folder + filename for disambiguation
+      const folder = parts.filter(Boolean).pop() || '';
+      const displayName = folder ? `${folder} / ${filename}` : filename;
+      const project = fullPath.split('/').filter(Boolean).length > 1
+        ? parts.filter(Boolean).join(' / ')
+        : (d.project || d.category || 'General');
+      // Content preview (first 80 chars of content, strip markdown)
+      const preview = (d.content || '')
+        .replace(/^#+\s*/gm, '').replace(/\*+/g, '').replace(/\n+/g, ' ').trim().slice(0, 80);
       return `<div class="brain-doc-item" data-idx="${i}" onclick="openBrainDoc(${i})">
-        <div class="doc-name">${escHtml(name)}</div>
-        <div class="doc-project">${escHtml(project)}</div>
+        <div class="doc-name">${escHtml(displayName || filename || 'Untitled')}</div>
+        <div class="doc-project">${escHtml(project.toUpperCase())}</div>
+        ${preview ? `<div class="doc-preview">${escHtml(preview)}…</div>` : ''}
       </div>`;
     }).join('');
   }
@@ -1339,13 +1396,39 @@
   function openBrainDoc(idx) {
     document.querySelectorAll('.brain-doc-item').forEach((el,i) => el.classList.toggle('active', i === idx));
     const doc = filteredDocs[idx];
-    const content = document.getElementById('brain-content');
-    const name = (doc.path||doc.title||'Document').split('/').pop().replace('.md','');
+    const contentEl = document.getElementById('brain-content');
+    const emptyEl = document.getElementById('brain-empty');
+    const parts = (doc.path||doc.title||'Document').split('/');
+    const filename = parts.pop().replace(/\.md$/i,'');
+    const folder = parts.filter(Boolean).pop() || '';
+    const displayName = folder ? `${folder} / ${filename}` : filename;
+    if (emptyEl) emptyEl.style.display = 'none';
+    const backHtml = `<div class="brain-back-btn" id="brain-back" onclick="closeBrainDoc()">← Back to documents</div>`;
+    const titleHtml = `<h2 style="font-size:18px;font-weight:700;margin-bottom:4px;color:var(--text)">${escHtml(displayName)}</h2>
+      ${doc.updated_at ? `<p style="font-size:11px;color:var(--muted);margin-bottom:16px">Updated ${relTime(doc.updated_at)} ago</p>` : '<div style="margin-bottom:16px"></div>'}`;
     if (doc.content) {
-      content.innerHTML = `<h2 style="font-size:18px;font-weight:700;margin-bottom:16px;color:var(--text)">${escHtml(name)}</h2><div class="brain-markdown">${marked.parse(doc.content)}</div>`;
+      contentEl.innerHTML = backHtml + titleHtml + `<div class="brain-markdown">${marked.parse(doc.content)}</div>`;
     } else {
-      content.innerHTML = `<h2 style="font-size:18px;font-weight:700;margin-bottom:16px;">${escHtml(name)}</h2><div class="brain-empty"><p style="color:var(--muted)">No content available.</p></div>`;
+      contentEl.innerHTML = backHtml + titleHtml + `<div style="color:var(--muted);font-size:13px">No content available.</div>`;
     }
+    // Mobile: hide sidebar, show content
+    if (window.innerWidth <= 768) {
+      const sidebar = document.getElementById('brain-sidebar');
+      if (sidebar) sidebar.classList.add('hidden-mobile');
+      contentEl.classList.add('active-mobile');
+      contentEl.scrollTop = 0;
+    }
+  }
+
+  function closeBrainDoc() {
+    if (window.innerWidth > 768) return;
+    const sidebar = document.getElementById('brain-sidebar');
+    const contentEl = document.getElementById('brain-content');
+    if (sidebar) sidebar.classList.remove('hidden-mobile');
+    contentEl.classList.remove('active-mobile');
+    const emptyEl = document.getElementById('brain-empty');
+    if (emptyEl) emptyEl.style.display = '';
+    contentEl.innerHTML = `<div class="brain-back-btn" id="brain-back" onclick="closeBrainDoc()">← Back to documents</div><div class="brain-empty" id="brain-empty"><div class="icon">🧠</div><p>Select a document to read it</p></div>`;
   }
 
   // ── UTIL ──
