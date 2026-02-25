@@ -2496,6 +2496,701 @@
       padding: 1px 3px;
       border-radius: 3px;
     }
+
+    /* ===== MISSION CONTROL HEADER ===== */
+    .mission-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: rgba(10, 14, 23, 0.85);
+      backdrop-filter: blur(24px) saturate(1.5);
+      -webkit-backdrop-filter: blur(24px) saturate(1.5);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      margin: -20px -20px 20px -20px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .mission-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mission-header-logo {
+      font-size: 1.8rem;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .mission-header-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: var(--gold);
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    }
+
+    .mission-header-title span {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .mission-header-center {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .mission-stats-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--glass-radius-pill);
+    }
+
+    .mission-stat {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .mission-stat .value {
+      color: var(--gold);
+      font-weight: 600;
+      font-family: 'SF Mono', Monaco, monospace;
+    }
+
+    .mission-stat.active .value { color: var(--orange); }
+    .mission-stat.done .value { color: var(--green); }
+
+    .mission-header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mission-clock {
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.95rem;
+      color: var(--text);
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+    }
+
+    .mission-connection {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+    }
+
+    .mission-connection.connected {
+      background: rgba(63, 185, 80, 0.1);
+      border: 1px solid rgba(63, 185, 80, 0.2);
+    }
+
+    .mission-connection .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse-glow 2s infinite;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 4px var(--green); }
+      50% { box-shadow: 0 0 12px var(--green), 0 0 20px rgba(63, 185, 80, 0.4); }
+    }
+
+    @media (max-width: 1024px) {
+      .mission-header { flex-wrap: wrap; gap: 12px; padding: 12px 16px; }
+      .mission-header-center { order: 3; width: 100%; justify-content: center; }
+      .mission-stats-bar { padding: 6px 12px; gap: 12px; }
+      .mission-stat { font-size: 0.75rem; }
+    }
+
+    @media (max-width: 768px) {
+      .mission-header { display: none; }
+    }
+
+    /* ===== KANBAN + ACTIVITY FEED LAYOUT ===== */
+    .kanban-container {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+    }
+
+    @media (max-width: 1200px) {
+      .kanban-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .kanban-main {
+      min-width: 0;
+    }
+
+    /* Kanban Board */
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 1024px) {
+      .kanban-board { grid-template-columns: 1fr; }
+    }
+
+    .kanban-column {
+      background: rgba(15, 20, 35, 0.55);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-radius: var(--glass-radius);
+      padding: 0;
+      border: 1px solid var(--glass-border);
+      transition: all 0.3s ease;
+      box-shadow: var(--glass-shadow);
+      overflow: hidden;
+    }
+
+    .kanban-column.drag-over {
+      border-color: rgba(212, 175, 55, 0.5);
+      box-shadow: 0 0 40px rgba(212, 175, 55, 0.2), inset 0 0 20px rgba(212, 175, 55, 0.05);
+    }
+
+    .kanban-column-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-top: 4px solid;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .kanban-column.todo .kanban-column-header { border-top-color: var(--blue); }
+    .kanban-column.in-progress .kanban-column-header { border-top-color: var(--orange); }
+    .kanban-column.done .kanban-column-header { border-top-color: var(--green); }
+
+    .kanban-column-header h2 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .kanban-column.todo .kanban-column-header h2 { color: var(--blue); }
+    .kanban-column.in-progress .kanban-column-header h2 { color: var(--orange); }
+    .kanban-column.done .kanban-column-header h2 { color: var(--green); }
+
+    .kanban-column-header .count-badge {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .kanban-column.todo .count-badge { color: var(--blue); }
+    .kanban-column.in-progress .count-badge { color: var(--orange); }
+    .kanban-column.done .count-badge { color: var(--green); }
+
+    .kanban-column-content {
+      padding: 16px;
+      min-height: 200px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    /* Kanban Cards */
+    .kanban-card {
+      background: rgba(20, 27, 45, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      cursor: grab;
+      transition: all 0.25s ease;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      position: relative;
+      animation: cardFadeIn 0.3s ease;
+    }
+
+    @keyframes cardFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .kanban-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .kanban-card.dragging {
+      opacity: 0.6;
+      transform: rotate(3deg) scale(1.02);
+      cursor: grabbing;
+    }
+
+    .kanban-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .kanban-card-category {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    .kanban-card-category.work { background: rgba(88, 166, 255, 0.15); color: var(--blue); }
+    .kanban-card-category.hustle { background: rgba(163, 113, 247, 0.15); color: var(--purple); }
+    .kanban-card-category.personal { background: rgba(63, 185, 80, 0.15); color: var(--green); }
+    .kanban-card-category.urgent { background: rgba(248, 81, 73, 0.15); color: var(--red); }
+
+    .kanban-card-priority {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .kanban-card-priority.high { background: var(--red); box-shadow: 0 0 8px var(--red); }
+    .kanban-card-priority.medium { background: var(--orange); }
+    .kanban-card-priority.low { background: var(--green); }
+
+    .kanban-card-title {
+      font-size: 0.9rem;
+      color: var(--text);
+      font-weight: 500;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .kanban-card.completed .kanban-card-title {
+      text-decoration: line-through;
+      color: var(--text-muted);
+      opacity: 0.7;
+    }
+
+    .kanban-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .kanban-card-time {
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.7rem;
+    }
+
+    .kanban-card-actions {
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .kanban-card:hover .kanban-card-actions { opacity: 1; }
+
+    .kanban-card-actions button {
+      background: rgba(255, 255, 255, 0.05);
+      border: none;
+      color: var(--text-muted);
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: all 0.2s;
+    }
+
+    .kanban-card-actions button:hover {
+      background: rgba(212, 175, 55, 0.2);
+      color: var(--gold);
+    }
+
+    .kanban-card-actions button.delete:hover {
+      background: rgba(248, 81, 73, 0.2);
+      color: var(--red);
+    }
+
+    /* ===== ACTIVITY FEED ===== */
+    .activity-feed {
+      background: rgba(10, 14, 23, 0.7);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-radius: var(--glass-radius);
+      border: 1px solid var(--glass-border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--glass-shadow);
+    }
+
+    .activity-feed-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .activity-feed-header h3 {
+      color: var(--gold);
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .activity-feed-header .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.7rem;
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .activity-feed-header .live-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse-glow 2s infinite;
+    }
+
+    .activity-feed-list {
+      flex: 1;
+      overflow-y: auto;
+      max-height: 600px;
+      padding: 12px 0;
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.78rem;
+      transition: background 0.2s;
+      animation: activitySlideIn 0.3s ease;
+    }
+
+    @keyframes activitySlideIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .activity-item:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .activity-item-icon {
+      font-size: 1rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .activity-item-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .activity-item-text {
+      color: var(--text-muted);
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .activity-item-text .highlight {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .activity-item-text .status {
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+    }
+
+    .activity-item-text .status.todo { background: rgba(88, 166, 255, 0.15); color: var(--blue); }
+    .activity-item-text .status.in-progress { background: rgba(210, 153, 34, 0.15); color: var(--orange); }
+    .activity-item-text .status.done { background: rgba(63, 185, 80, 0.15); color: var(--green); }
+
+    .activity-item-time {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      opacity: 0.6;
+      margin-top: 4px;
+    }
+
+    .activity-empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    @media (max-width: 1200px) {
+      .activity-feed {
+        margin-top: 24px;
+      }
+      .activity-feed-list {
+        max-height: 300px;
+      }
+    }
+
+    /* ===== COMMAND PALETTE ===== */
+    .command-palette-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 15vh;
+      z-index: 2000;
+    }
+
+    .command-palette-overlay.active {
+      display: flex;
+    }
+
+    .command-palette {
+      background: rgba(15, 20, 35, 0.95);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: var(--glass-radius);
+      width: 100%;
+      max-width: 600px;
+      overflow: hidden;
+      animation: commandSlideIn 0.2s ease;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 60px rgba(212, 175, 55, 0.1);
+    }
+
+    @keyframes commandSlideIn {
+      from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .command-palette-header {
+      display: flex;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      gap: 12px;
+    }
+
+    .command-palette-icon {
+      font-size: 1.2rem;
+    }
+
+    .command-palette-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 1.1rem;
+      font-family: inherit;
+      outline: none;
+    }
+
+    .command-palette-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .command-palette-kbd {
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.7rem;
+      padding: 4px 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      color: var(--text-muted);
+    }
+
+    .command-palette-body {
+      padding: 16px 20px;
+    }
+
+    .command-palette-hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .command-palette-hint code {
+      background: rgba(212, 175, 55, 0.15);
+      color: var(--gold);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'SF Mono', Monaco, monospace;
+    }
+
+    .command-palette-options {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .command-palette-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .command-palette-option:hover,
+    .command-palette-option.selected {
+      background: rgba(212, 175, 55, 0.1);
+      border-color: rgba(212, 175, 55, 0.3);
+    }
+
+    .command-palette-option-icon {
+      font-size: 1.2rem;
+    }
+
+    .command-palette-option-text {
+      flex: 1;
+    }
+
+    .command-palette-option-title {
+      font-size: 0.9rem;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .command-palette-option-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .command-palette-footer {
+      padding: 12px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .command-palette-footer kbd {
+      padding: 2px 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+      margin: 0 2px;
+    }
+
+    /* ===== BRAIN RECENTLY UPDATED ===== */
+    .brain-recently-updated {
+      margin-bottom: 20px;
+    }
+
+    .brain-recently-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .brain-recently-header h4 {
+      color: var(--gold);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .brain-recently-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .brain-recently-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .brain-recently-item:hover {
+      background: rgba(212, 175, 55, 0.08);
+      border-color: rgba(212, 175, 55, 0.2);
+    }
+
+    .brain-recently-item-icon {
+      font-size: 1rem;
+    }
+
+    .brain-recently-item-title {
+      flex: 1;
+      font-size: 0.85rem;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brain-recently-item-time {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-family: 'SF Mono', Monaco, monospace;
+    }
+
+    /* Show kanban category tabs, hide old board */
+    #kanban-category-tabs {
+      display: flex !important;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
   </style>
 </head>
 <body>
@@ -2517,6 +3212,32 @@
   <div class="bg-pattern"></div>
   
   <div class="container">
+    <!-- Mission Control Header -->
+    <div class="mission-header">
+      <div class="mission-header-left">
+        <span class="mission-header-logo">🎩</span>
+        <span class="mission-header-title">GEOFFREY <span>//</span> MISSION CONTROL</span>
+      </div>
+      <div class="mission-header-center">
+        <div class="mission-stats-bar">
+          <div class="mission-stat active">
+            <span id="header-active-count" class="value">0</span>
+            <span>active</span>
+          </div>
+          <div class="mission-stat done">
+            <span id="header-done-today" class="value">0</span>
+            <span>done today</span>
+          </div>
+        </div>
+      </div>
+      <div class="mission-header-right">
+        <div class="mission-clock" id="mission-clock">00:00:00</div>
+        <div class="mission-connection connected">
+          <span class="dot"></span>
+        </div>
+      </div>
+    </div>
+
     <header>
       <div class="logo">🎩</div>
       <h1>Geoffrey's Mission Control</h1>
@@ -2567,7 +3288,8 @@
     <!-- Tasks View -->
     <div id="tasks-view" class="view-container active">
 
-    <div class="category-tabs">
+    <!-- Category Filter Tabs -->
+    <div class="category-tabs" id="kanban-category-tabs">
       <button class="category-tab active" data-category="all" data-tooltip="Show all tasks regardless of category">🏠 All Tasks</button>
       <button class="category-tab" data-category="work" data-tooltip="9-5 job tasks — medical billing, company projects">💼 Work</button>
       <button class="category-tab" data-category="hustle" data-tooltip="Side projects — apps, content, revenue streams">🚀 Side Hustle</button>
@@ -2575,14 +3297,67 @@
       <button class="category-tab" data-category="urgent" data-tooltip="Drop everything — needs immediate attention">🔥 Urgent</button>
     </div>
 
-    <div class="board">
+    <!-- Kanban + Activity Feed Container -->
+    <div class="kanban-container">
+      <div class="kanban-main">
+        <!-- Kanban Board -->
+        <div class="kanban-board" id="kanban-board">
+          <!-- TODO Column -->
+          <div class="kanban-column todo" data-status="todo">
+            <div class="kanban-column-header">
+              <h2>📥 TODO</h2>
+              <span class="count-badge" id="kanban-todo-count">0</span>
+            </div>
+            <div class="kanban-column-content" id="kanban-todo-list"></div>
+            <div style="padding: 0 16px 16px;">
+              <button class="add-task-btn" onclick="openCommandPalette()" data-tooltip="Press Cmd+K or / to quick add">+ Add task (⌘K)</button>
+            </div>
+          </div>
+
+          <!-- IN PROGRESS Column -->
+          <div class="kanban-column in-progress" data-status="in-progress">
+            <div class="kanban-column-header">
+              <h2>🔄 IN PROGRESS</h2>
+              <span class="count-badge" id="kanban-progress-count">0</span>
+            </div>
+            <div class="kanban-column-content" id="kanban-progress-list"></div>
+          </div>
+
+          <!-- DONE Column -->
+          <div class="kanban-column done" data-status="done">
+            <div class="kanban-column-header">
+              <h2>✅ DONE</h2>
+              <span class="count-badge" id="kanban-done-count">0</span>
+            </div>
+            <div class="kanban-column-content" id="kanban-done-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Feed -->
+      <div class="activity-feed" id="activity-feed">
+        <div class="activity-feed-header">
+          <h3>📡 Insights</h3>
+          <div class="live-indicator">
+            <span class="live-dot"></span>
+            <span>LIVE</span>
+          </div>
+        </div>
+        <div class="activity-feed-list" id="activity-feed-list">
+          <div class="activity-empty">Loading activity...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden old board structure for backwards compatibility -->
+    <div class="board" style="display:none;">
       <div class="column todo" data-status="todo">
-        <div class="column-header" data-tooltip="Tasks waiting to be started. Drag to In Progress when you begin work.">
+        <div class="column-header">
           <h2>📋 Awaiting Action</h2>
-          <span class="count" data-tooltip="Number of pending tasks" data-tooltip-pos="left">0</span>
+          <span class="count">0</span>
         </div>
         <div class="task-list"></div>
-        <button class="add-task-btn" onclick="toggleForm(this)" data-tooltip="Click to add a new task, or press 'N' on your keyboard">+ Add a task, sir</button>
+        <button class="add-task-btn" onclick="toggleForm(this)">+ Add a task, sir</button>
         <div class="add-task-form">
           <textarea class="task-input" placeholder="What requires attention, Master Matt?"></textarea>
           <div class="form-row">
@@ -2608,19 +3383,17 @@
           </div>
         </div>
       </div>
-
       <div class="column in-progress" data-status="in-progress">
-        <div class="column-header" data-tooltip="Tasks currently being worked on. Geoffrey auto-moves tasks here when he starts working.">
+        <div class="column-header">
           <h2>⚡ In Progress</h2>
-          <span class="count" data-tooltip="Active tasks" data-tooltip-pos="left">0</span>
+          <span class="count">0</span>
         </div>
         <div class="task-list"></div>
       </div>
-
       <div class="column done" data-status="done">
-        <div class="column-header" data-tooltip="Completed tasks. Drag here or use arrow buttons to mark done. Triggers confetti! 🎉">
+        <div class="column-header">
           <h2>✨ Accomplished</h2>
-          <span class="count" data-tooltip="Completed tasks" data-tooltip-pos="left">0</span>
+          <span class="count">0</span>
         </div>
         <div class="bulk-actions" id="bulk-actions">
           <label class="select-all-label">
@@ -2975,6 +3748,16 @@
         </div>
       </div>
 
+      <!-- Recently Updated Section -->
+      <div class="brain-recently-updated" id="brain-recently-updated">
+        <div class="brain-recently-header">
+          <h4>🕐 Recently Updated</h4>
+        </div>
+        <div class="brain-recently-list" id="brain-recently-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
       <div class="brain-container">
         <div class="brain-sidebar">
           <div class="brain-sidebar-header">
@@ -3095,6 +3878,56 @@
       </div>
     </div>
 
+    <!-- Command Palette -->
+    <div class="command-palette-overlay" id="command-palette-overlay">
+      <div class="command-palette">
+        <div class="command-palette-header">
+          <span class="command-palette-icon">⚡</span>
+          <input type="text" class="command-palette-input" id="command-palette-input" placeholder="Quick add task..." autocomplete="off">
+          <span class="command-palette-kbd">ESC</span>
+        </div>
+        <div class="command-palette-body">
+          <div class="command-palette-hint">
+            Smart parsing: <code>urgent: fix login</code> or <code>hustle: write thread</code>
+          </div>
+          <div class="command-palette-options" id="command-palette-options">
+            <div class="command-palette-option selected" data-category="work" onclick="setCommandCategory('work')">
+              <span class="command-palette-option-icon">💼</span>
+              <div class="command-palette-option-text">
+                <div class="command-palette-option-title">Work Task</div>
+                <div class="command-palette-option-desc">Add to 9-5 job tasks</div>
+              </div>
+            </div>
+            <div class="command-palette-option" data-category="hustle" onclick="setCommandCategory('hustle')">
+              <span class="command-palette-option-icon">🚀</span>
+              <div class="command-palette-option-text">
+                <div class="command-palette-option-title">Side Hustle</div>
+                <div class="command-palette-option-desc">Add to side projects</div>
+              </div>
+            </div>
+            <div class="command-palette-option" data-category="personal" onclick="setCommandCategory('personal')">
+              <span class="command-palette-option-icon">🧘</span>
+              <div class="command-palette-option-text">
+                <div class="command-palette-option-title">Personal</div>
+                <div class="command-palette-option-desc">Add to personal tasks</div>
+              </div>
+            </div>
+            <div class="command-palette-option" data-category="urgent" onclick="setCommandCategory('urgent')">
+              <span class="command-palette-option-icon">🔥</span>
+              <div class="command-palette-option-text">
+                <div class="command-palette-option-title">Urgent</div>
+                <div class="command-palette-option-desc">High priority - drop everything</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="command-palette-footer">
+          <span><kbd>↑</kbd><kbd>↓</kbd> Navigate</span>
+          <span><kbd>Enter</kbd> Add task</span>
+        </div>
+      </div>
+    </div>
+
     <footer>
       <p>Crafted with reluctant excellence by <a href="#">Geoffrey</a> 🎩</p>
       <p style="margin-top: 5px; font-size: 0.8rem;">"One does not simply abandon a task list."</p>
@@ -3110,7 +3943,7 @@
   </div>
 
   <div class="shortcut-hint" data-tooltip="Keyboard shortcuts work when not typing in a field">
-    <kbd>N</kbd> New task &nbsp;|&nbsp; <kbd>R</kbd> Refresh &nbsp;|&nbsp; <kbd>?</kbd> Help
+    <kbd>⌘K</kbd> Quick add &nbsp;|&nbsp; <kbd>/</kbd> Command &nbsp;|&nbsp; <kbd>R</kbd> Refresh
   </div>
 
   <script>
@@ -4807,10 +5640,384 @@
     function initBrain() {
       populateBrainFilters();
       renderBrainList();
+      renderBrainRecentlyUpdated();
       updateBrainStats();
     }
 
+    // ===== BRAIN RECENTLY UPDATED =====
+    function renderBrainRecentlyUpdated() {
+      const allItems = [
+        ...documents.map(d => ({ ...d, _type: 'document' })),
+        ...notes.map(n => ({ ...n, _type: 'note' }))
+      ].sort((a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at));
+
+      const recent = allItems.slice(0, 5);
+      const list = document.getElementById('brain-recently-list');
+
+      if (recent.length === 0) {
+        list.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;padding:10px;">No recent items</div>';
+        return;
+      }
+
+      list.innerHTML = recent.map(item => {
+        const icon = item._type === 'document' ? '📄' : '📝';
+        const time = getTimeAgo(item.updated_at || item.created_at);
+        return `
+          <div class="brain-recently-item" onclick="selectBrainItem('${item.id}', '${item._type}')">
+            <span class="brain-recently-item-icon">${icon}</span>
+            <span class="brain-recently-item-title">${escapeHtml(item.title || 'Untitled')}</span>
+            <span class="brain-recently-item-time">${time}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ===== LIVE CLOCK =====
+    function updateMissionClock() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+      const clockEl = document.getElementById('mission-clock');
+      if (clockEl) clockEl.textContent = timeStr;
+    }
+
+    // ===== HEADER STATS =====
+    function updateHeaderStats() {
+      const active = tasks.filter(t => t.status === 'in-progress' && t.category !== 'checklist').length;
+      const today = new Date().toISOString().split('T')[0];
+      const doneToday = tasks.filter(t => t.status === 'done' && t.completed_at && t.completed_at.startsWith(today)).length;
+
+      const activeEl = document.getElementById('header-active-count');
+      const doneEl = document.getElementById('header-done-today');
+      if (activeEl) activeEl.textContent = active;
+      if (doneEl) doneEl.textContent = doneToday;
+    }
+
+    // ===== KANBAN BOARD =====
+    function renderKanban() {
+      const filtered = getFilteredTasks();
+
+      // Render TODO column
+      const todoTasks = filtered.filter(t => t.status === 'todo');
+      const todoList = document.getElementById('kanban-todo-list');
+      document.getElementById('kanban-todo-count').textContent = todoTasks.length;
+      todoList.innerHTML = todoTasks.length === 0
+        ? '<div class="empty-state"><div class="icon">📭</div><p>Nothing pending</p></div>'
+        : '';
+      todoTasks.forEach(t => todoList.appendChild(createKanbanCard(t)));
+
+      // Render IN PROGRESS column
+      const progressTasks = filtered.filter(t => t.status === 'in-progress');
+      const progressList = document.getElementById('kanban-progress-list');
+      document.getElementById('kanban-progress-count').textContent = progressTasks.length;
+      progressList.innerHTML = progressTasks.length === 0
+        ? '<div class="empty-state"><div class="icon">⏳</div><p>Nothing in progress</p></div>'
+        : '';
+      progressTasks.forEach(t => progressList.appendChild(createKanbanCard(t)));
+
+      // Render DONE column (last 10 only)
+      const doneTasks = filtered.filter(t => t.status === 'done').slice(0, 10);
+      const totalDone = filtered.filter(t => t.status === 'done').length;
+      const doneList = document.getElementById('kanban-done-list');
+      document.getElementById('kanban-done-count').textContent = totalDone;
+      doneList.innerHTML = doneTasks.length === 0
+        ? '<div class="empty-state"><div class="icon">🏆</div><p>Complete tasks to see them here</p></div>'
+        : '';
+      doneTasks.forEach(t => doneList.appendChild(createKanbanCard(t)));
+
+      updateHeaderStats();
+    }
+
+    function createKanbanCard(task) {
+      const div = document.createElement('div');
+      div.className = 'kanban-card' + (task.status === 'done' ? ' completed' : '');
+      div.draggable = true;
+      div.dataset.id = task.id;
+
+      const timeAgo = getTimeAgo(task.updated_at || task.created_at);
+
+      div.innerHTML = `
+        <div class="kanban-card-header">
+          <span class="kanban-card-category ${task.category}">${getCategoryEmoji(task.category)} ${task.category}</span>
+          <span class="kanban-card-priority ${task.priority}" title="${task.priority} priority"></span>
+        </div>
+        <div class="kanban-card-title">${escapeHtml(task.title)}</div>
+        <div class="kanban-card-footer">
+          <span class="kanban-card-time">${timeAgo}</span>
+          <div class="kanban-card-actions">
+            <button onclick="event.stopPropagation(); moveKanbanTask('${task.id}', 'prev')">◀</button>
+            <button onclick="event.stopPropagation(); moveKanbanTask('${task.id}', 'next')">▶</button>
+            <button class="delete" onclick="event.stopPropagation(); deleteTask('${task.id}')">🗑</button>
+          </div>
+        </div>
+      `;
+
+      div.addEventListener('dragstart', e => {
+        draggedTask = e.target;
+        e.target.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      div.addEventListener('dragend', e => {
+        e.target.classList.remove('dragging');
+        document.querySelectorAll('.kanban-column').forEach(c => c.classList.remove('drag-over'));
+        draggedTask = null;
+      });
+
+      return div;
+    }
+
+    async function moveKanbanTask(id, dir) {
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+      const statuses = ['todo', 'in-progress', 'done'];
+      const idx = statuses.indexOf(task.status);
+      const newStatus = dir === 'next' && idx < 2 ? statuses[idx + 1] : dir === 'prev' && idx > 0 ? statuses[idx - 1] : task.status;
+      if (newStatus !== task.status) await updateTaskStatusKanban(task, newStatus);
+    }
+
+    async function updateTaskStatusKanban(task, newStatus) {
+      const wasDone = task.status === 'done';
+      try {
+        const updates = { status: newStatus, completed_at: newStatus === 'done' ? new Date().toISOString() : null, updated_at: new Date().toISOString() };
+        if (isOnline && !task.id.startsWith('local-')) await supabase.updateTask(task.id, updates);
+        task.status = newStatus;
+        task.completed_at = updates.completed_at;
+        task.updated_at = updates.updated_at;
+        if (newStatus === 'done' && !wasDone) await celebrateCompletion();
+        saveToLocalStorage();
+        renderKanban();
+        renderActivityFeed();
+        updateCounts();
+      } catch (e) { showToast('❌', 'Error', 'Failed to update.'); }
+    }
+
+    function setupKanbanDragAndDrop() {
+      document.querySelectorAll('.kanban-column').forEach(col => {
+        col.addEventListener('dragover', e => {
+          e.preventDefault();
+          col.classList.add('drag-over');
+        });
+        col.addEventListener('dragleave', e => {
+          if (!col.contains(e.relatedTarget)) col.classList.remove('drag-over');
+        });
+        col.addEventListener('drop', async e => {
+          e.preventDefault();
+          col.classList.remove('drag-over');
+          if (draggedTask) {
+            const task = tasks.find(t => t.id === draggedTask.dataset.id);
+            const newStatus = col.dataset.status;
+            if (task && task.status !== newStatus) {
+              await updateTaskStatusKanban(task, newStatus);
+            }
+          }
+        });
+      });
+    }
+
+    // ===== ACTIVITY FEED =====
+    function renderActivityFeed() {
+      const recentTasks = [...tasks]
+        .filter(t => t.category !== 'checklist')
+        .sort((a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at))
+        .slice(0, 20);
+
+      const list = document.getElementById('activity-feed-list');
+
+      if (recentTasks.length === 0) {
+        list.innerHTML = '<div class="activity-empty">No recent activity</div>';
+        return;
+      }
+
+      list.innerHTML = recentTasks.map(task => {
+        const icon = task.status === 'done' ? '✅' : task.status === 'in-progress' ? '🔄' : '➕';
+        const statusLabel = task.status === 'done' ? 'done' : task.status === 'in-progress' ? 'in-progress' : 'todo';
+        const time = getTimeAgo(task.updated_at || task.created_at);
+        const title = task.title.length > 35 ? task.title.substring(0, 35) + '...' : task.title;
+
+        return `
+          <div class="activity-item">
+            <span class="activity-item-icon">${icon}</span>
+            <div class="activity-item-content">
+              <div class="activity-item-text">
+                <span class="highlight">${escapeHtml(title)}</span> → <span class="status ${statusLabel}">${statusLabel.replace('-', ' ')}</span>
+              </div>
+              <div class="activity-item-time">${time}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Auto-refresh activity feed every 30 seconds
+    setInterval(() => {
+      if (currentView === 'tasks') {
+        renderActivityFeed();
+      }
+    }, 30000);
+
+    // ===== COMMAND PALETTE =====
+    let commandPaletteCategory = 'work';
+    let commandPaletteSelectedIndex = 0;
+    const commandCategories = ['work', 'hustle', 'personal', 'urgent'];
+
+    function openCommandPalette() {
+      const overlay = document.getElementById('command-palette-overlay');
+      overlay.classList.add('active');
+      const input = document.getElementById('command-palette-input');
+      input.value = '';
+      input.focus();
+      commandPaletteSelectedIndex = 0;
+      updateCommandPaletteSelection();
+    }
+
+    function closeCommandPalette() {
+      document.getElementById('command-palette-overlay').classList.remove('active');
+    }
+
+    function setCommandCategory(cat) {
+      commandPaletteCategory = cat;
+      commandPaletteSelectedIndex = commandCategories.indexOf(cat);
+      updateCommandPaletteSelection();
+    }
+
+    function updateCommandPaletteSelection() {
+      document.querySelectorAll('.command-palette-option').forEach((opt, i) => {
+        opt.classList.toggle('selected', i === commandPaletteSelectedIndex);
+      });
+      commandPaletteCategory = commandCategories[commandPaletteSelectedIndex];
+    }
+
+    async function submitCommandPalette() {
+      const input = document.getElementById('command-palette-input');
+      let text = input.value.trim();
+      if (!text) return;
+
+      // Smart parsing: "urgent: fix bug" or "hustle: write thread"
+      let category = commandPaletteCategory;
+      let priority = 'medium';
+
+      const prefixMatch = text.match(/^(work|hustle|personal|urgent|high|low):\s*/i);
+      if (prefixMatch) {
+        const prefix = prefixMatch[1].toLowerCase();
+        text = text.slice(prefixMatch[0].length);
+        if (['work', 'hustle', 'personal', 'urgent'].includes(prefix)) {
+          category = prefix;
+        }
+        if (prefix === 'high') priority = 'high';
+        if (prefix === 'low') priority = 'low';
+      }
+
+      if (category === 'urgent') priority = 'high';
+
+      const task = {
+        title: text,
+        category,
+        priority,
+        status: 'todo',
+        source: 'web'
+      };
+
+      closeCommandPalette();
+
+      try {
+        if (isOnline) {
+          const [created] = await supabase.createTask(task);
+          tasks.unshift(created);
+        } else {
+          task.id = 'local-' + Date.now();
+          task.created_at = new Date().toISOString();
+          task.updated_at = new Date().toISOString();
+          tasks.unshift(task);
+        }
+        saveToLocalStorage();
+        renderKanban();
+        renderActivityFeed();
+        updateCounts();
+        updateNavBadges();
+        showToast('⚡', 'Task Added', `Added to ${category}`);
+      } catch (e) {
+        console.error(e);
+        showToast('❌', 'Error', 'Failed to add task');
+      }
+    }
+
+    // Command palette keyboard handling
+    document.getElementById('command-palette-input').addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        closeCommandPalette();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        submitCommandPalette();
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        commandPaletteSelectedIndex = (commandPaletteSelectedIndex + 1) % commandCategories.length;
+        updateCommandPaletteSelection();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        commandPaletteSelectedIndex = (commandPaletteSelectedIndex - 1 + commandCategories.length) % commandCategories.length;
+        updateCommandPaletteSelection();
+      }
+    });
+
+    // Close command palette on overlay click
+    document.getElementById('command-palette-overlay').addEventListener('click', e => {
+      if (e.target === e.currentTarget) closeCommandPalette();
+    });
+
+    // ===== KEYBOARD SHORTCUTS =====
+    function setupMissionControlShortcuts() {
+      document.addEventListener('keydown', e => {
+        // Ignore if typing in input/textarea
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+        // Cmd+K or / to open command palette
+        if ((e.metaKey && e.key === 'k') || (e.key === '/' && !e.metaKey && !e.ctrlKey)) {
+          e.preventDefault();
+          openCommandPalette();
+        }
+      });
+    }
+
+    // ===== KANBAN CATEGORY TABS =====
+    function setupKanbanCategoryTabs() {
+      document.querySelectorAll('#kanban-category-tabs .category-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('#kanban-category-tabs .category-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          currentFilter = tab.dataset.category;
+          renderKanban();
+        });
+      });
+    }
+
+    // ===== INIT MISSION CONTROL =====
+    function initMissionControl() {
+      // Start live clock
+      updateMissionClock();
+      setInterval(updateMissionClock, 1000);
+
+      // Setup kanban
+      setupKanbanDragAndDrop();
+      setupKanbanCategoryTabs();
+      setupMissionControlShortcuts();
+
+      // Initial render
+      renderKanban();
+      renderActivityFeed();
+      updateHeaderStats();
+    }
+
+    // Override the original renderTasks to also update kanban
+    const originalRenderTasks = renderTasks;
+    renderTasks = function() {
+      originalRenderTasks();
+      if (document.getElementById('kanban-board')) {
+        renderKanban();
+        renderActivityFeed();
+      }
+    };
+
     init();
+    initMissionControl();
   </script>
 </body>
 </html>
