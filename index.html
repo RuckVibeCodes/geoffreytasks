@@ -942,6 +942,86 @@
       .chat-panel { width: calc(100vw - 24px); right: 12px; bottom: 80px; }
       .chat-fab { bottom: 16px; right: 16px; }
     }
+
+    /* ── PR REVIEW TAB ── */
+    .pr-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden; transition: border-color 0.2s;
+    }
+    .pr-card:hover { border-color: var(--border2); }
+    .pr-card-header {
+      padding: 16px 20px 12px; display: flex; align-items: flex-start; gap: 12px;
+    }
+    .pr-repo-badge {
+      font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px;
+      text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; flex-shrink: 0;
+    }
+    .pr-number { color: var(--muted); font-size: 12px; flex-shrink: 0; margin-top: 1px; }
+    .pr-title { font-weight: 600; font-size: 15px; line-height: 1.4; flex: 1; }
+    .pr-meta {
+      padding: 0 20px 10px; display: flex; gap: 16px; flex-wrap: wrap;
+      font-size: 12px; color: var(--muted);
+    }
+    .pr-meta span { display: flex; align-items: center; gap: 4px; }
+    .pr-branch { font-family: monospace; font-size: 11px; background: var(--bg3);
+      padding: 2px 6px; border-radius: 4px; color: var(--text); }
+    .pr-body {
+      margin: 0 20px 12px; font-size: 13px; color: var(--muted); line-height: 1.5;
+      padding: 10px 12px; background: var(--bg3); border-radius: 8px;
+      white-space: pre-wrap; word-break: break-word;
+    }
+    .pr-stats {
+      padding: 10px 20px; display: flex; gap: 12px; flex-wrap: wrap;
+      border-top: 1px solid var(--border); font-size: 12px; align-items: center;
+    }
+    .pr-stat-add { color: #22c55e; font-weight: 600; }
+    .pr-stat-del { color: #ef4444; font-weight: 600; }
+    .pr-stat-files { color: var(--muted); }
+    .pr-files-toggle {
+      margin-left: auto; background: none; border: 1px solid var(--border);
+      color: var(--muted); border-radius: 6px; padding: 3px 10px; font-size: 12px;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .pr-files-toggle:hover { border-color: var(--border2); color: var(--text); }
+    .pr-files-list {
+      padding: 0 20px 12px; display: none;
+    }
+    .pr-files-list.open { display: block; }
+    .pr-file-row {
+      display: flex; align-items: center; gap: 8px; padding: 5px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 12px;
+    }
+    .pr-file-row:last-child { border-bottom: none; }
+    .pr-file-name { font-family: monospace; color: var(--text); flex: 1; overflow: hidden;
+      text-overflow: ellipsis; white-space: nowrap; }
+    .pr-file-add { color: #22c55e; font-weight: 600; min-width: 40px; text-align: right; }
+    .pr-file-del { color: #ef4444; font-weight: 600; min-width: 40px; text-align: right; }
+    .pr-file-status { font-size: 10px; padding: 1px 5px; border-radius: 3px;
+      text-transform: uppercase; font-weight: 700; }
+    .pr-file-status.added { background: rgba(34,197,94,.15); color: #22c55e; }
+    .pr-file-status.modified { background: rgba(59,130,246,.15); color: #60a5fa; }
+    .pr-file-status.deleted { background: rgba(239,68,68,.15); color: #f87171; }
+    .pr-file-status.renamed { background: rgba(245,158,11,.15); color: #fbbf24; }
+    .pr-actions {
+      padding: 12px 20px; border-top: 1px solid var(--border);
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+    }
+    .pr-btn-diff {
+      background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+      border-radius: 8px; padding: 8px 16px; font-size: 13px; cursor: pointer;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+      transition: border-color 0.15s;
+    }
+    .pr-btn-diff:hover { border-color: var(--border2); }
+    .pr-btn-merge {
+      background: #22c55e; border: none; color: #000; font-weight: 700;
+      border-radius: 8px; padding: 8px 18px; font-size: 13px; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 6px; transition: opacity 0.15s;
+    }
+    .pr-btn-merge:hover { opacity: 0.85; }
+    .pr-btn-merge:disabled { opacity: 0.4; cursor: default; }
+    .pr-btn-merge.merging { background: #f59e0b; }
+    .pr-merge-status { font-size: 12px; color: var(--muted); margin-left: auto; }
   </style>
 </head>
 <body>
@@ -972,6 +1052,7 @@
   <button class="nav-tab" data-view="brain" onclick="switchView('brain')">🧠 Second Brain <span class="badge" id="badge-brain">0</span></button>
   <button class="nav-tab" data-view="agents" onclick="switchView('agents')">🤖 Agents</button>
   <button class="nav-tab" data-view="shifts" onclick="switchView('shifts')">🌙 Shifts</button>
+  <button class="nav-tab" data-view="prs" onclick="switchView('prs')">🔀 PRs <span class="badge" id="badge-prs">0</span></button>
   <button class="nav-cmd" onclick="openCmd()"><kbd>⌘K</kbd> Quick Add</button>
 </div>
 
@@ -1083,6 +1164,23 @@
       <p>Autonomous build sessions — proof of work while you slept</p>
     </div>
     <div id="shifts-list"></div>
+  </div>
+
+  <!-- PRs -->
+  <div id="prs-view" class="view generic-view" style="display:none">
+    <div class="view-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h2>🔀 Pull Requests</h2>
+        <p>Open PRs across all repos — review the changes and merge when ready</p>
+      </div>
+      <button onclick="prsLoaded=false;loadPRs()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 14px;cursor:pointer;font-size:13px;">↻ Refresh</button>
+    </div>
+    <div id="prs-loading" style="text-align:center;padding:40px;color:var(--muted);font-size:14px;">Loading PRs…</div>
+    <div id="prs-empty" style="display:none;text-align:center;padding:60px 20px;">
+      <div style="font-size:48px;margin-bottom:12px;">✅</div>
+      <p style="color:var(--muted);font-size:15px;">No open pull requests. All clear.</p>
+    </div>
+    <div id="prs-list" style="display:flex;flex-direction:column;gap:16px;"></div>
   </div>
 
 </div>
@@ -1217,6 +1315,7 @@
     if (viewEl) viewEl.classList.add('active');
     if (v === 'agents') try { renderAgents(); } catch(e) {}
     if (v === 'shifts') try { loadShifts(); } catch(e) { renderShifts(); }
+    if (v === 'prs') try { loadPRs(); } catch(e) {}
   }
 
   // ── RENDER KANBAN ──
@@ -1621,6 +1720,160 @@
         <div class="shift-body ${si === 0 ? 'open' : ''}">${items || '<div style="padding:8px;color:var(--muted);font-size:12px">No items logged.</div>'}</div>
       </div>`;
     }).join('');
+  }
+
+  // ── PR REVIEW TAB ──
+  const TOUCHGRASS_API = 'https://touchgrass.trade';
+  let prsData = [];
+  let prsLoaded = false;
+
+  async function loadPRs() {
+    if (prsLoaded) { renderPRs(); return; }
+    document.getElementById('prs-loading').style.display = 'block';
+    document.getElementById('prs-empty').style.display = 'none';
+    document.getElementById('prs-list').style.display = 'none';
+    try {
+      const res = await fetch(`${TOUCHGRASS_API}/api/github/prs`, { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        prsData = data.prs || [];
+        prsLoaded = true;
+      }
+    } catch(e) { console.error('PR load failed', e); }
+    renderPRs();
+  }
+
+  function renderPRs() {
+    const loading = document.getElementById('prs-loading');
+    const empty   = document.getElementById('prs-empty');
+    const list    = document.getElementById('prs-list');
+    if (!list) return;
+    if (loading) loading.style.display = 'none';
+
+    // Badge count
+    const badge = document.getElementById('badge-prs');
+    if (badge) badge.textContent = prsData.length || '0';
+
+    if (!prsData.length) {
+      if (empty) empty.style.display = 'block';
+      list.style.display = 'none';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+    list.style.display = 'flex';
+
+    list.innerHTML = prsData.map(pr => {
+      const ago = timeAgo(pr.updatedAt);
+      const bodyHtml = pr.body
+        ? `<div class="pr-body">${escHtml(pr.body.trim())}</div>` : '';
+
+      const fileRows = pr.files.map(f => {
+        const statusClass = f.status === 'added' ? 'added'
+          : f.status === 'removed' ? 'deleted'
+          : f.status === 'renamed' ? 'renamed' : 'modified';
+        const statusLabel = f.status === 'removed' ? 'del' : f.status;
+        return `<div class="pr-file-row">
+          <span class="pr-file-status ${statusClass}">${statusLabel}</span>
+          <span class="pr-file-name" title="${escHtml(f.filename)}">${escHtml(f.filename)}</span>
+          <span class="pr-file-add">+${f.additions}</span>
+          <span class="pr-file-del">-${f.deletions}</span>
+        </div>`;
+      }).join('');
+
+      const filesId = `pr-files-${pr.id.replace(/[^a-z0-9]/gi, '_')}`;
+
+      return `<div class="pr-card" id="card-${filesId}">
+        <div class="pr-card-header">
+          <span class="pr-repo-badge" style="background:${pr.color}22;color:${pr.color};border:1px solid ${pr.color}44">${escHtml(pr.repo)}</span>
+          <div style="flex:1;min-width:0">
+            <div class="pr-title">${escHtml(pr.title)}</div>
+          </div>
+          <span class="pr-number">#${pr.number}</span>
+        </div>
+        <div class="pr-meta">
+          <span>🌿 <span class="pr-branch">${escHtml(pr.branch)}</span> → <span class="pr-branch">${escHtml(pr.baseBranch)}</span></span>
+          <span>🕐 ${ago}</span>
+          <span>👤 ${escHtml(pr.author)}</span>
+        </div>
+        ${bodyHtml}
+        <div class="pr-stats">
+          <span class="pr-stat-add">+${pr.totalAdditions}</span>
+          <span class="pr-stat-del">-${pr.totalDeletions}</span>
+          <span class="pr-stat-files">${pr.totalFiles} file${pr.totalFiles !== 1 ? 's' : ''} changed</span>
+          ${pr.files.length > 0 ? `<button class="pr-files-toggle" onclick="toggleFiles('${filesId}')">📄 Show files</button>` : ''}
+        </div>
+        <div class="pr-files-list" id="${filesId}">${fileRows}</div>
+        <div class="pr-actions">
+          <a href="${escHtml(pr.diffUrl)}" target="_blank" class="pr-btn-diff">📂 View Full Diff</a>
+          <a href="${escHtml(pr.url)}" target="_blank" class="pr-btn-diff">🔗 PR on GitHub</a>
+          <button class="pr-btn-merge" id="merge-btn-${filesId}"
+            onclick="mergePR('${escHtml(pr.owner)}','${escHtml(pr.repo)}',${pr.number},'${filesId}')">
+            ✅ Approve & Merge
+          </button>
+          <span class="pr-merge-status" id="merge-status-${filesId}"></span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function toggleFiles(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.toggle('open');
+    const btn = el.previousElementSibling?.querySelector('.pr-files-toggle');
+    if (btn) btn.textContent = el.classList.contains('open') ? '📄 Hide files' : '📄 Show files';
+  }
+
+  async function mergePR(owner, repo, pullNumber, filesId) {
+    const btn = document.getElementById(`merge-btn-${filesId}`);
+    const status = document.getElementById(`merge-status-${filesId}`);
+    if (!btn) return;
+    if (!confirm(`Merge PR #${pullNumber} in ${owner}/${repo}?\n\nThis will squash-merge the branch into main.`)) return;
+
+    btn.disabled = true;
+    btn.classList.add('merging');
+    btn.textContent = '⏳ Merging…';
+    if (status) status.textContent = '';
+
+    try {
+      const res = await fetch(`${TOUCHGRASS_API}/api/github/merge`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ owner, repo, pull_number: pullNumber }),
+      });
+      const data = await res.json();
+      if (res.ok && data.merged) {
+        btn.textContent = '🎉 Merged!';
+        btn.style.background = '#10b981';
+        if (status) status.textContent = `Squash-merged successfully`;
+        // Remove card after 2 seconds
+        setTimeout(() => {
+          prsData = prsData.filter(p => !(p.owner === owner && p.repo === repo && p.number === pullNumber));
+          renderPRs();
+          toast('✅', 'Merged!', `${repo} #${pullNumber} squash-merged`);
+        }, 2000);
+      } else {
+        btn.textContent = '✅ Approve & Merge';
+        btn.disabled = false;
+        btn.classList.remove('merging');
+        if (status) status.textContent = `❌ ${data.error || 'Merge failed'}`;
+      }
+    } catch(e) {
+      btn.textContent = '✅ Approve & Merge';
+      btn.disabled = false;
+      btn.classList.remove('merging');
+      if (status) status.textContent = '❌ Network error';
+    }
+  }
+
+  function timeAgo(iso) {
+    const diff = Date.now() - new Date(iso).getTime();
+    const m = Math.floor(diff / 60000);
+    if (m < 60) return `${m}m ago`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h}h ago`;
+    const d = Math.floor(h / 24);
+    return `${d}d ago`;
   }
 
   let activeFeedTab = 'all';
