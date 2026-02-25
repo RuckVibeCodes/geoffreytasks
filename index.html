@@ -446,6 +446,38 @@
     #toast .t-title { font-weight: 600; color: var(--text); }
     #toast .t-sub { color: var(--muted); font-size: 11px; }
 
+
+    /* ── DRAG & DROP ── */
+    .k-card.dragging { opacity: .4; transform: scale(.98); cursor: grabbing; }
+    .k-card { cursor: grab; }
+    .k-cards.drag-over { background: rgba(212,175,55,.06); outline: 2px dashed rgba(212,175,55,.3); border-radius: 8px; }
+    .k-col.drop-target .k-col-head { background: rgba(255,255,255,.03); }
+
+    /* ── EXPANDED MODAL ── */
+    .modal { width: 520px; }
+    .modal-desc {
+      margin: 12px 0;
+    }
+    .modal-desc label { font-size: 11px; color: var(--muted); letter-spacing: .5px; text-transform: uppercase; display: block; margin-bottom: 6px; }
+    .modal-desc textarea {
+      width: 100%; min-height: 80px; padding: 10px 12px;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-size: 13px;
+      font-family: 'Inter', sans-serif; resize: vertical; outline: none;
+      line-height: 1.5; transition: border-color .15s;
+    }
+    .modal-desc textarea:focus { border-color: var(--gold); }
+    .modal-info {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 8px; margin: 12px 0;
+    }
+    .modal-info-item { font-size: 11px; }
+    .modal-info-item .lbl { color: var(--muted); margin-bottom: 2px; text-transform: uppercase; letter-spacing: .5px; }
+    .modal-info-item .val { color: var(--text); font-weight: 500; }
+
+    /* ── REALTIME PULSE ── */
+    .tb-status.syncing .pulse-dot { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
+
     /* ── LOADING ── */
     #loading {
       position: fixed; inset: 0; z-index: 500;
@@ -715,12 +747,17 @@
 </div>
 
 <!-- TASK DETAIL MODAL -->
-<div class="modal-overlay" id="task-modal">
+<div class="modal-overlay" id="task-modal" onclick="if(event.target===this)closeTaskModal()">
   <div class="modal">
     <button class="modal-close" onclick="closeTaskModal()">×</button>
     <h2 id="modal-title">Task</h2>
     <div class="modal-meta" id="modal-meta"></div>
-    <div class="modal-label">Move to:</div>
+    <div class="modal-info" id="modal-info"></div>
+    <div class="modal-desc">
+      <label>Notes / Description</label>
+      <textarea id="modal-notes" placeholder="Add notes about this task…"></textarea>
+    </div>
+    <div class="modal-label" style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Move to</div>
     <div class="modal-actions" id="modal-actions"></div>
   </div>
 </div>
@@ -863,6 +900,34 @@
       ['done',        'col-done',    'cnt-done',    '🏆 All clear.'],
     ];
 
+    // Setup drop zones on columns
+    document.querySelectorAll('.k-cards').forEach(zone => {
+      zone.ondragover = e => { e.preventDefault(); zone.classList.add('drag-over'); };
+      zone.ondragleave = () => zone.classList.remove('drag-over');
+      zone.ondrop = async e => {
+        e.preventDefault();
+        zone.classList.remove('drag-over');
+        const id = e.dataTransfer.getData('text/plain');
+        const task = tasks.find(t => t.id === id);
+        if (!task) return;
+        // Determine target status from column id
+        const colId = zone.id;
+        let newStatus = 'todo';
+        if (colId === 'col-prog') newStatus = 'in-progress';
+        else if (colId === 'col-review') newStatus = 'in-progress'; // review = in-progress for now
+        else if (colId === 'col-done') newStatus = 'done';
+        else if (colId === 'col-backlog') { newStatus = 'todo'; task.priority = 'low'; }
+        else if (colId === 'col-todo') { newStatus = 'todo'; if (task.priority === 'low') task.priority = 'medium'; }
+        if (newStatus === task.status && colId !== 'col-backlog' && colId !== 'col-todo') return;
+        task.status = newStatus;
+        task.updated_at = new Date().toISOString();
+        await db.patch(\`tasks?id=eq.\${task.id}\`, { status: newStatus, priority: task.priority, updated_at: task.updated_at });
+        const icons = { 'todo': '📥', 'in-progress': '🔄', 'done': '✅' };
+        addActivity(icons[newStatus]||'📥', \`→ \${newStatus === 'in-progress' ? 'in progress' : newStatus}\`, task.title);
+        renderKanban();
+      };
+    });
+
     colMap.forEach(([bucket, colId, cntId, emptyMsg]) => {
       const col = document.getElementById(colId);
       const items = cols[bucket] || [];
@@ -877,7 +942,9 @@
         const card = document.createElement('div');
         card.className = 'k-card';
         card.dataset.id = t.id;
+        card.dataset.status = t.status;
         card.dataset.category = t.category || 'work';
+        card.draggable = true;
         const agent = getAgent(t);
         card.innerHTML = `
           <div class="k-card-title">${escHtml(t.title)}</div>
@@ -888,6 +955,11 @@
             <span class="k-prio ${t.priority || 'medium'}"></span>
           </div>`;
         card.addEventListener('click', () => openTaskModal(t));
+        card.addEventListener('dragstart', e => {
+          e.dataTransfer.setData('text/plain', t.id);
+          card.classList.add('dragging');
+        });
+        card.addEventListener('dragend', () => card.classList.remove('dragging'));
         col.appendChild(card);
       });
     });
@@ -957,7 +1029,22 @@
     selectedTaskId = task.id;
     document.getElementById('modal-title').textContent = task.title;
     const meta = document.getElementById('modal-meta');
-    meta.innerHTML = `<span class="k-tag ${task.category||'work'}">${task.category||'work'}</span><span class="k-tag" style="background:rgba(255,255,255,.05);color:var(--muted)">${task.priority||'medium'} priority</span>`;
+    meta.innerHTML = `
+      <span class="k-tag ${task.category||'work'}">${task.category||'work'}</span>
+      <span class="k-tag" style="background:rgba(255,255,255,.05);color:var(--muted)">${task.priority||'medium'} priority</span>
+      ${task.source && task.source !== 'web' ? `<span class="k-agent">🤖 ${escHtml((task.source||'').toUpperCase())}</span>` : ''}`;
+    const info = document.getElementById('modal-info');
+    info.innerHTML = `
+      <div class="modal-info-item"><div class="lbl">Created</div><div class="val">${new Date(task.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div></div>
+      <div class="modal-info-item"><div class="lbl">Updated</div><div class="val">${relTime(task.updated_at||task.created_at)} ago</div></div>
+      <div class="modal-info-item"><div class="lbl">Status</div><div class="val">${task.status}</div></div>
+      <div class="modal-info-item"><div class="lbl">Source</div><div class="val">${task.source||'web'}</div></div>`;
+    const notesEl = document.getElementById('modal-notes');
+    notesEl.value = task.description || '';
+    notesEl.onchange = async () => {
+      task.description = notesEl.value;
+      await db.patch(`tasks?id=eq.${task.id}`, { description: notesEl.value, updated_at: new Date().toISOString() });
+    };
     const actions = document.getElementById('modal-actions');
     const moves = [];
     if (task.status !== 'todo') moves.push({ label: '📥 Todo', status: 'todo', cls: '' });
@@ -1170,11 +1257,46 @@
       renderPipeline();
       renderBrainDocs(brainDocs);
 
-      // Auto-refresh every 45s
+      // Auto-refresh every 20s — picks up night shift activity instantly
+      let lastTaskSnapshot = '';
       setInterval(async () => {
-        const fresh = await db.get('geoffrey_tasks?order=created_at.desc&limit=200');
-        if (fresh) { tasks = fresh; renderKanban(); buildActivityFromTasks(); }
-      }, 45000);
+        const fresh = await db.get('tasks?order=updated_at.desc&limit=200');
+        if (!fresh) return;
+        const snap = JSON.stringify(fresh.map(t => t.id + t.status + t.updated_at));
+        if (snap === lastTaskSnapshot) return;
+        // Detect changes and log to activity feed
+        fresh.forEach(t => {
+          const old = tasks.find(o => o.id === t.id);
+          if (!old) { addActivity('➕', '\u2192 created', t.title.slice(0,26)); }
+          else if (old.status !== t.status) {
+            const icons = {'todo':'📥','in-progress':'🔄','done':'✅'};
+            addActivity(icons[t.status]||'📥', `\u2192 ${t.status==='in-progress'?'in progress':t.status}`, t.title.slice(0,26));
+          }
+        });
+        lastTaskSnapshot = snap;
+        tasks = fresh;
+        renderKanban();
+        buildActivityFromTasks();
+      }, 20000);
+
+      // Supabase Realtime websocket — instant push when Geoffrey works at night
+      try {
+        const wsUrl = `wss://arprmkukemtlhglsqgcs.supabase.co/realtime/v1/websocket?apikey=${SUPABASE_KEY}&vsn=1.0.0`;
+        const ws = new WebSocket(wsUrl);
+        ws.onopen = () => {
+          ws.send(JSON.stringify({topic:'realtime:geoffrey:tasks',event:'phx_join',payload:{},ref:'1'}));
+          const dot = document.querySelector('.pulse-dot');
+          if (dot) { dot.style.background='#d4af37'; setTimeout(()=>dot.style.background='',2000); }
+        };
+        ws.onmessage = async (msg) => {
+          const d = JSON.parse(msg.data);
+          if (['INSERT','UPDATE','DELETE'].includes(d.event)) {
+            const fresh = await db.get('tasks?order=updated_at.desc&limit=200');
+            if (fresh) { tasks = fresh; renderKanban(); buildActivityFromTasks(); }
+          }
+        };
+        ws.onerror = () => {};
+      } catch(e) {}
 
     } catch (e) {
       console.error('Init error:', e);
