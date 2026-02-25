@@ -1359,32 +1359,63 @@
   }
 
   // ── RENDER AGENTS PANEL ────────────────────────────────────────────────────
+  function agentStatusFromOps(agentId, isMain) {
+    const now = Date.now();
+    const agentOps = opsLog.filter(o => o.agent === agentId);
+    const latest = agentOps[0];
+    const inProg = tasks.filter(t => t.status === 'in-progress');
+
+    if (isMain) {
+      // Geoffrey is always at least active
+      if (latest) {
+        const age = now - new Date(latest.time).getTime();
+        if (age < 10 * 60 * 1000) return { status: 'working', label: '● WORKING', op: latest };
+      }
+      return inProg.length > 0
+        ? { status: 'working', label: '● WORKING', op: latest }
+        : { status: 'active',  label: '● ACTIVE',  op: latest };
+    }
+
+    if (!latest) return { status: 'idle', label: 'IDLE', op: null };
+
+    const age = now - new Date(latest.time).getTime();
+    if (age < 15 * 60 * 1000) return { status: 'working', label: '● WORKING', op: latest };
+    if (age < 3 * 60 * 60 * 1000) return { status: 'active',  label: '● ACTIVE',  op: latest };
+    return { status: 'idle', label: 'IDLE', op: latest };
+  }
+
   function renderAgents() {
     const grid = document.getElementById('agents-grid');
     if (!grid) return;
-    const inProg = tasks.filter(t => t.status === 'in-progress');
+    const inProg  = tasks.filter(t => t.status === 'in-progress');
     const recentDone = tasks.filter(t => t.status === 'done')
       .sort((a,b) => new Date(b.updated_at) - new Date(a.updated_at)).slice(0, 5);
 
     grid.innerHTML = AGENT_DEFS.map(ag => {
-      // Determine status
-      let status = 'idle', statusLabel = 'IDLE';
-      let currentTask = null;
-      if (ag.isMain) {
-        status = inProg.length > 0 ? 'working' : 'active';
-        statusLabel = inProg.length > 0 ? '● WORKING' : '● ACTIVE';
-        currentTask = inProg[0] || recentDone[0];
-      }
-      // Pipeline steps
+      const { status, label: statusLabel, op: latestOp } = agentStatusFromOps(ag.id, ag.isMain);
+
+      // Current task context
+      let currentTask = ag.isMain ? (inProg[0] || recentDone[0]) : null;
+
+      // Pipeline steps — light up based on status + latest op phase
+      const activeStepIdx = status === 'working' ? 0 : -1;
       const steps = ag.pipeline.map((step, i) => {
-        const isActive = ag.isMain && inProg.length > 0 && i === 0;
-        const isDone = ag.isMain && recentDone.length > 0 && i < ag.pipeline.length - 1;
+        const isActive = status === 'working' && i === activeStepIdx;
+        const isDone   = status !== 'idle' && i < activeStepIdx;
         return `<div class="pipeline-step ${isActive ? 'active' : isDone ? 'done' : ''}">${step}</div>`;
       }).join('');
 
-      const lastTask = currentTask
-        ? `<div class="agent-last">Last: <strong>${escHtml(currentTask.title.slice(0, 45))}${currentTask.title.length > 45 ? '…' : ''}</strong><br><span style="font-size:9px">${relTime(currentTask.updated_at || currentTask.created_at)} ago · ${currentTask.status}</span></div>`
-        : `<div class="agent-last" style="color:var(--border2);font-style:italic">No recent activity</div>`;
+      // Last activity line — prefer ops log detail over task title
+      let lastActivity = '';
+      if (latestOp) {
+        const ago = relTime(latestOp.time);
+        const detail = latestOp.detail ? ` — ${latestOp.detail.slice(0,50)}` : '';
+        lastActivity = `<div class="agent-last"><strong>${escHtml(latestOp.action)}${escHtml(detail)}</strong><br><span style="font-size:9px">${ago} ago</span></div>`;
+      } else if (currentTask) {
+        lastActivity = `<div class="agent-last">Last: <strong>${escHtml(currentTask.title.slice(0,45))}</strong><br><span style="font-size:9px">${relTime(currentTask.updated_at || currentTask.created_at)} ago · ${currentTask.status}</span></div>`;
+      } else {
+        lastActivity = `<div class="agent-last" style="color:var(--border2);font-style:italic">Waiting for work…</div>`;
+      }
 
       return `<div class="agent-card" style="border-left:3px solid ${ag.color}">
         <div class="agent-card-head">
@@ -1394,7 +1425,7 @@
         </div>
         <div class="agent-pipeline">${steps}</div>
         <p style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5">${ag.desc}</p>
-        ${lastTask}
+        ${lastActivity}
       </div>`;
     }).join('');
 
@@ -1988,6 +2019,30 @@
       try { renderBrainDocs(brainDocs); } catch(e) {}
       try { renderAgents(); } catch(e) {}
       try { loadShifts(); } catch(e) { renderShifts(); }
+
+      // Seed ops log from Supabase — last 6h of real agent activity
+      try {
+        const since = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
+        const activity = await db.get(`agent_activity?order=created_at.desc&limit=40&created_at=gt.${encodeURIComponent(since)}`);
+        if (activity && activity.length) {
+          activity.reverse().forEach(a => addOp(a.agent_id, a.action, a.detail || '', a.created_at));
+          renderAgents();
+        }
+      } catch(e) {}
+
+      // Poll agent_activity every 20s for live updates during active build sessions
+      setInterval(async () => {
+        try {
+          const last = opsLog.find(o => o.agent !== 'geoffrey' || o.action !== 'Board loaded');
+          const since = last ? last.time : new Date(Date.now() - 30000).toISOString();
+          const fresh = await db.get(`agent_activity?order=created_at.asc&created_at=gt.${encodeURIComponent(since)}`);
+          if (fresh && fresh.length) {
+            fresh.forEach(a => addOp(a.agent_id, a.action, a.detail || '', a.created_at));
+            renderAgents();
+          }
+        } catch(e) {}
+      }, 20000);
+
       // Seed ops log with session start
       addOp('geoffrey', 'Board loaded', `${tasks.filter(t=>t.status==='in-progress').length} in progress · ${tasks.filter(t=>t.status==='done').length} done`);
       if (tasks.filter(t=>t.status==='in-progress').length > 0) {
