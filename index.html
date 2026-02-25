@@ -784,6 +784,125 @@
         max-height: 85vh; overflow-y: auto;
       }
     }
+
+    /* ===== CHAT PANEL ===== */
+    .chat-fab {
+      position: fixed; bottom: 24px; right: 24px; z-index: 900;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--gold); color: #000;
+      border: none; cursor: pointer; font-size: 22px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(212,175,55,0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .chat-fab:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(212,175,55,0.55); }
+    .chat-fab .chat-unread {
+      position: absolute; top: -4px; right: -4px;
+      background: #ef4444; color: #fff; border-radius: 10px;
+      font-size: 10px; font-weight: 700; padding: 1px 5px;
+      display: none;
+    }
+    .chat-fab .chat-unread.visible { display: block; }
+
+    .chat-panel {
+      position: fixed; bottom: 88px; right: 24px; z-index: 901;
+      width: 360px; height: 500px;
+      background: var(--bg2); border: 1px solid rgba(212,175,55,0.25);
+      border-radius: 16px; display: flex; flex-direction: column;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.5);
+      transform: translateY(16px) scale(0.97); opacity: 0;
+      pointer-events: none;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+    .chat-panel.open {
+      transform: translateY(0) scale(1); opacity: 1; pointer-events: all;
+    }
+    .chat-panel-header {
+      padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.07);
+      display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+    }
+    .chat-panel-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, #d4af37, #8b7325);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+    .chat-panel-name { font-weight: 700; font-size: 14px; color: var(--text); }
+    .chat-panel-status { font-size: 11px; color: #4ade80; }
+    .chat-panel-close {
+      margin-left: auto; background: none; border: none;
+      color: var(--muted); cursor: pointer; font-size: 18px; line-height: 1;
+    }
+    .chat-panel-close:hover { color: var(--text); }
+
+    .chat-messages {
+      flex: 1; overflow-y: auto; padding: 14px 12px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .chat-messages::-webkit-scrollbar { width: 3px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .chat-msg { display: flex; flex-direction: column; max-width: 84%; }
+    .chat-msg.user { align-self: flex-end; align-items: flex-end; }
+    .chat-msg.assistant { align-self: flex-start; align-items: flex-start; }
+    .chat-bubble {
+      padding: 9px 13px; border-radius: 14px;
+      font-size: 13px; line-height: 1.5; word-break: break-word;
+    }
+    .chat-msg.user .chat-bubble {
+      background: var(--gold); color: #000; font-weight: 500;
+      border-bottom-right-radius: 4px;
+    }
+    .chat-msg.assistant .chat-bubble {
+      background: var(--bg3); color: var(--text); border: 1px solid rgba(255,255,255,0.07);
+      border-bottom-left-radius: 4px;
+    }
+    .chat-msg-time { font-size: 10px; color: var(--muted); margin-top: 3px; padding: 0 4px; }
+
+    .chat-typing {
+      align-self: flex-start; display: flex; align-items: center;
+      gap: 4px; padding: 10px 14px; background: var(--bg3);
+      border-radius: 14px; border-bottom-left-radius: 4px;
+    }
+    .chat-typing span {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--muted);
+      animation: chatBounce 1.2s infinite;
+    }
+    .chat-typing span:nth-child(2) { animation-delay: 0.2s; }
+    .chat-typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes chatBounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
+
+    .chat-empty {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: var(--muted); gap: 8px; text-align: center; padding: 20px;
+    }
+    .chat-empty .icon { font-size: 36px; opacity: 0.4; }
+    .chat-empty p { font-size: 12px; line-height: 1.6; }
+
+    .chat-input-row {
+      padding: 10px 12px; border-top: 1px solid rgba(255,255,255,0.07);
+      display: flex; gap: 8px; align-items: flex-end; flex-shrink: 0;
+    }
+    .chat-input {
+      flex: 1; background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 10px; padding: 9px 12px; color: var(--text);
+      font-size: 13px; resize: none; max-height: 100px; min-height: 38px;
+      font-family: inherit; line-height: 1.4; outline: none;
+    }
+    .chat-input:focus { border-color: rgba(212,175,55,0.4); }
+    .chat-send {
+      background: var(--gold); color: #000; border: none; border-radius: 10px;
+      padding: 9px 14px; font-size: 16px; cursor: pointer; flex-shrink: 0;
+      font-weight: 700; transition: opacity 0.1s;
+    }
+    .chat-send:hover { opacity: 0.85; }
+    .chat-send:disabled { opacity: 0.4; cursor: default; }
+
+    @media (max-width: 768px) {
+      .chat-panel { width: calc(100vw - 24px); right: 12px; bottom: 80px; }
+      .chat-fab { bottom: 16px; right: 16px; }
+    }
   </style>
 </head>
 <body>
@@ -1932,7 +2051,185 @@
     }
   }
 
+  // ===== CHAT =====
+  const CHAT_POLL_MS = 3000;
+  let chatOpen = false;
+  let chatMessages = [];
+  let chatPollTimer = null;
+  let chatUnreadCount = 0;
+  let chatWaitingReply = false;
+
+  function toggleChat() {
+    chatOpen = !chatOpen;
+    document.getElementById('chat-panel').classList.toggle('open', chatOpen);
+    if (chatOpen) {
+      chatUnreadCount = 0;
+      updateChatUnread();
+      renderChatMessages();
+      scrollChatToBottom();
+      loadChatHistory();
+      if (!chatPollTimer) chatPollTimer = setInterval(pollChat, CHAT_POLL_MS);
+      setTimeout(() => document.getElementById('chat-input')?.focus(), 200);
+    } else {
+      clearInterval(chatPollTimer); chatPollTimer = null;
+    }
+  }
+
+  async function loadChatHistory() {
+    try {
+      const data = await db.get('chat_messages?order=created_at.asc&limit=50');
+      if (data && data.length) {
+        chatMessages = data;
+        renderChatMessages();
+        scrollChatToBottom();
+      }
+    } catch(e) {}
+  }
+
+  async function pollChat() {
+    try {
+      const last = chatMessages.length ? chatMessages[chatMessages.length - 1] : null;
+      const since = last ? `&created_at=gt.${encodeURIComponent(last.created_at)}` : '';
+      const data = await db.get(`chat_messages?order=created_at.asc${since}`);
+      if (data && data.length) {
+        chatMessages = [...chatMessages, ...data];
+        const newAssistant = data.filter(m => m.role === 'assistant');
+        if (newAssistant.length) {
+          chatWaitingReply = false;
+          if (!chatOpen) {
+            chatUnreadCount += newAssistant.length;
+            updateChatUnread();
+          }
+        }
+        renderChatMessages();
+        scrollChatToBottom();
+      }
+    } catch(e) {}
+  }
+
+  async function sendChatMessage() {
+    const input = document.getElementById('chat-input');
+    const content = (input?.value || '').trim();
+    if (!content || chatWaitingReply) return;
+
+    input.value = '';
+    input.style.height = 'auto';
+
+    const tempMsg = { id: 'temp-' + Date.now(), role: 'user', content, created_at: new Date().toISOString() };
+    chatMessages.push(tempMsg);
+    chatWaitingReply = true;
+    renderChatMessages();
+    scrollChatToBottom();
+
+    try {
+      // Save to Supabase
+      await db.post('chat_messages', { role: 'user', content, source: 'board' });
+
+      // Notify Geoffrey via Telegram bot
+      const BOT_TOKEN = '8215252049:AAHpYo0StGHpe4QiH_6Kr7ymKjt2p9jmQJg';
+      const MATT_ID   = '869500271';
+      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: MATT_ID,
+          text: `💬 *Mission Control:*\n${content}`,
+          parse_mode: 'Markdown',
+        }),
+      });
+    } catch(e) {
+      console.error('Chat send error:', e);
+      chatWaitingReply = false;
+    }
+
+    renderChatMessages();
+  }
+
+  function renderChatMessages() {
+    const container = document.getElementById('chat-message-list');
+    if (!container) return;
+
+    if (!chatMessages.length && !chatWaitingReply) {
+      container.innerHTML = `<div class="chat-empty">
+        <div class="icon">🎩</div>
+        <p>Chat directly with Geoffrey.<br>He'll respond shortly.</p>
+      </div>`;
+      return;
+    }
+
+    const msgs = chatMessages.map(m => {
+      const time = new Date(m.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      const text = escHtml(m.content).replace(/\n/g, '<br>');
+      return `<div class="chat-msg ${m.role}">
+        <div class="chat-bubble">${text}</div>
+        <div class="chat-msg-time">${time}</div>
+      </div>`;
+    }).join('');
+
+    const typing = chatWaitingReply
+      ? `<div class="chat-typing"><span></span><span></span><span></span></div>` : '';
+
+    container.innerHTML = msgs + typing;
+  }
+
+  function scrollChatToBottom() {
+    const el = document.getElementById('chat-message-list');
+    if (el) el.scrollTop = el.scrollHeight;
+  }
+
+  function updateChatUnread() {
+    const badge = document.getElementById('chat-unread');
+    if (!badge) return;
+    badge.textContent = chatUnreadCount;
+    badge.classList.toggle('visible', chatUnreadCount > 0);
+  }
+
+  function chatKeydown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendChatMessage();
+    }
+    // Auto-resize textarea
+    const ta = e.target;
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, 100) + 'px';
+  }
+
   init();
 </script>
+
+<!-- CHAT -->
+<button class="chat-fab" onclick="toggleChat()" title="Chat with Geoffrey">
+  🎩
+  <span class="chat-unread" id="chat-unread">0</span>
+</button>
+
+<div class="chat-panel" id="chat-panel">
+  <div class="chat-panel-header">
+    <div class="chat-panel-avatar">🎩</div>
+    <div>
+      <div class="chat-panel-name">Geoffrey</div>
+      <div class="chat-panel-status">● Online</div>
+    </div>
+    <button class="chat-panel-close" onclick="toggleChat()">×</button>
+  </div>
+  <div class="chat-messages" id="chat-message-list">
+    <div class="chat-empty">
+      <div class="icon">🎩</div>
+      <p>Chat directly with Geoffrey.<br>He'll respond shortly.</p>
+    </div>
+  </div>
+  <div class="chat-input-row">
+    <textarea
+      id="chat-input"
+      class="chat-input"
+      placeholder="Ask Geoffrey anything…"
+      rows="1"
+      onkeydown="chatKeydown(event)"
+    ></textarea>
+    <button class="chat-send" onclick="sendChatMessage()">↑</button>
+  </div>
+</div>
+
 </body>
 </html>
