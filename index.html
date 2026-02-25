@@ -27,6 +27,8 @@
       --col-todo:  #3b82f6;
       --col-prog:  #f59e0b;
       --col-done:  #10b981;
+      --col-backlog: #64748b;
+      --col-review:  #ec4899;
     }
 
     html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; }
@@ -456,6 +458,40 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     #loading p { color: var(--muted); font-size: 13px; font-family: 'JetBrains Mono', monospace; }
 
+
+    /* ── AGENT BADGE ON CARDS ── */
+    .k-agent {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
+      padding: 2px 6px; border-radius: 3px;
+      background: rgba(212,175,55,0.12); color: #d4af37;
+      text-transform: uppercase; margin-left: auto;
+    }
+    /* ── ACTIVITY TABS ── */
+    .ap-tabs {
+      display: flex; gap: 2px;
+      padding: 8px 10px 0;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .ap-tab {
+      padding: 4px 10px; border-radius: 6px 6px 0 0;
+      border: 1px solid transparent; border-bottom: none;
+      background: none; color: var(--muted);
+      font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+      cursor: pointer; text-transform: uppercase; transition: all .15s;
+    }
+    .ap-tab:hover { color: var(--text); }
+    .ap-tab.active { color: var(--text); background: var(--bg3); border-color: var(--border); }
+    /* ── KANBAN horizontal scroll on medium screens ── */
+    @media (min-width: 769px) {
+      .kanban-board { grid-template-columns: repeat(5, minmax(180px, 1fr)); overflow-x: auto; }
+    }
+    .k-col.backlog { border-top: 3px solid var(--col-backlog); }
+    .k-col.review  { border-top: 3px solid var(--col-review); }
+    .backlog .k-col-head .label { color: var(--col-backlog); }
+    .review  .k-col-head .label { color: var(--col-review); }
+
     /* ── SCROLLBAR GLOBAL ── */
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -521,8 +557,13 @@
         <button class="kf-btn" data-cat="urgent">🔥 Urgent</button>
       </div>
       <div class="kanban-board">
+        <div class="k-col backlog">
+          <div class="k-col-head"><span class="label">📋 Backlog</span><span class="k-count" id="cnt-backlog">0</span></div>
+          <div class="k-cards" id="col-backlog"></div>
+          <div class="k-add"><button class="k-add-btn" onclick="openCmd('todo','low')">+ Add to backlog</button></div>
+        </div>
         <div class="k-col todo">
-          <div class="k-col-head"><span class="label">📥 Todo</span><span class="k-count" id="cnt-todo">0</span></div>
+          <div class="k-col-head"><span class="label">📥 Queue</span><span class="k-count" id="cnt-todo">0</span></div>
           <div class="k-cards" id="col-todo"></div>
           <div class="k-add"><button class="k-add-btn" onclick="openCmd('todo')">+ Add task  ⌘K</button></div>
         </div>
@@ -530,6 +571,11 @@
           <div class="k-col-head"><span class="label">🔄 In Progress</span><span class="k-count" id="cnt-prog">0</span></div>
           <div class="k-cards" id="col-prog"></div>
           <div class="k-add"><button class="k-add-btn" onclick="openCmd('in-progress')">+ Add task</button></div>
+        </div>
+        <div class="k-col review">
+          <div class="k-col-head"><span class="label">👀 Review</span><span class="k-count" id="cnt-review">0</span></div>
+          <div class="k-cards" id="col-review"></div>
+          <div class="k-add"><button class="k-add-btn" onclick="openCmd('review')">+ Add task</button></div>
         </div>
         <div class="k-col done">
           <div class="k-col-head"><span class="label">✅ Done</span><span class="k-count" id="cnt-done">0</span></div>
@@ -540,8 +586,13 @@
     </div>
     <div class="activity-panel">
       <div class="ap-head">
-        <span class="title">Activity</span>
+        <span class="title">Insights</span>
         <span class="live-badge">LIVE</span>
+      </div>
+      <div class="ap-tabs">
+        <button class="ap-tab active" onclick="switchFeed('all')" id="feed-tab-all">All</button>
+        <button class="ap-tab" onclick="switchFeed('tasks')" id="feed-tab-tasks">Tasks</button>
+        <button class="ap-tab" onclick="switchFeed('agents')" id="feed-tab-agents">Agents</button>
       </div>
       <div class="ap-list" id="activity-list"></div>
     </div>
@@ -769,26 +820,56 @@
   }
 
   // ── RENDER KANBAN ──
+  // Agent name based on source/created_by
+  function getAgent(t) {
+    if (t.assigned_to) return t.assigned_to.toUpperCase();
+    if (t.source === 'telegram' || t.source === 'api') return 'GEOFFREY';
+    return null;
+  }
+
   function renderKanban() {
     const filtered = activeFilter === 'all' ? tasks : tasks.filter(t => t.category === activeFilter);
-    const statuses = { 'todo': [], 'in-progress': [], 'done': [] };
-    filtered.forEach(t => { if (statuses[t.status] !== undefined) statuses[t.status].push(t); });
+
+    // 5 logical buckets: backlog=low todo, queue=med/high todo, in-progress, review(done+src=review), done
+    const cols = { backlog: [], todo: [], 'in-progress': [], review: [], done: [] };
+    filtered.forEach(t => {
+      if (t.status === 'todo') {
+        if (t.priority === 'low') cols.backlog.push(t);
+        else cols.todo.push(t);
+      } else if (t.status === 'in-progress') {
+        cols['in-progress'].push(t);
+      } else if (t.status === 'done') {
+        cols.done.push(t);
+      }
+    });
 
     const today = new Date().toDateString();
     const doneToday = tasks.filter(t => t.status === 'done' && new Date(t.updated_at).toDateString() === today).length;
-    const active = tasks.filter(t => t.status === 'todo' || t.status === 'in-progress').length;
+    const active = tasks.filter(t => t.status !== 'done').length;
     document.getElementById('stat-active').textContent = active;
     document.getElementById('stat-done-today').textContent = doneToday;
     document.getElementById('stat-total').textContent = tasks.length;
     document.getElementById('badge-tasks').textContent = active;
 
-    [['todo', 'col-todo', 'cnt-todo'], ['in-progress', 'col-prog', 'cnt-prog'], ['done', 'col-done', 'cnt-done']].forEach(([status, colId, cntId]) => {
+    // Update agent ACTIVE status
+    const inProg = tasks.filter(t => t.status === 'in-progress');
+    updateAgentStatuses(inProg);
+
+    const colMap = [
+      ['backlog',     'col-backlog', 'cnt-backlog', 'Nothing in the backlog.'],
+      ['todo',        'col-todo',    'cnt-todo',    'Queue is clear, sir.'],
+      ['in-progress', 'col-prog',    'cnt-prog',    'Nothing in motion.'],
+      ['review',      'col-review',  'cnt-review',  'No items pending review.'],
+      ['done',        'col-done',    'cnt-done',    '🏆 All clear.'],
+    ];
+
+    colMap.forEach(([bucket, colId, cntId, emptyMsg]) => {
       const col = document.getElementById(colId);
-      const items = statuses[status] !== undefined ? statuses[status] : [];
-      const limited = status === 'done' ? items.slice(0, 15) : items;
+      const items = cols[bucket] || [];
+      const limited = bucket === 'done' ? items.slice(0, 15) : items;
       document.getElementById(cntId).textContent = items.length;
       if (!limited.length) {
-        col.innerHTML = `<div class="k-empty"><div class="em-icon">${status === 'done' ? '🏆' : '📭'}</div>${status === 'todo' ? 'Queue is clear, sir.' : status === 'in-progress' ? 'Nothing in motion.' : 'No victories yet today.'}</div>`;
+        col.innerHTML = `<div class="k-empty"><div class="em-icon">📭</div>${emptyMsg}</div>`;
         return;
       }
       col.innerHTML = '';
@@ -797,11 +878,13 @@
         card.className = 'k-card';
         card.dataset.id = t.id;
         card.dataset.category = t.category || 'work';
+        const agent = getAgent(t);
         card.innerHTML = `
           <div class="k-card-title">${escHtml(t.title)}</div>
           <div class="k-card-meta">
             <span class="k-tag ${t.category || 'work'}">${t.category || 'work'}</span>
             <span class="k-time">${relTime(t.updated_at || t.created_at)}</span>
+            ${agent ? `<span class="k-agent">🤖 ${escHtml(agent)}</span>` : ''}
             <span class="k-prio ${t.priority || 'medium'}"></span>
           </div>`;
         card.addEventListener('click', () => openTaskModal(t));
@@ -810,7 +893,31 @@
     });
   }
 
+  function updateAgentStatuses(inProgTasks) {
+    const agentCards = document.querySelectorAll('#agents-grid .data-card');
+    agentCards.forEach(card => {
+      const badge = card.querySelector('span[style*="border-radius:10px"]');
+      if (!badge) return;
+      const h3 = card.querySelector('h3');
+      if (!h3) return;
+      const name = h3.textContent;
+      if (name === 'Geoffrey (Main)') {
+        const busy = inProgTasks.length > 0;
+        badge.textContent = busy ? '● WORKING' : '● ACTIVE';
+        badge.style.background = busy ? 'rgba(245,158,11,0.15)' : 'rgba(212,175,55,0.15)';
+        badge.style.color = busy ? '#f59e0b' : '#d4af37';
+      }
+    });
+  }
+
   // ── ACTIVITY FEED ──
+  let activeFeedTab = 'all';
+  function switchFeed(tab) {
+    activeFeedTab = tab;
+    document.querySelectorAll('.ap-tab').forEach(t => t.classList.toggle('active', t.id === `feed-tab-${tab}`));
+    renderActivity();
+  }
+
   function addActivity(icon, text, strong) {
     activityLog.unshift({ icon, text, strong, time: new Date().toISOString() });
     if (activityLog.length > 30) activityLog.pop();
@@ -818,11 +925,14 @@
   }
   function renderActivity() {
     const list = document.getElementById('activity-list');
-    if (!activityLog.length) {
-      list.innerHTML = '<div class="ap-item"><span class="ap-text" style="color:var(--muted);font-style:italic">Awaiting activity…</span></div>';
+    let entries = activityLog;
+    if (activeFeedTab === 'tasks') entries = activityLog.filter(a => !a.isAgent);
+    if (activeFeedTab === 'agents') entries = activityLog.filter(a => a.isAgent || a.source === 'api' || a.source === 'telegram');
+    if (!entries.length) {
+      list.innerHTML = '<div class="ap-item"><span class="ap-text" style="color:var(--muted);font-style:italic">No activity yet…</span></div>';
       return;
     }
-    list.innerHTML = activityLog.map(a => `
+    list.innerHTML = entries.map(a => `
       <div class="ap-item">
         <span class="ap-icon">${a.icon}</span>
         <span class="ap-text"><strong>${escHtml(a.strong)}</strong> ${escHtml(a.text)}</span>
@@ -833,9 +943,11 @@
     const recent = [...tasks].sort((a,b) => new Date(b.updated_at||b.created_at) - new Date(a.updated_at||a.created_at)).slice(0, 20);
     activityLog = recent.map(t => ({
       icon: t.status === 'done' ? '✅' : t.status === 'in-progress' ? '🔄' : '📥',
-      strong: t.title.length > 28 ? t.title.slice(0,28)+'…' : t.title,
+      strong: t.title.length > 26 ? t.title.slice(0,26)+'…' : t.title,
       text: `→ ${t.status === 'in-progress' ? 'in progress' : t.status}`,
       time: t.updated_at || t.created_at,
+      isAgent: t.source === 'api' || t.source === 'telegram',
+      source: t.source,
     }));
     renderActivity();
   }
@@ -848,9 +960,9 @@
     meta.innerHTML = `<span class="k-tag ${task.category||'work'}">${task.category||'work'}</span><span class="k-tag" style="background:rgba(255,255,255,.05);color:var(--muted)">${task.priority||'medium'} priority</span>`;
     const actions = document.getElementById('modal-actions');
     const moves = [];
-    if (task.status !== 'todo') moves.push({ label: '📥 Move to Todo', status: 'todo', cls: '' });
+    if (task.status !== 'todo') moves.push({ label: '📥 Todo', status: 'todo', cls: '' });
     if (task.status !== 'in-progress') moves.push({ label: '🔄 In Progress', status: 'in-progress', cls: 'primary' });
-    if (task.status !== 'done') moves.push({ label: '✅ Mark Done', status: 'done', cls: 'success' });
+    if (task.status !== 'done') moves.push({ label: '✅ Done', status: 'done', cls: 'success' });
     moves.push({ label: '🗑️ Delete', status: 'delete', cls: 'danger' });
     actions.innerHTML = moves.map(m => `<button class="btn ${m.cls}" onclick="handleTaskAction('${m.status}')">${m.label}</button>`).join('');
     document.getElementById('task-modal').classList.add('open');
@@ -899,8 +1011,10 @@
   });
 
   // ── COMMAND PALETTE ──
-  function openCmd(targetStatus = 'todo') {
+  let cmdDefaultPriority = 'medium';
+  function openCmd(targetStatus = 'todo', defaultPriority = 'medium') {
     cmdTargetStatus = targetStatus;
+    cmdDefaultPriority = defaultPriority;
     cmdCategory = 'work';
     document.querySelectorAll('.cmd-cat').forEach(c => c.classList.toggle('selected', c.dataset.cat === 'work'));
     document.getElementById('cmd-input').value = '';
@@ -931,7 +1045,7 @@
     if (!title) return;
     const prefixes = ['urgent:', 'hustle:', 'work:', 'personal:'];
     for (const p of prefixes) if (title.toLowerCase().startsWith(p)) { title = title.slice(p.length).trim(); break; }
-    const priority = cmdCategory === 'urgent' ? 'high' : 'medium';
+    const priority = cmdCategory === 'urgent' ? 'high' : cmdDefaultPriority === 'low' ? 'low' : 'medium';
     const newTask = { title, status: cmdTargetStatus, category: cmdCategory, priority, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
     closeCmd();
     const result = await db.post('tasks', newTask);
