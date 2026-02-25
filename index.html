@@ -1450,7 +1450,7 @@
     const done = tasks.filter(t => t.status === 'done');
     if (!done.length) return;
     if (!confirm(`Clear all ${done.length} completed task${done.length > 1 ? 's' : ''}?`)) return;
-    for (const t of done) await db.del(`geoffrey_tasks?id=eq.${t.id}`);
+    for (const t of done) await db.del(`tasks?id=eq.${t.id}`);
     tasks = tasks.filter(t => t.status !== 'done');
     addActivity('🧹', '→ cleared', `${done.length} completed tasks`);
     toast('🧹', 'Cleared completed tasks');
