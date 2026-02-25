@@ -479,6 +479,92 @@
     /* ── REALTIME PULSE ── */
     .tb-status.syncing .pulse-dot { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
 
+
+    /* ── OPS FEED ── */
+    .op-entry {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 9px 14px; border-bottom: 1px solid var(--border);
+      transition: background .1s;
+    }
+    .op-entry:hover { background: rgba(255,255,255,.02); }
+    .op-agent-badge {
+      font-size: 9px; font-weight: 800; letter-spacing: .8px;
+      padding: 2px 7px; border-radius: 4px; flex-shrink: 0;
+      text-transform: uppercase; margin-top: 1px; min-width: 72px;
+      text-align: center;
+    }
+    .op-agent-badge.architect { background:rgba(59,130,246,.15); color:#3b82f6; }
+    .op-agent-badge.builder   { background:rgba(16,185,129,.15); color:#10b981; }
+    .op-agent-badge.reviewer  { background:rgba(139,92,246,.15); color:#8b5cf6; }
+    .op-agent-badge.debugger  { background:rgba(245,158,11,.15); color:#f59e0b; }
+    .op-agent-badge.geoffrey  { background:rgba(212,175,55,.15); color:#d4af37; }
+    .op-body { flex:1; min-width:0; }
+    .op-action { font-size:12px; font-weight:500; color:var(--text); }
+    .op-detail { font-size:10px; color:var(--muted); margin-top:2px; }
+    .op-time   { font-size:9px; color:var(--border2); flex-shrink:0; margin-top:2px; }
+
+    /* ── AGENT STATUS CARDS ── */
+    .agent-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px; transition: border-color .15s;
+    }
+    .agent-card:hover { border-color: var(--border2); }
+    .agent-card-head { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+    .agent-icon { font-size:24px; flex-shrink:0; }
+    .agent-name { font-size:14px; font-weight:700; color:var(--text); }
+    .agent-role { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-top:1px; }
+    .agent-status-pill {
+      margin-left:auto; font-size:9px; font-weight:800;
+      padding:3px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:.5px;
+    }
+    .agent-status-pill.idle    { background:rgba(100,116,139,.1); color:#64748b; }
+    .agent-status-pill.active  { background:rgba(212,175,55,.15); color:#d4af37; }
+    .agent-status-pill.working { background:rgba(16,185,129,.15); color:#10b981; animation: pulse-glow 1.5s ease-in-out infinite; }
+    @keyframes pulse-glow { 0%,100%{opacity:1} 50%{opacity:.6} }
+    .agent-pipeline { display:flex; gap:4px; margin-bottom:10px; }
+    .pipeline-step {
+      flex:1; padding:4px 6px; border-radius:4px; text-align:center;
+      font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.3px;
+      background:rgba(255,255,255,.04); color:var(--muted); transition:all .2s;
+    }
+    .pipeline-step.done  { background:rgba(16,185,129,.15); color:#10b981; }
+    .pipeline-step.active{ background:rgba(212,175,55,.2); color:#d4af37; }
+    .agent-last { font-size:11px; color:var(--muted); line-height:1.4; }
+    .agent-last strong { color:var(--text); font-weight:500; }
+
+    /* ── NIGHT SHIFTS ── */
+    .shift-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; margin-bottom: 12px; overflow: hidden;
+    }
+    .shift-head {
+      display:flex; align-items:center; gap:10px;
+      padding:14px 16px; cursor:pointer;
+      border-bottom:1px solid var(--border);
+    }
+    .shift-head:hover { background:rgba(255,255,255,.02); }
+    .shift-date { font-size:13px; font-weight:700; color:var(--text); }
+    .shift-summary { font-size:11px; color:var(--muted); margin-top:2px; }
+    .shift-badge {
+      margin-left:auto; font-size:10px; font-weight:700;
+      padding:3px 9px; border-radius:20px; flex-shrink:0;
+    }
+    .shift-badge.done { background:rgba(16,185,129,.15); color:#10b981; }
+    .shift-badge.pr   { background:rgba(212,175,55,.15); color:#d4af37; }
+    .shift-badge.wip  { background:rgba(245,158,11,.15); color:#f59e0b; }
+    .shift-body { padding:12px 16px; display:none; }
+    .shift-body.open { display:block; }
+    .shift-item {
+      display:flex; align-items:center; gap:8px;
+      padding:6px 0; border-bottom:1px solid rgba(255,255,255,.04);
+      font-size:12px;
+    }
+    .shift-item:last-child { border-bottom:none; }
+    .shift-item .si-icon { font-size:14px; flex-shrink:0; }
+    .shift-item .si-text { flex:1; color:var(--text); }
+    .shift-item .si-meta { font-size:10px; color:var(--muted); }
+    .shift-empty { padding:20px; text-align:center; color:var(--muted); font-size:12px; }
+
     /* ── LOADING ── */
     #loading {
       position: fixed; inset: 0; z-index: 500;
@@ -696,6 +782,7 @@
   <button class="nav-tab" data-view="pipeline" onclick="switchView('pipeline')">📤 Pipeline <span class="badge" id="badge-pipeline">0</span></button>
   <button class="nav-tab" data-view="brain" onclick="switchView('brain')">🧠 Second Brain <span class="badge" id="badge-brain">0</span></button>
   <button class="nav-tab" data-view="agents" onclick="switchView('agents')">🤖 Agents</button>
+  <button class="nav-tab" data-view="shifts" onclick="switchView('shifts')">🌙 Shifts</button>
   <button class="nav-cmd" onclick="openCmd()"><kbd>⌘K</kbd> Quick Add</button>
 </div>
 
@@ -786,88 +873,22 @@
 
   <!-- AGENTS -->
   <div id="agents-view" class="view generic-view">
-    <div class="view-header"><h2>🤖 Agents</h2><p>Geoffrey's specialized sub-agents — deployed on demand for complex tasks</p></div>
-    <div class="cards-grid" id="agents-grid">
-
-      <div class="data-card" style="border-left:3px solid #3b82f6;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-          <span style="font-size:28px">🏗️</span>
-          <div>
-            <h3 style="margin:0">Architect</h3>
-            <span style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1px">System Design &amp; Planning</span>
-          </div>
-          <span style="margin-left:auto;font-size:10px;padding:3px 8px;border-radius:10px;background:rgba(59,130,246,.15);color:#3b82f6;font-weight:700;">IDLE</span>
-        </div>
-        <p>Analyzes codebases, creates implementation plans, identifies dependencies. Outputs numbered checklists — never writes code directly.</p>
-        <div class="card-meta" style="margin-top:12px;">
-          <span class="k-tag work">Explore → Plan → Handoff</span>
-        </div>
-      </div>
-
-      <div class="data-card" style="border-left:3px solid #f59e0b;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-          <span style="font-size:28px">🐛</span>
-          <div>
-            <h3 style="margin:0">Debugger</h3>
-            <span style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1px">Root Cause Analysis</span>
-          </div>
-          <span style="margin-left:auto;font-size:10px;padding:3px 8px;border-radius:10px;background:rgba(245,158,11,.15);color:#f59e0b;font-weight:700;">IDLE</span>
-        </div>
-        <p>Reproduces and isolates issues systematically. Reads error stacks carefully, traces recent regressions. Proposes minimal targeted fixes.</p>
-        <div class="card-meta" style="margin-top:12px;">
-          <span class="k-tag hustle">Reproduce → Isolate → Fix</span>
-        </div>
-      </div>
-
-      <div class="data-card" style="border-left:3px solid #8b5cf6;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-          <span style="font-size:28px">👁️</span>
-          <div>
-            <h3 style="margin:0">Reviewer</h3>
-            <span style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1px">Code Quality &amp; Standards</span>
-          </div>
-          <span style="margin-left:auto;font-size:10px;padding:3px 8px;border-radius:10px;background:rgba(139,92,246,.15);color:#8b5cf6;font-weight:700;">IDLE</span>
-        </div>
-        <p>Checks TypeScript errors, lint issues, security vulnerabilities, and edge cases. Ensures consistent style. Flags performance problems.</p>
-        <div class="card-meta" style="margin-top:12px;">
-          <span class="k-tag personal">Review → Flag → Suggest</span>
-        </div>
-      </div>
-
-      <div class="data-card" style="border-left:3px solid #10b981;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-          <span style="font-size:28px">⚒️</span>
-          <div>
-            <h3 style="margin:0">Builder</h3>
-            <span style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1px">Feature Implementation</span>
-          </div>
-          <span style="margin-left:auto;font-size:10px;padding:3px 8px;border-radius:10px;background:rgba(16,185,129,.15);color:#10b981;font-weight:700;">IDLE</span>
-        </div>
-        <p>Executes implementation plans from the Architect. Builds features, creates PRs on <code>geoffrey/&lt;feature&gt;</code> branches. Never pushes to main.</p>
-        <div class="card-meta" style="margin-top:12px;">
-          <span class="k-tag personal">Plan → Build → PR</span>
-        </div>
-      </div>
-
-      <div class="data-card" style="border-left:3px solid #d4af37;grid-column:1/-1;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-          <span style="font-size:28px">🎩</span>
-          <div>
-            <h3 style="margin:0">Geoffrey (Main)</h3>
-            <span style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1px">Orchestrator &amp; Butler</span>
-          </div>
-          <span style="margin-left:auto;font-size:10px;padding:3px 8px;border-radius:10px;background:rgba(212,175,55,.15);color:#d4af37;font-weight:700;">● ACTIVE</span>
-        </div>
-        <p>Coordinates all agents. Runs proactive night shifts, manages the task board, monitors signals, sends morning briefs, handles Telegram. The one running this board right now.</p>
-        <div class="card-meta" style="margin-top:12px;">
-          <span style="font-size:10px;padding:3px 10px;border-radius:4px;background:rgba(212,175,55,.1);color:#d4af37;font-weight:700;text-transform:uppercase;letter-spacing:0.5px">Main Session</span>
-          <span style="font-size:10px;padding:3px 10px;border-radius:4px;background:rgba(255,255,255,.05);color:#64748b;font-weight:600">Mac Mini · 24/7</span>
-        </div>
-      </div>
-
+    <div class="view-header"><h2>🤖 Agents</h2><p>Live status — Geoffrey's specialized crew working toward your mission</p></div>
+    <div id="agent-pipeline-bar" style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-right:4px;">Active Pipeline</span>
+      <div id="pipeline-display" style="display:flex;gap:6px;flex:1;flex-wrap:wrap;"></div>
     </div>
+    <div class="cards-grid" id="agents-grid"></div>
   </div>
 
+  <!-- SHIFTS -->
+  <div id="shifts-view" class="view generic-view">
+    <div class="view-header">
+      <h2>🌙 Night Shifts</h2>
+      <p>Autonomous build sessions — proof of work while you slept</p>
+    </div>
+    <div id="shifts-list"></div>
+  </div>
 
 </div>
 
@@ -997,7 +1018,10 @@
   function switchView(v) {
     document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.nav-tab').forEach(el => el.classList.toggle('active', el.dataset.view === v));
-    document.getElementById(`${v}-view`).classList.add('active');
+    const viewEl = document.getElementById(`${v}-view`);
+    if (viewEl) viewEl.classList.add('active');
+    if (v === 'agents') try { renderAgents(); } catch(e) {}
+    if (v === 'shifts') try { renderShifts(); } catch(e) {}
   }
 
   // ── RENDER KANBAN ──
@@ -1142,6 +1166,168 @@
   }
 
   // ── ACTIVITY FEED ──
+  // ── AGENT DEFINITIONS ─────────────────────────────────────────────────────
+  const AGENT_DEFS = [
+    { id:'architect', name:'Architect', icon:'🏗️', role:'System Design & Planning',
+      color:'#3b82f6', colorBg:'rgba(59,130,246,.15)',
+      desc:'Analyzes codebases, creates implementation plans. Outputs numbered checklists — never writes code directly.',
+      pipeline:['Plan','Handoff'], phase:'plan' },
+    { id:'builder', name:'Builder', icon:'⚒️', role:'Feature Implementation',
+      color:'#10b981', colorBg:'rgba(16,185,129,.15)',
+      desc:'Executes plans from Architect. Creates branches, writes code, commits frequently.',
+      pipeline:['Code','Test','PR'], phase:'code' },
+    { id:'reviewer', name:'Reviewer', icon:'👁️', role:'Code Quality & Standards',
+      color:'#8b5cf6', colorBg:'rgba(139,92,246,.15)',
+      desc:'TypeScript errors, security issues, edge cases. Flags problems before merge.',
+      pipeline:['Lint','Check','Approve'], phase:'check' },
+    { id:'debugger', name:'Debugger', icon:'🐛', role:'Root Cause Analysis',
+      color:'#f59e0b', colorBg:'rgba(245,158,11,.15)',
+      desc:'Reproduces and isolates issues systematically. Never guesses — proves with evidence.',
+      pipeline:['Repro','Trace','Fix'], phase:'fix' },
+    { id:'geoffrey', name:'Geoffrey (Main)', icon:'🎩', role:'Orchestrator & Butler',
+      color:'#d4af37', colorBg:'rgba(212,175,55,.15)',
+      desc:'Coordinates all agents. Runs night shifts, manages board, monitors signals, sends briefs.',
+      pipeline:['Monitor','Build','Deploy'], phase:'monitor', isMain:true },
+  ];
+
+  // ── OPERATIONS LOG ─────────────────────────────────────────────────────────
+  // Rich ops entries: { agent, action, detail, time, phase }
+  let opsLog = [];
+
+  function addOp(agent, action, detail = '', time = null) {
+    opsLog.unshift({ agent, action, detail, time: time || new Date().toISOString() });
+    if (opsLog.length > 60) opsLog = opsLog.slice(0, 60);
+    if (activeFeedTab === 'agents' || activeFeedTab === 'all') renderActivity();
+  }
+
+  function agentBadgeHtml(agentId) {
+    const labels = { architect:'ARCHITECT', builder:'BUILDER', reviewer:'REVIEWER',
+                     debugger:'DEBUGGER', geoffrey:'GEOFFREY' };
+    return `<span class="op-agent-badge ${agentId}">${labels[agentId] || agentId.toUpperCase()}</span>`;
+  }
+
+  // ── RENDER AGENTS PANEL ────────────────────────────────────────────────────
+  function renderAgents() {
+    const grid = document.getElementById('agents-grid');
+    if (!grid) return;
+    const inProg = tasks.filter(t => t.status === 'in-progress');
+    const recentDone = tasks.filter(t => t.status === 'done')
+      .sort((a,b) => new Date(b.updated_at) - new Date(a.updated_at)).slice(0, 5);
+
+    grid.innerHTML = AGENT_DEFS.map(ag => {
+      // Determine status
+      let status = 'idle', statusLabel = 'IDLE';
+      let currentTask = null;
+      if (ag.isMain) {
+        status = inProg.length > 0 ? 'working' : 'active';
+        statusLabel = inProg.length > 0 ? '● WORKING' : '● ACTIVE';
+        currentTask = inProg[0] || recentDone[0];
+      }
+      // Pipeline steps
+      const steps = ag.pipeline.map((step, i) => {
+        const isActive = ag.isMain && inProg.length > 0 && i === 0;
+        const isDone = ag.isMain && recentDone.length > 0 && i < ag.pipeline.length - 1;
+        return `<div class="pipeline-step ${isActive ? 'active' : isDone ? 'done' : ''}">${step}</div>`;
+      }).join('');
+
+      const lastTask = currentTask
+        ? `<div class="agent-last">Last: <strong>${escHtml(currentTask.title.slice(0, 45))}${currentTask.title.length > 45 ? '…' : ''}</strong><br><span style="font-size:9px">${relTime(currentTask.updated_at || currentTask.created_at)} ago · ${currentTask.status}</span></div>`
+        : `<div class="agent-last" style="color:var(--border2);font-style:italic">No recent activity</div>`;
+
+      return `<div class="agent-card" style="border-left:3px solid ${ag.color}">
+        <div class="agent-card-head">
+          <span class="agent-icon">${ag.icon}</span>
+          <div><div class="agent-name">${ag.name}</div><div class="agent-role">${ag.role}</div></div>
+          <span class="agent-status-pill ${status}">${statusLabel}</span>
+        </div>
+        <div class="agent-pipeline">${steps}</div>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5">${ag.desc}</p>
+        ${lastTask}
+      </div>`;
+    }).join('');
+
+    // Pipeline bar
+    const bar = document.getElementById('pipeline-display');
+    if (bar) {
+      const phases = [
+        {icon:'🏗️', label:'Architect', active: false},
+        {icon:'⚒️', label:'Builder',   active: inProg.length > 0},
+        {icon:'👁️', label:'Reviewer',  active: false},
+        {icon:'✅', label:'Merged',    active: false},
+      ];
+      bar.innerHTML = phases.map((p, i) => `
+        <div style="display:flex;align-items:center;gap:4px;">
+          <div style="padding:4px 10px;border-radius:6px;font-size:10px;font-weight:700;
+            background:${p.active ? 'rgba(212,175,55,.2)' : 'rgba(255,255,255,.04)'};
+            color:${p.active ? '#d4af37' : 'var(--muted)'};">
+            ${p.icon} ${p.label}
+          </div>
+          ${i < phases.length-1 ? '<span style="color:var(--border2);font-size:10px">→</span>' : ''}
+        </div>`).join('');
+    }
+  }
+
+  // ── RENDER NIGHT SHIFTS ────────────────────────────────────────────────────
+  const SHIFT_LOG = [
+    { date: 'Feb 24, 2026', summary: 'Mission Control v3 + TouchGrass landing', status: 'done',
+      items: [
+        { icon:'✅', text:'TouchGrass landing: fixed dead buy button, removed "use client" SSR, FAQ accordion, mobile nav', meta:'PR #1 · touchgrass-indicator' },
+        { icon:'✅', text:'Mission Control: drag-to-move columns, expanded card modal with notes, realtime WS', meta:'PR #7 · geoffreytasks' },
+        { icon:'✅', text:'Mission Control: 5-col kanban, Insights tabs, agent badges on cards, live status', meta:'PR #6 · geoffreytasks' },
+        { icon:'✅', text:'Fixed loading freeze (JS escape corruption + no fetch timeout)', meta:'PR #8, #9 · geoffreytasks' },
+      ]
+    },
+    { date: 'Feb 21, 2026', summary: 'IRL Capital Academy + Signal fixes', status: 'done',
+      items: [
+        { icon:'✅', text:'IRL Capital Academy Module 2: 5 video scripts (~45 min runtime)', meta:'~/clawd/projects/irl-capital-academy/' },
+        { icon:'✅', text:'TouchGrass stats caching fix — daily briefing track record was showing stale data', meta:'PR merged · touchgrass' },
+        { icon:'✅', text:'Signal cooldown fix — 60-min minimum between open signal replacements', meta:'PR merged · touchgrass' },
+      ]
+    },
+    { date: 'Feb 19, 2026', summary: 'IRL Capital Academy Module 1 + RentCoin', status: 'done',
+      items: [
+        { icon:'✅', text:'IRL Capital Academy: full course framework, pricing, bank list, sales copy', meta:'~/clawd/projects/irl-capital-academy/' },
+        { icon:'✅', text:'RentCoin website deployed with OG/SEO', meta:'rentcoin.cash · deployed' },
+        { icon:'📋', text:'Competitor analysis: Motus Investment Group, business credit stacking market', meta:'Research doc' },
+      ]
+    },
+    { date: 'Feb 17, 2026', summary: 'IRL Capital Atlanta positioning + FB ads', status: 'done',
+      items: [
+        { icon:'✅', text:'IRL Capital landing: Atlanta badge, "Bad credit? We fix it first, then fund you" copy', meta:'PR #1 · irl-capital' },
+        { icon:'✅', text:'5 FB ad copy sets ready for $20-30/day test campaign', meta:'FB_AD_COPY.md' },
+        { icon:'📋', text:'Timeslot: 404 + loading skeleton error pages', meta:'PR · timeslot' },
+      ]
+    },
+  ];
+
+  function renderShifts() {
+    const list = document.getElementById('shifts-list');
+    if (!list) return;
+    if (!SHIFT_LOG.length) {
+      list.innerHTML = '<div class="shift-empty">🌙 No night shift logs yet. First session logs here automatically.</div>';
+      return;
+    }
+    list.innerHTML = SHIFT_LOG.map((shift, si) => {
+      const items = shift.items.map(item => `
+        <div class="shift-item">
+          <span class="si-icon">${item.icon}</span>
+          <span class="si-text">${escHtml(item.text)}</span>
+          <span class="si-meta">${escHtml(item.meta)}</span>
+        </div>`).join('');
+      return `<div class="shift-card">
+        <div class="shift-head" onclick="this.nextElementSibling.classList.toggle('open')">
+          <span style="font-size:20px">🌙</span>
+          <div>
+            <div class="shift-date">${shift.date}</div>
+            <div class="shift-summary">${escHtml(shift.summary)}</div>
+          </div>
+          <span class="shift-badge ${shift.status}">${shift.status === 'done' ? '✅ Shipped' : shift.status === 'pr' ? '👀 PR Open' : '🔄 WIP'}</span>
+        </div>
+        <div class="shift-body ${si === 0 ? 'open' : ''}">${items}</div>
+      </div>`;
+    }).join('');
+  }
+
   let activeFeedTab = 'all';
   function switchFeed(tab) {
     activeFeedTab = tab;
@@ -1156,23 +1342,48 @@
   }
   function renderActivity() {
     const list = document.getElementById('activity-list');
-    let entries = activityLog;
-    if (activeFeedTab === 'tasks') entries = activityLog.filter(a => !a.isAgent);
-    if (activeFeedTab === 'agents') entries = activityLog.filter(a => a.isAgent || a.source === 'api' || a.source === 'telegram');
-    if (!entries.length) {
-      list.innerHTML = '<div class="ap-item"><span class="ap-text" style="color:var(--muted);font-style:italic">No activity yet…</span></div>';
+    // Merge ops log + task activity into unified feed
+    const opEntries = opsLog.map(o => ({
+      type: 'op', agent: o.agent, action: o.action,
+      detail: o.detail, time: o.time, isAgent: true,
+    }));
+    const taskEntries = activityLog.map(a => ({
+      type: 'task', icon: a.icon, strong: a.strong,
+      text: a.text, time: a.time, isAgent: a.isAgent, source: a.source, isSession: a.isSession,
+    }));
+    let all = [...opEntries, ...taskEntries]
+      .sort((a,b) => new Date(b.time) - new Date(a.time))
+      .slice(0, 40);
+    if (activeFeedTab === 'tasks') all = all.filter(e => e.type === 'task' && !e.isAgent);
+    if (activeFeedTab === 'agents') all = all.filter(e => e.isAgent || e.type === 'op');
+    if (!all.length) {
+      list.innerHTML = '<div class="ap-item" style="padding:14px"><span style="color:var(--muted);font-size:11px;font-style:italic">No operations logged yet</span></div>';
       return;
     }
-    list.innerHTML = entries.map(a => `
-      <div class="ap-item">
-        <span class="ap-icon">${a.icon}</span>
-        <span class="ap-text"><strong>${escHtml(a.strong)}</strong> ${escHtml(a.text)}</span>
-        <span class="ap-time">${relTime(a.time)}</span>
-      </div>`).join('');
+    list.innerHTML = all.map(e => {
+      if (e.type === 'op') {
+        return `<div class="op-entry">
+          ${agentBadgeHtml(e.agent)}
+          <div class="op-body">
+            <div class="op-action">${escHtml(e.action)}</div>
+            ${e.detail ? `<div class="op-detail">${escHtml(e.detail)}</div>` : ''}
+          </div>
+          <span class="op-time">${relTime(e.time)}</span>
+        </div>`;
+      }
+      const agentId = e.isSession ? 'geoffrey' : (e.isAgent ? 'builder' : null);
+      return `<div class="op-entry">
+        ${agentId ? agentBadgeHtml(agentId) : `<span class="ap-icon">${e.icon||'📋'}</span>`}
+        <div class="op-body">
+          <div class="op-action"><strong>${escHtml(e.strong||'')}</strong> ${escHtml(e.text||'')}</div>
+        </div>
+        <span class="op-time">${relTime(e.time)}</span>
+      </div>`;
+    }).join('');
   }
   function buildActivityFromTasks() {
     const recent = [...tasks].sort((a,b) => new Date(b.updated_at||b.created_at) - new Date(a.updated_at||a.created_at)).slice(0, 20);
-    const taskEntries = recent.map(t => ({
+    activityLog = recent.map(t => ({
       icon: t.status === 'done' ? '✅' : t.status === 'in-progress' ? '🔄' : '📥',
       strong: t.title.length > 26 ? t.title.slice(0,26)+'…' : t.title,
       text: `→ ${t.status === 'in-progress' ? 'in progress' : t.status}`,
@@ -1180,13 +1391,6 @@
       isAgent: t.source === 'api' || t.source === 'telegram',
       source: t.source,
     }));
-    // Preserve real-time entries added this session, prepend them
-    const sessionEntries = activityLog.filter(a => a.isSession);
-    activityLog = [
-      ...sessionEntries,
-      { icon: '🎩', strong: 'Geoffrey', text: `→ board synced · ${tasks.length} tasks`, time: new Date().toISOString(), isSession: true },
-      ...taskEntries,
-    ];
     renderActivity();
   }
 
@@ -1463,6 +1667,14 @@
       try { renderNotes(); } catch(e) {}
       try { renderPipeline(); } catch(e) {}
       try { renderBrainDocs(brainDocs); } catch(e) {}
+      try { renderAgents(); } catch(e) {}
+      try { renderShifts(); } catch(e) {}
+      // Seed ops log with session start
+      addOp('geoffrey', 'Board loaded', `${tasks.filter(t=>t.status==='in-progress').length} in progress · ${tasks.filter(t=>t.status==='done').length} done`);
+      if (tasks.filter(t=>t.status==='in-progress').length > 0) {
+        const t = tasks.find(t=>t.status==='in-progress');
+        addOp('builder', 'Task in progress', t ? t.title.slice(0,50) : '');
+      }
 
       // Auto-refresh every 20s — picks up night shift activity instantly
       let lastTaskSnapshot = '';
@@ -1484,6 +1696,7 @@
         tasks = fresh;
         renderKanban();
         buildActivityFromTasks();
+        renderAgents();
       }, 20000);
 
       // Supabase Realtime websocket — instant push when Geoffrey works at night
