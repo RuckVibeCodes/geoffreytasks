@@ -1021,7 +1021,7 @@
     const viewEl = document.getElementById(`${v}-view`);
     if (viewEl) viewEl.classList.add('active');
     if (v === 'agents') try { renderAgents(); } catch(e) {}
-    if (v === 'shifts') try { renderShifts(); } catch(e) {}
+    if (v === 'shifts') try { loadShifts(); } catch(e) { renderShifts(); }
   }
 
   // ── RENDER KANBAN ──
@@ -1279,62 +1279,54 @@
   }
 
   // ── RENDER NIGHT SHIFTS ────────────────────────────────────────────────────
-  const SHIFT_LOG = [
-    { date: 'Feb 24, 2026', summary: 'Mission Control v3 + TouchGrass landing', status: 'done',
-      items: [
-        { icon:'✅', text:'TouchGrass landing: fixed dead buy button, removed "use client" SSR, FAQ accordion, mobile nav', meta:'PR #1 · touchgrass-indicator' },
-        { icon:'✅', text:'Mission Control: drag-to-move columns, expanded card modal with notes, realtime WS', meta:'PR #7 · geoffreytasks' },
-        { icon:'✅', text:'Mission Control: 5-col kanban, Insights tabs, agent badges on cards, live status', meta:'PR #6 · geoffreytasks' },
-        { icon:'✅', text:'Fixed loading freeze (JS escape corruption + no fetch timeout)', meta:'PR #8, #9 · geoffreytasks' },
-      ]
-    },
-    { date: 'Feb 21, 2026', summary: 'IRL Capital Academy + Signal fixes', status: 'done',
-      items: [
-        { icon:'✅', text:'IRL Capital Academy Module 2: 5 video scripts (~45 min runtime)', meta:'~/clawd/projects/irl-capital-academy/' },
-        { icon:'✅', text:'TouchGrass stats caching fix — daily briefing track record was showing stale data', meta:'PR merged · touchgrass' },
-        { icon:'✅', text:'Signal cooldown fix — 60-min minimum between open signal replacements', meta:'PR merged · touchgrass' },
-      ]
-    },
-    { date: 'Feb 19, 2026', summary: 'IRL Capital Academy Module 1 + RentCoin', status: 'done',
-      items: [
-        { icon:'✅', text:'IRL Capital Academy: full course framework, pricing, bank list, sales copy', meta:'~/clawd/projects/irl-capital-academy/' },
-        { icon:'✅', text:'RentCoin website deployed with OG/SEO', meta:'rentcoin.cash · deployed' },
-        { icon:'📋', text:'Competitor analysis: Motus Investment Group, business credit stacking market', meta:'Research doc' },
-      ]
-    },
-    { date: 'Feb 17, 2026', summary: 'IRL Capital Atlanta positioning + FB ads', status: 'done',
-      items: [
-        { icon:'✅', text:'IRL Capital landing: Atlanta badge, "Bad credit? We fix it first, then fund you" copy', meta:'PR #1 · irl-capital' },
-        { icon:'✅', text:'5 FB ad copy sets ready for $20-30/day test campaign', meta:'FB_AD_COPY.md' },
-        { icon:'📋', text:'Timeslot: 404 + loading skeleton error pages', meta:'PR · timeslot' },
-      ]
-    },
-  ];
+  let shiftsData = [];
+
+  async function loadShifts() {
+    try {
+      const data = await db.get('shifts?order=shift_date.desc&limit=20');
+      if (data && data.length) {
+        shiftsData = data;
+      }
+    } catch(e) {}
+    renderShifts();
+  }
 
   function renderShifts() {
     const list = document.getElementById('shifts-list');
     if (!list) return;
-    if (!SHIFT_LOG.length) {
-      list.innerHTML = '<div class="shift-empty">🌙 No night shift logs yet. First session logs here automatically.</div>';
+    if (!shiftsData.length) {
+      list.innerHTML = `<div class="shift-empty">
+        <div style="font-size:36px;margin-bottom:8px">🌙</div>
+        <p>Night shift logs will appear here after the first session.</p>
+        <p style="margin-top:4px;font-size:11px;color:var(--border2)">Geoffrey logs each build session to Supabase automatically.</p>
+      </div>`;
       return;
     }
-    list.innerHTML = SHIFT_LOG.map((shift, si) => {
-      const items = shift.items.map(item => `
+    list.innerHTML = shiftsData.map((shift, si) => {
+      const items = (shift.items || []).map(item => `
         <div class="shift-item">
-          <span class="si-icon">${item.icon}</span>
-          <span class="si-text">${escHtml(item.text)}</span>
-          <span class="si-meta">${escHtml(item.meta)}</span>
+          <span class="si-icon">${escHtml(item.icon||'📋')}</span>
+          <span class="si-text">${escHtml(item.text||'')}</span>
+          <span class="si-meta">${escHtml(item.meta||'')}</span>
         </div>`).join('');
+      // Format date nicely
+      const d = new Date(shift.shift_date + 'T12:00:00Z');
+      const dateStr = d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+      const badgeLabel = shift.status === 'done' ? '✅ Shipped' : shift.status === 'pr' ? '👀 PR Open' : '🔄 WIP';
+      const prMeta = shift.pr_count > 0 ? `${shift.pr_count} PR${shift.pr_count>1?'s':''} · ` : '';
+      const taskMeta = shift.tasks_completed > 0 ? `${shift.tasks_completed} tasks` : '';
+      const repoMeta = (shift.repos||[]).slice(0,2).join(', ');
       return `<div class="shift-card">
         <div class="shift-head" onclick="this.nextElementSibling.classList.toggle('open')">
           <span style="font-size:20px">🌙</span>
-          <div>
-            <div class="shift-date">${shift.date}</div>
+          <div style="flex:1;min-width:0">
+            <div class="shift-date">${dateStr}</div>
             <div class="shift-summary">${escHtml(shift.summary)}</div>
+            ${repoMeta ? `<div style="font-size:10px;color:var(--border2);margin-top:2px">${escHtml(prMeta+taskMeta)} · ${escHtml(repoMeta)}</div>` : ''}
           </div>
-          <span class="shift-badge ${shift.status}">${shift.status === 'done' ? '✅ Shipped' : shift.status === 'pr' ? '👀 PR Open' : '🔄 WIP'}</span>
+          <span class="shift-badge ${shift.status||'done'}">${badgeLabel}</span>
         </div>
-        <div class="shift-body ${si === 0 ? 'open' : ''}">${items}</div>
+        <div class="shift-body ${si === 0 ? 'open' : ''}">${items || '<div style="padding:8px;color:var(--muted);font-size:12px">No items logged.</div>'}</div>
       </div>`;
     }).join('');
   }
@@ -1698,7 +1690,7 @@
       try { renderPipeline(); } catch(e) {}
       try { renderBrainDocs(brainDocs); } catch(e) {}
       try { renderAgents(); } catch(e) {}
-      try { renderShifts(); } catch(e) {}
+      try { loadShifts(); } catch(e) { renderShifts(); }
       // Seed ops log with session start
       addOp('geoffrey', 'Board loaded', `${tasks.filter(t=>t.status==='in-progress').length} in progress · ${tasks.filter(t=>t.status==='done').length} done`);
       if (tasks.filter(t=>t.status==='in-progress').length > 0) {
