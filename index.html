@@ -483,6 +483,45 @@
     .k-card.dragging { opacity: .4; transform: scale(.98); cursor: grabbing; }
     .k-card { cursor: grab; }
     .k-cards.drag-over { background: rgba(212,175,55,.06); outline: 2px dashed rgba(212,175,55,.3); border-radius: 8px; }
+
+    /* Live card — in-progress with active agent */
+    .k-card.card-live {
+      border-color: rgba(16,185,129,0.45);
+      box-shadow: 0 0 0 1px rgba(16,185,129,0.12), 0 2px 12px rgba(16,185,129,0.08);
+    }
+    .k-card.card-live[data-category="work"]     { border-left-color: rgba(59,130,246,0.9); }
+    .k-card.card-live[data-category="hustle"]   { border-left-color: rgba(139,92,246,0.9); }
+    .k-card.card-live[data-category="urgent"]   { border-left-color: rgba(239,68,68,0.9); }
+    .k-card.card-live[data-category="personal"] { border-left-color: rgba(16,185,129,0.9); }
+    .k-live-dot {
+      width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+      background: #10b981; animation: pulse-glow 1.5s ease-in-out infinite;
+    }
+    .k-card-agent-row {
+      display: flex; align-items: center; gap: 6px; margin-top: 6px;
+      padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .k-card-agent-pill {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px;
+    }
+    .k-card-agent-pill.architect { background:rgba(59,130,246,.15);  color:#60a5fa; }
+    .k-card-agent-pill.builder   { background:rgba(16,185,129,.15);  color:#10b981; }
+    .k-card-agent-pill.reviewer  { background:rgba(139,92,246,.15);  color:#a78bfa; }
+    .k-card-agent-pill.debugger  { background:rgba(245,158,11,.15);  color:#fbbf24; }
+    .k-card-agent-pill.geoffrey  { background:rgba(212,175,55,.15);  color:#d4af37; }
+    .k-card-agent-label { font-size: 10px; color: var(--muted); }
+
+    /* In-Progress column header agent line */
+    .prog-agent-line {
+      font-size: 10px; color: #10b981; font-weight: 600;
+      display: flex; align-items: center; gap: 5px; margin-top: 2px;
+      min-height: 14px;
+    }
+    .prog-agent-line .live-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: #10b981; animation: pulse-glow 1.5s ease-in-out infinite; flex-shrink: 0;
+    }
     .k-col.drop-target .k-col-head { background: rgba(255,255,255,.03); }
 
     /* ── EXPANDED MODAL ── */
@@ -961,7 +1000,13 @@
           <div class="k-add"><button class="k-add-btn" onclick="openCmd('todo')">+ Add task  ⌘K</button></div>
         </div>
         <div class="k-col prog">
-          <div class="k-col-head"><span class="label">🔄 In Progress</span><span class="k-count" id="cnt-prog">0</span></div>
+          <div class="k-col-head">
+            <div style="flex:1">
+              <span class="label">🔄 In Progress</span>
+              <div class="prog-agent-line" id="prog-agent-line"></div>
+            </div>
+            <span class="k-count" id="cnt-prog">0</span>
+          </div>
           <div class="k-cards" id="col-prog"></div>
           <div class="k-add"><button class="k-add-btn" onclick="openCmd('in-progress')">+ Add task</button></div>
         </div>
@@ -1182,6 +1227,56 @@
     return null;
   }
 
+  // Determine which agent is actively working on an in-progress task
+  // Looks at recent opsLog entries whose detail contains part of the task title
+  function getCardAgent(task) {
+    if (!task || task.status !== 'in-progress') return null;
+    const titleLower = (task.title || '').toLowerCase().slice(0, 30);
+    const now = Date.now();
+    // Check opsLog for a recent entry mentioning this task (within 3h)
+    const match = opsLog.find(op => {
+      const age = now - new Date(op.time).getTime();
+      if (age > 3 * 60 * 60 * 1000) return false;
+      const detail = (op.detail || '').toLowerCase();
+      return titleLower.split(' ').filter(w => w.length > 3).some(w => detail.includes(w));
+    });
+    if (match) return match.agent;
+    // Fallback: most recently WORKING agent (non-geoffrey first, then geoffrey)
+    const recentWorking = opsLog.find(op => {
+      const age = now - new Date(op.time).getTime();
+      return age < 15 * 60 * 1000 && op.agent !== 'geoffrey';
+    });
+    if (recentWorking) return recentWorking.agent;
+    // Last resort: Geoffrey is always watching
+    const anyRecent = opsLog.find(op => {
+      const age = now - new Date(op.time).getTime();
+      return age < 30 * 60 * 1000;
+    });
+    return anyRecent ? anyRecent.agent : 'geoffrey';
+  }
+
+  // Update the In Progress column header with the active agent
+  function updateProgHeader() {
+    const line = document.getElementById('prog-agent-line');
+    if (!line) return;
+    const now = Date.now();
+    // Find the most recently WORKING non-idle agent
+    const agents = AGENT_DEFS.map(ag => {
+      const latest = opsLog.find(o => o.agent === ag.id);
+      const age = latest ? now - new Date(latest.time).getTime() : Infinity;
+      return { ...ag, age, latest };
+    });
+    const working = agents.find(a => a.age < 15 * 60 * 1000);
+    const active  = agents.find(a => a.age < 3 * 60 * 60 * 1000);
+    const current = working || active;
+    if (current && current.latest) {
+      const label = working ? 'working' : 'last active ' + relTime(current.latest.time) + ' ago';
+      line.innerHTML = `<div class="live-dot"></div><span>${current.icon} ${current.name} — ${label}</span>`;
+    } else {
+      line.innerHTML = '';
+    }
+  }
+
   function renderKanban() {
     const filtered = activeFilter === 'all' ? tasks : tasks.filter(t => t.category === activeFilter);
 
@@ -1206,9 +1301,10 @@
     document.getElementById('stat-total').textContent = tasks.length;
     document.getElementById('badge-tasks').textContent = active;
 
-    // Update agent ACTIVE status
+    // Update agent ACTIVE status + column header
     const inProg = tasks.filter(t => t.status === 'in-progress');
     updateAgentStatuses(inProg);
+    updateProgHeader();
 
     const colMap = [
       ['backlog',     'col-backlog', 'cnt-backlog', 'Nothing in the backlog.'],
@@ -1275,12 +1371,26 @@
       col.innerHTML = '';
       limited.forEach(t => {
         const card = document.createElement('div');
-        card.className = 'k-card';
+        const isInProg = t.status === 'in-progress';
+        const cardAgent = isInProg ? getCardAgent(t) : null;
+        const isLive = isInProg && cardAgent !== null;
+        card.className = 'k-card' + (isLive ? ' card-live' : '');
         card.dataset.id = t.id;
         card.dataset.status = t.status;
         card.dataset.category = t.category || 'work';
         card.draggable = true;
         const agent = getAgent(t);
+        const agentDef = cardAgent ? AGENT_DEFS.find(a => a.id === cardAgent) : null;
+        const agentRow = agentDef ? `
+          <div class="k-card-agent-row">
+            <div class="k-live-dot"></div>
+            <span class="k-card-agent-pill ${agentDef.id}">${agentDef.icon} ${agentDef.name}</span>
+            <span class="k-card-agent-label">working</span>
+          </div>` : (isInProg ? `
+          <div class="k-card-agent-row">
+            <div class="k-live-dot"></div>
+            <span class="k-card-agent-label" style="color:var(--muted)">in progress</span>
+          </div>` : '');
         card.innerHTML = `
           <div class="k-card-title">${escHtml(t.title)}</div>
           <div class="k-card-meta">
@@ -1288,7 +1398,8 @@
             <span class="k-time">${relTime(t.updated_at || t.created_at)}</span>
             ${agent ? `<span class="k-agent">🤖 ${escHtml(agent)}</span>` : ''}
             <span class="k-prio ${t.priority || 'medium'}"></span>
-          </div>`;
+          </div>
+          ${agentRow}`;
         card.addEventListener('click', () => openTaskModal(t));
         card.addEventListener('dragstart', e => {
           e.dataTransfer.setData('text/plain', t.id);
@@ -2074,22 +2185,76 @@
         renderAgents();
       }, 20000);
 
-      // Supabase Realtime websocket — instant push when Geoffrey works at night
+      // Supabase Realtime WebSocket — instant push on task + agent_activity changes
       try {
         const wsUrl = `wss://arprmkukemtlhglsqgcs.supabase.co/realtime/v1/websocket?apikey=${SUPABASE_KEY}&vsn=1.0.0`;
         const ws = new WebSocket(wsUrl);
+        let wsHeartbeat = null;
+
         ws.onopen = () => {
-          ws.send(JSON.stringify({topic:'realtime:geoffrey:tasks',event:'phx_join',payload:{},ref:'1'}));
+          // v2 format: join with postgres_changes for both tables
+          ws.send(JSON.stringify({
+            topic: 'realtime:board',
+            event: 'phx_join',
+            payload: {
+              config: {
+                broadcast: { self: false },
+                postgres_changes: [
+                  { event: '*', schema: 'geoffrey', table: 'tasks' },
+                  { event: '*', schema: 'geoffrey', table: 'agent_activity' },
+                  { event: '*', schema: 'geoffrey', table: 'chat_messages' },
+                ]
+              }
+            },
+            ref: '1'
+          }));
+          // Heartbeat every 25s to keep connection alive
+          wsHeartbeat = setInterval(() => {
+            ws.send(JSON.stringify({ topic: 'phoenix', event: 'heartbeat', payload: {}, ref: null }));
+          }, 25000);
           const dot = document.querySelector('.pulse-dot');
-          if (dot) { dot.style.background='#d4af37'; setTimeout(()=>dot.style.background='',2000); }
+          if (dot) { dot.style.background='#4ade80'; setTimeout(()=>dot.style.background='',2000); }
         };
+
         ws.onmessage = async (msg) => {
-          const d = JSON.parse(msg.data);
-          if (['INSERT','UPDATE','DELETE'].includes(d.event)) {
-            const fresh = await db.get('tasks?order=updated_at.desc&limit=200');
-            if (fresh) { tasks = fresh; renderKanban(); buildActivityFromTasks(); }
-          }
+          try {
+            const d = JSON.parse(msg.data);
+            // postgres_changes events arrive as d.event === 'postgres_changes'
+            // or in older format as d.payload.type
+            const pgEvent = d.event === 'postgres_changes' ? d.payload?.data : null;
+            const table = pgEvent?.table || d.payload?.table;
+
+            if (table === 'tasks') {
+              const fresh = await db.get('tasks?order=updated_at.desc&limit=200');
+              if (fresh) {
+                fresh.forEach(t => {
+                  const old = tasks.find(o => o.id === t.id);
+                  if (old && old.status !== t.status) {
+                    const op = STATUS_OPS[t.status] || { agent:'geoffrey', action:'Task → ' + t.status };
+                    addOp(op.agent, op.action, t.title.slice(0,50));
+                  }
+                });
+                tasks = fresh; renderKanban(); buildActivityFromTasks(); renderAgents();
+              }
+            } else if (table === 'agent_activity') {
+              // New agent event — pull latest and refresh
+              const rec = pgEvent?.record;
+              if (rec) {
+                addOp(rec.agent_id, rec.action, rec.detail || '', rec.created_at);
+                renderAgents(); updateProgHeader();
+              }
+            } else if (table === 'chat_messages') {
+              const rec = pgEvent?.record;
+              if (rec && rec.role === 'assistant' && !chatOpen) {
+                chatUnreadCount++;
+                updateChatUnread();
+              }
+              if (rec) { chatMessages.push(rec); if (chatOpen) { renderChatMessages(); scrollChatToBottom(); } }
+            }
+          } catch(e2) {}
         };
+
+        ws.onclose = () => { clearInterval(wsHeartbeat); };
         ws.onerror = () => {};
       } catch(e) {}
 
