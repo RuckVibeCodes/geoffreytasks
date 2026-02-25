@@ -1096,18 +1096,20 @@
         // Determine target status from column id
         const colId = zone.id;
         let newStatus = 'todo';
-        if (colId === 'col-prog') newStatus = 'in-progress';
-        else if (colId === 'col-review') newStatus = 'in-progress'; // review = in-progress for now
-        else if (colId === 'col-done') newStatus = 'done';
-        else if (colId === 'col-backlog') { newStatus = 'todo'; task.priority = 'low'; }
-        else if (colId === 'col-todo') { newStatus = 'todo'; if (task.priority === 'low') task.priority = 'medium'; }
+        let conceptualStage = 'todo';
+        if (colId === 'col-prog')    { newStatus = 'in-progress'; conceptualStage = 'in-progress'; }
+        else if (colId === 'col-review') { newStatus = 'in-progress'; conceptualStage = 'review'; }
+        else if (colId === 'col-done')   { newStatus = 'done'; conceptualStage = 'done'; }
+        else if (colId === 'col-backlog'){ newStatus = 'todo'; task.priority = 'low'; conceptualStage = 'backlog'; }
+        else if (colId === 'col-todo')   { newStatus = 'todo'; if (task.priority === 'low') task.priority = 'medium'; }
         if (newStatus === task.status && colId !== 'col-backlog' && colId !== 'col-todo') return;
         task.status = newStatus;
         task.updated_at = new Date().toISOString();
         await db.patch(`tasks?id=eq.${task.id}`, { status: newStatus, priority: task.priority, updated_at: task.updated_at });
         const icons = { 'todo': '📥', 'in-progress': '🔄', 'done': '✅' };
-        addActivity(icons[newStatus]||'📥', `→ ${newStatus === 'in-progress' ? 'in progress' : newStatus}`, task.title);
-        renderKanban();
+        const dropOp = STATUS_OPS[conceptualStage] || STATUS_OPS[newStatus] || { agent:'geoffrey', action:'Moved to ' + newStatus };
+        addOp(dropOp.agent, dropOp.action, task.title.slice(0, 50));
+        renderKanban(); renderAgents();
       };
     });
 
@@ -1246,24 +1248,33 @@
       </div>`;
     }).join('');
 
-    // Pipeline bar
+    // Pipeline bar — 5-phase with Debugger, active phase from recent ops
     const bar = document.getElementById('pipeline-display');
     if (bar) {
+      // Determine active phase from latest op
+      const latestOp = opsLog[0];
+      const activeAgent = latestOp ? latestOp.agent : null;
       const phases = [
-        {icon:'🏗️', label:'Architect', active: false},
-        {icon:'⚒️', label:'Builder',   active: inProg.length > 0},
-        {icon:'👁️', label:'Reviewer',  active: false},
-        {icon:'✅', label:'Merged',    active: false},
+        { icon:'🏗️', label:'Architect', agent:'architect', color:'#3b82f6' },
+        { icon:'⚒️', label:'Builder',   agent:'builder',   color:'#10b981' },
+        { icon:'🐛', label:'Debugger',  agent:'debugger',  color:'#f59e0b' },
+        { icon:'👁️', label:'Reviewer',  agent:'reviewer',  color:'#8b5cf6' },
+        { icon:'✅', label:'Merged',    agent:'geoffrey',  color:'#d4af37' },
       ];
-      bar.innerHTML = phases.map((p, i) => `
-        <div style="display:flex;align-items:center;gap:4px;">
+      bar.innerHTML = phases.map((p, i) => {
+        const isActive = activeAgent === p.agent ||
+          (p.agent === 'builder' && inProg.length > 0 && !activeAgent);
+        return `<div style="display:flex;align-items:center;gap:4px;">
           <div style="padding:4px 10px;border-radius:6px;font-size:10px;font-weight:700;
-            background:${p.active ? 'rgba(212,175,55,.2)' : 'rgba(255,255,255,.04)'};
-            color:${p.active ? '#d4af37' : 'var(--muted)'};">
-            ${p.icon} ${p.label}
+            background:${isActive ? p.color+'33' : 'rgba(255,255,255,.04)'};
+            color:${isActive ? p.color : 'var(--muted)'};
+            border:1px solid ${isActive ? p.color+'44' : 'transparent'};
+            transition:all .3s;">
+            ${p.icon} ${p.label}${isActive ? ' ●' : ''}
           </div>
           ${i < phases.length-1 ? '<span style="color:var(--border2);font-size:10px">→</span>' : ''}
-        </div>`).join('');
+        </div>`;
+      }).join('');
     }
   }
 
@@ -1414,6 +1425,7 @@
     notesEl.onchange = async () => {
       task.description = notesEl.value;
       await db.patch(`tasks?id=eq.${task.id}`, { description: notesEl.value, updated_at: new Date().toISOString() });
+      addOp('architect', 'Notes updated', task.title.slice(0, 50));
     };
     const actions = document.getElementById('modal-actions');
     const moves = [];
@@ -1425,24 +1437,36 @@
     document.getElementById('task-modal').classList.add('open');
   }
   function closeTaskModal() { document.getElementById('task-modal').classList.remove('open'); }
+  // Agent attribution by status + column
+  const STATUS_OPS = {
+    'todo':        { agent:'architect', action:'Queued for planning'  },
+    'backlog':     { agent:'architect', action:'Added to backlog'     },
+    'in-progress': { agent:'builder',   action:'Started building'     },
+    'review':      { agent:'reviewer',  action:'Sent for review'      },
+    'debug':       { agent:'debugger',  action:'Sent for debugging'   },
+    'done':        { agent:'reviewer',  action:'Approved & done'      },
+  };
+
   async function handleTaskAction(action) {
     const task = tasks.find(t => t.id === selectedTaskId);
     if (!task) return;
+    const shortTitle = task.title.slice(0,50) + (task.title.length > 50 ? '…' : '');
     closeTaskModal();
     if (action === 'delete') {
       await db.del(`tasks?id=eq.${task.id}`);
       tasks = tasks.filter(t => t.id !== task.id);
-      addActivity('🗑️', '→ deleted', task.title);
-      toast('🗑️', 'Task deleted');
+      addOp('geoffrey', 'Task deleted', shortTitle);
+      toast('🗑️', 'Task deleted', task.title.slice(0,30));
     } else {
       await db.patch(`tasks?id=eq.${task.id}`, { status: action, updated_at: new Date().toISOString() });
       task.status = action;
       task.updated_at = new Date().toISOString();
+      const op = STATUS_OPS[action];
+      if (op) addOp(op.agent, op.action, shortTitle);
       const icons = { 'todo': '📥', 'in-progress': '🔄', 'done': '✅' };
-      addActivity(icons[action], `→ ${action === 'in-progress' ? 'in progress' : action}`, task.title);
-      toast(icons[action], `Moved to ${action === 'in-progress' ? 'In Progress' : action}`);
+      toast(icons[action]||'📋', `Moved to ${action === 'in-progress' ? 'In Progress' : action}`);
     }
-    renderKanban();
+    renderKanban(); renderAgents();
   }
 
   // ── CLEAR DONE ──
@@ -1452,8 +1476,8 @@
     if (!confirm(`Clear all ${done.length} completed task${done.length > 1 ? 's' : ''}?`)) return;
     for (const t of done) await db.del(`tasks?id=eq.${t.id}`);
     tasks = tasks.filter(t => t.status !== 'done');
-    addActivity('🧹', '→ cleared', `${done.length} completed tasks`);
-    toast('🧹', 'Cleared completed tasks');
+    addOp('geoffrey', `Cleared ${done.length} completed tasks`, 'Board cleaned up');
+    toast('🧹', 'Board cleared', `${done.length} tasks removed`);
     renderKanban();
   }
 
@@ -1506,8 +1530,14 @@
     const newTask = { title, status: cmdTargetStatus, category: cmdCategory, priority, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
     closeCmd();
     const result = await db.post('tasks', newTask);
-    if (result && result[0]) { tasks.unshift(result[0]); addActivity('➕', `→ created (${cmdCategory})`, title); }
-    else { newTask.id = 'local-' + Date.now(); tasks.unshift(newTask); addActivity('➕', `→ created locally`, title); }
+    if (result && result[0]) {
+      tasks.unshift(result[0]);
+      addOp('architect', 'New task created', `${title.slice(0,45)} · ${cmdCategory}`);
+    } else {
+      newTask.id = 'local-' + Date.now();
+      tasks.unshift(newTask);
+      addOp('architect', 'New task created (local)', title.slice(0,45));
+    }
     renderKanban();
     toast('➕', 'Task added', title);
   }
@@ -1686,10 +1716,11 @@
         // Detect changes and log to activity feed
         fresh.forEach(t => {
           const old = tasks.find(o => o.id === t.id);
-          if (!old) { addActivity('➕', '\u2192 created', t.title.slice(0,26)); }
-          else if (old.status !== t.status) {
-            const icons = {'todo':'📥','in-progress':'🔄','done':'✅'};
-            addActivity(icons[t.status]||'📥', `\u2192 ${t.status==='in-progress'?'in progress':t.status}`, t.title.slice(0,26));
+          if (!old) {
+            addOp('architect', 'New task detected', t.title.slice(0,50));
+          } else if (old.status !== t.status) {
+            const op = STATUS_OPS[t.status] || { agent:'geoffrey', action:'Status changed to ' + t.status };
+            addOp(op.agent, op.action, t.title.slice(0,50));
           }
         });
         lastTaskSnapshot = snap;
