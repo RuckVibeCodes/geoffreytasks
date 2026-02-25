@@ -398,6 +398,37 @@
     .brain-doc-list { flex: 1; overflow-y: auto; }
     .brain-doc-list::-webkit-scrollbar { width: 3px; }
     .brain-doc-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    /* Folder Tree */
+    .brain-folder {
+      user-select: none;
+    }
+    .brain-folder-row {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 12px; cursor: pointer;
+      font-size: 11px; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.6px;
+      border-radius: 4px; margin: 1px 4px;
+      transition: background 0.1s, color 0.1s;
+    }
+    .brain-folder-row:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+    .brain-folder-chevron {
+      font-size: 9px; transition: transform 0.15s ease;
+      color: var(--muted); flex-shrink: 0;
+    }
+    .brain-folder-chevron.open { transform: rotate(90deg); }
+    .brain-folder-icon { flex-shrink: 0; font-size: 13px; }
+    .brain-folder-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .brain-folder-count {
+      font-size: 10px; color: var(--muted); opacity: 0.6;
+      background: rgba(255,255,255,0.06); border-radius: 10px;
+      padding: 0 6px; flex-shrink: 0;
+    }
+    .brain-folder-children {
+      overflow: hidden; transition: max-height 0.2s ease;
+    }
+    .brain-folder-children.collapsed { max-height: 0 !important; }
+    .brain-folder-indent { padding-left: 12px; }
+
     .brain-doc-item {
       padding: 10px 14px; border-bottom: 1px solid var(--border);
       cursor: pointer; transition: background .1s;
@@ -1589,39 +1620,186 @@
 
   // ── SECOND BRAIN ──
   let filteredDocs = [];
-  function renderBrainDocs(docs) {
-    filteredDocs = docs;
-    document.getElementById('badge-brain').textContent = docs.length;
-    const list = document.getElementById('brain-doc-list');
-    if (!docs.length) { list.innerHTML = '<div style="padding:20px;color:var(--muted);font-size:12px">No documents found.</div>'; return; }
-    list.innerHTML = docs.map((d,i) => {
-      const fullPath = d.path || d.title || '';
-      const parts = fullPath.split('/');
-      const filename = parts.pop().replace(/\.md$/i, '');
-      // Reconstruct a meaningful display name
-      // If path has folders, use last folder + filename for disambiguation
-      const folder = parts.filter(Boolean).pop() || '';
-      const displayName = folder ? `${folder} / ${filename}` : filename;
-      const project = fullPath.split('/').filter(Boolean).length > 1
-        ? parts.filter(Boolean).join(' / ')
-        : (d.project || d.category || 'General');
-      // Content preview (first 80 chars of content, strip markdown)
-      const preview = (d.content || '')
-        .replace(/^#+\s*/gm, '').replace(/\*+/g, '').replace(/\n+/g, ' ').trim().slice(0, 80);
-      return `<div class="brain-doc-item" data-idx="${i}" onclick="openBrainDoc(${i})">
-        <div class="doc-name">${escHtml(displayName || filename || 'Untitled')}</div>
-        <div class="doc-project">${escHtml(project.toUpperCase())}</div>
+  // ── BRAIN FOLDER TREE ──────────────────────────────────────────────────────
+  let openFolders = new Set(); // tracks which folder paths are expanded
+  let brainSearchActive = false;
+
+  // Folder emoji map (top-level folder name → emoji)
+  const folderEmojis = {
+    'Projects': '🚀', 'Journal': '📖', 'Resources': '📚',
+    'App Ideas': '💡', 'Content Pipeline': '📤', 'Config': '⚙️',
+    'concepts': '🧠', 'notes': '📝', '.': '📄',
+  };
+
+  function getFolderEmoji(name) {
+    return folderEmojis[name] || '📁';
+  }
+
+  // Build a nested tree from a flat list of docs
+  // Each doc has: folder ("Projects/KLASS"), title, file_path, etc.
+  function buildFolderTree(docs) {
+    const tree = {}; // { folderPath: { _docs: [], _children: {subFolderName: ...} } }
+    docs.forEach((doc, globalIdx) => {
+      const folderPath = (doc.folder || '').trim() || 'General';
+      const parts = folderPath.split('/').filter(Boolean);
+      let node = tree;
+      let cumPath = '';
+      parts.forEach(part => {
+        cumPath = cumPath ? `${cumPath}/${part}` : part;
+        if (!node[part]) node[part] = { _docs: [], _children: {}, _path: cumPath };
+        node = node[part]._children;
+      });
+      // leaf: add doc to the folder's doc list
+      const leafKey = parts[parts.length - 1] || 'General';
+      // navigate back to parent
+      let parent = tree;
+      parts.slice(0, -1).forEach(p => { parent = parent[p]._children; });
+      const leafNode = parts.length ? parent[leafKey] || tree[leafKey] : (tree['General'] = tree['General'] || { _docs: [], _children: {}, _path: 'General' });
+      if (parts.length === 0) {
+        if (!tree['General']) tree['General'] = { _docs: [], _children: {}, _path: 'General' };
+        tree['General']._docs.push({ ...doc, _globalIdx: globalIdx });
+      } else {
+        let n = tree;
+        parts.forEach(p => { n = n[p]._children; });
+        // back one level
+        let parent2 = tree;
+        parts.slice(0,-1).forEach(p => { parent2 = parent2[p]._children; });
+        const target = parts.length === 1 ? tree[parts[0]] : parent2[parts[parts.length-1]];
+        if (target) target._docs.push({ ...doc, _globalIdx: globalIdx });
+      }
+    });
+    return tree;
+  }
+
+  function renderFolderNode(folderName, node, depth) {
+    const path = node._path || folderName;
+    const isOpen = openFolders.has(path);
+    const totalDocs = countDocs(node);
+    const emoji = depth === 0 ? getFolderEmoji(folderName) : '📁';
+    const childKeys = Object.keys(node._children || {});
+    const hasChildren = childKeys.length > 0 || node._docs.length > 0;
+
+    const indent = depth > 0 ? `style="padding-left:${12 + depth * 14}px"` : '';
+    const chevron = hasChildren
+      ? `<span class="brain-folder-chevron ${isOpen ? 'open' : ''}">▶</span>`
+      : `<span style="width:14px;display:inline-block"></span>`;
+
+    let html = `
+      <div class="brain-folder">
+        <div class="brain-folder-row" ${indent} onclick="toggleBrainFolder('${path.replace(/'/g,"\\'")}', this)">
+          ${chevron}
+          <span class="brain-folder-icon">${emoji}</span>
+          <span class="brain-folder-name">${escHtml(folderName)}</span>
+          <span class="brain-folder-count">${totalDocs}</span>
+        </div>
+        <div class="brain-folder-children${isOpen ? '' : ' collapsed'}" id="folder-${path.replace(/[^a-zA-Z0-9]/g,'_')}" style="max-height:${isOpen ? '9999px' : '0'}">
+    `;
+
+    // Render sub-folders first
+    childKeys.sort().forEach(childName => {
+      html += renderFolderNode(childName, node._children[childName], depth + 1);
+    });
+
+    // Render docs in this folder
+    node._docs.forEach(doc => {
+      const docName = doc.title || (doc.file_path || '').split('/').pop()?.replace(/\.md$/i,'') || 'Untitled';
+      const preview = (doc.content || '')
+        .replace(/^#+\s*/gm,'').replace(/\*+/g,'').replace(/\n+/g,' ').trim().slice(0, 70);
+      const docIndent = `style="padding-left:${24 + (depth + 1) * 14}px"`;
+      html += `<div class="brain-doc-item" data-idx="${doc._globalIdx}" onclick="openBrainDoc(${doc._globalIdx})" ${docIndent}>
+        <div class="doc-name">📄 ${escHtml(docName)}</div>
         ${preview ? `<div class="doc-preview">${escHtml(preview)}…</div>` : ''}
       </div>`;
-    }).join('');
+    });
+
+    html += `</div></div>`;
+    return html;
   }
+
+  function countDocs(node) {
+    let count = (node._docs || []).length;
+    Object.values(node._children || {}).forEach(child => { count += countDocs(child); });
+    return count;
+  }
+
+  function toggleBrainFolder(path, rowEl) {
+    const id = `folder-${path.replace(/[^a-zA-Z0-9]/g,'_')}`;
+    const children = document.getElementById(id);
+    const chevron = rowEl.querySelector('.brain-folder-chevron');
+    if (!children) return;
+    const isOpen = openFolders.has(path);
+    if (isOpen) {
+      openFolders.delete(path);
+      children.classList.add('collapsed');
+      children.style.maxHeight = '0';
+      if (chevron) chevron.classList.remove('open');
+    } else {
+      openFolders.add(path);
+      children.classList.remove('collapsed');
+      children.style.maxHeight = '9999px';
+      if (chevron) chevron.classList.add('open');
+    }
+  }
+
+  function renderBrainDocs(docs) {
+    filteredDocs = docs;
+    document.getElementById('badge-brain').textContent = brainDocs.length;
+    const list = document.getElementById('brain-doc-list');
+    if (!docs.length) { list.innerHTML = '<div style="padding:20px;color:var(--muted);font-size:12px">No documents found.</div>'; return; }
+
+    if (brainSearchActive) {
+      // Flat filtered list when searching
+      list.innerHTML = docs.map((d, i) => {
+        const name = d.title || (d.file_path || '').split('/').pop()?.replace(/\.md$/i,'') || 'Untitled';
+        const folder = d.folder || '';
+        const preview = (d.content || '').replace(/^#+\s*/gm,'').replace(/\*+/g,'').replace(/\n+/g,' ').trim().slice(0, 70);
+        return `<div class="brain-doc-item" data-idx="${d._globalIdx ?? i}" onclick="openBrainDoc(${d._globalIdx ?? i})">
+          <div class="doc-name">📄 ${escHtml(name)}</div>
+          <div class="doc-project">${escHtml(folder.toUpperCase())}</div>
+          ${preview ? `<div class="doc-preview">${escHtml(preview)}…</div>` : ''}
+        </div>`;
+      }).join('');
+      return;
+    }
+
+    // Tree view — build from all brainDocs (not filtered slice)
+    const docsWithIdx = brainDocs.map((d, i) => ({ ...d, _globalIdx: i }));
+    const tree = buildFolderTree(docsWithIdx);
+
+    // Auto-open top-level folders on first load
+    if (openFolders.size === 0) {
+      Object.keys(tree).forEach(k => openFolders.add(tree[k]._path || k));
+    }
+
+    let html = '';
+    Object.keys(tree).sort().forEach(folderName => {
+      html += renderFolderNode(folderName, tree[folderName], 0);
+    });
+    list.innerHTML = html || '<div style="padding:20px;color:var(--muted);font-size:12px">No documents found.</div>';
+  }
+
   function filterBrainDocs(q) {
-    const filtered = q ? brainDocs.filter(d => (d.path||d.title||'').toLowerCase().includes(q.toLowerCase()) || (d.content||'').toLowerCase().includes(q.toLowerCase())) : brainDocs;
-    renderBrainDocs(filtered);
+    if (q && q.trim()) {
+      brainSearchActive = true;
+      const lower = q.toLowerCase();
+      const filtered = brainDocs
+        .map((d, i) => ({ ...d, _globalIdx: i }))
+        .filter(d =>
+          (d.title || '').toLowerCase().includes(lower) ||
+          (d.folder || '').toLowerCase().includes(lower) ||
+          (d.file_path || '').toLowerCase().includes(lower) ||
+          (d.content || '').toLowerCase().includes(lower)
+        );
+      renderBrainDocs(filtered);
+    } else {
+      brainSearchActive = false;
+      renderBrainDocs(brainDocs);
+    }
   }
   function openBrainDoc(idx) {
-    document.querySelectorAll('.brain-doc-item').forEach((el,i) => el.classList.toggle('active', i === idx));
-    const doc = filteredDocs[idx];
+    document.querySelectorAll('.brain-doc-item').forEach(el => el.classList.toggle('active', parseInt(el.dataset.idx) === idx));
+    // idx is always a globalIdx into brainDocs (tree mode) or filteredDocs (search mode)
+    const doc = brainDocs[idx] || filteredDocs[idx];
     const contentEl = document.getElementById('brain-content');
     const emptyEl = document.getElementById('brain-empty');
     const parts = (doc.path||doc.title||'Document').split('/');
