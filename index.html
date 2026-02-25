@@ -1446,6 +1446,8 @@
         else cols.todo.push(t);
       } else if (t.status === 'in-progress') {
         cols['in-progress'].push(t);
+      } else if (t.status === 'review') {
+        cols.review.push(t);
       } else if (t.status === 'done') {
         cols.done.push(t);
       }
