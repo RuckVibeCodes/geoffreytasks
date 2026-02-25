@@ -3998,7 +3998,7 @@
 
     // ===== INIT =====
     async function init() {
-      document.getElementById('quote-text').textContent = geoffreyQuotes[Math.floor(Math.random() * geoffreyQuotes.length)];
+      const qtEl = document.getElementById('quote-text'); if (qtEl) qtEl.textContent = geoffreyQuotes[Math.floor(Math.random() * geoffreyQuotes.length)];
       setupDragAndDrop();
       setupIdeasDragAndDrop();
       setupPipelineDragAndDrop();
@@ -4114,10 +4114,10 @@
         col.querySelector('.count').textContent = getFilteredTasks().filter(t => t.status === status).length;
       });
       const total = tasks.length, completed = tasks.filter(t => t.status === 'done').length;
-      document.getElementById('total-tasks').textContent = total;
-      document.getElementById('completed-tasks').textContent = completed;
-      document.getElementById('completion-rate').textContent = total > 0 ? Math.round((completed / total) * 100) + '%' : '0%';
-      document.getElementById('streak').textContent = streak;
+      const ttEl = document.getElementById('total-tasks'); if (ttEl) ttEl.textContent = total;
+      const ctEl = document.getElementById('completed-tasks'); if (ctEl) ctEl.textContent = completed;
+      const crEl = document.getElementById('completion-rate'); if (crEl) crEl.textContent = total > 0 ? Math.round((completed / total) * 100) + '%' : '0%';
+      const stEl = document.getElementById('streak'); if (stEl) stEl.textContent = streak;
     }
 
     function getFilteredTasks() {
