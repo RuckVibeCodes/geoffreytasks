@@ -531,17 +531,105 @@
 
     /* ── MOBILE ── */
     @media (max-width: 768px) {
-      #topbar { padding: 0 14px; }
+      /* Top bar */
+      #topbar { padding: 0 12px; height: 44px; }
       .tb-stats { display: none; }
-      .tb-brand { min-width: auto; }
-      .tb-right { min-width: auto; }
-      .tb-clock { font-size: 11px; }
-      #nav { padding: 0 10px; gap: 1px; }
-      .nav-tab { padding: 4px 9px; font-size: 10px; gap: 4px; }
+      .tb-brand { font-size: 11px; gap: 6px; min-width: auto; }
+      .tb-brand .icon { font-size: 16px; }
+      .tb-right { min-width: auto; gap: 8px; }
+      .tb-clock { font-size: 10px; }
+      .tb-status { font-size: 9px; }
+
+      /* Nav — horizontal scroll, hide scrollbar */
+      #nav {
+        padding: 0 8px; gap: 4px;
+        overflow-x: auto; overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        flex-wrap: nowrap;
+      }
+      #nav::-webkit-scrollbar { display: none; }
+      .nav-tab {
+        padding: 6px 12px; font-size: 11px; gap: 4px;
+        flex-shrink: 0; scroll-snap-align: start;
+        white-space: nowrap;
+      }
       .nav-cmd { display: none; }
-      #tasks-view { flex-direction: column; }
-      .activity-panel { width: 100%; height: 200px; border-left: none; border-top: 1px solid var(--border); }
-      .kanban-board { grid-template-columns: 1fr; overflow-y: auto; }
+
+      /* Category filter — scrollable */
+      .kf-row {
+        padding: 8px 10px; gap: 6px;
+        overflow-x: auto; flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .kf-row::-webkit-scrollbar { display: none; }
+      .kf-btn { flex-shrink: 0; }
+
+      /* Tasks view — stack vertically */
+      #tasks-view { flex-direction: column; gap: 0; }
+
+      /* Kanban — single column accordion */
+      .kanban-board {
+        display: flex; flex-direction: column;
+        gap: 0; padding: 8px 10px;
+        overflow-y: visible; grid-template-columns: unset;
+      }
+      .k-col {
+        border-radius: 10px; margin-bottom: 8px;
+        border-top: none; border-left: 4px solid transparent;
+        min-height: unset;
+      }
+      .k-col.todo    { border-left-color: var(--col-todo); }
+      .k-col.prog    { border-left-color: var(--col-prog); }
+      .k-col.done    { border-left-color: var(--col-done); }
+      .k-col.backlog { border-left-color: var(--col-backlog); }
+      .k-col.review  { border-left-color: var(--col-review); }
+
+      /* Accordion header */
+      .k-col-head {
+        padding: 12px 14px; cursor: pointer;
+        display: flex; align-items: center; gap: 10px;
+        user-select: none; -webkit-user-select: none;
+      }
+      .k-col-head::after {
+        content: '›'; margin-left: auto;
+        font-size: 20px; line-height: 1; color: var(--muted);
+        transition: transform .2s;
+      }
+      .k-col.expanded .k-col-head::after { transform: rotate(90deg); }
+
+      /* Cards hidden by default, shown when expanded */
+      .k-cards { display: none; padding: 0 10px 4px; }
+      .k-col.expanded .k-cards { display: block; }
+      .k-add { display: none; }
+      .k-col.expanded .k-add { display: block; }
+
+      .k-card { margin-bottom: 8px; }
+
+      /* Activity panel — compact below kanban */
+      .activity-panel {
+        width: 100%; height: auto; min-height: 180px; max-height: 280px;
+        border-left: none; border-top: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+
+      /* Generic views */
+      .generic-view { padding: 12px; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .view-header { margin-bottom: 12px; }
+      .view-header h2 { font-size: 16px; }
+
+      /* Modal full-screen on mobile */
+      .modal-overlay { align-items: flex-end; }
+      .modal {
+        width: 100%; max-width: 100%;
+        border-radius: 16px 16px 0 0;
+        border-bottom: none;
+        padding: 20px 16px 32px;
+        max-height: 85vh; overflow-y: auto;
+      }
     }
   </style>
 </head>
@@ -916,6 +1004,21 @@
       ['review',      'col-review',  'cnt-review',  'No items pending review.'],
       ['done',        'col-done',    'cnt-done',    '🏆 All clear.'],
     ];
+
+    // Mobile accordion: tap header to expand/collapse
+    if (window.innerWidth <= 768) {
+      document.querySelectorAll('.k-col').forEach(col => {
+        // Auto-expand In Progress and Done
+        const colCards = col.querySelector('.k-cards');
+        const isActive = col.classList.contains('prog') || col.classList.contains('done');
+        if (isActive) col.classList.add('expanded');
+        // Toggle on header tap
+        const head = col.querySelector('.k-col-head');
+        if (head) {
+          head.onclick = () => col.classList.toggle('expanded');
+        }
+      });
+    }
 
     // Setup drop zones on columns
     document.querySelectorAll('.k-cards').forEach(zone => {
