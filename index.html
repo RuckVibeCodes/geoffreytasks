@@ -921,9 +921,9 @@
         if (newStatus === task.status && colId !== 'col-backlog' && colId !== 'col-todo') return;
         task.status = newStatus;
         task.updated_at = new Date().toISOString();
-        await db.patch(\`tasks?id=eq.\${task.id}\`, { status: newStatus, priority: task.priority, updated_at: task.updated_at });
+        await db.patch(`tasks?id=eq.${task.id}`, { status: newStatus, priority: task.priority, updated_at: task.updated_at });
         const icons = { 'todo': '📥', 'in-progress': '🔄', 'done': '✅' };
-        addActivity(icons[newStatus]||'📥', \`→ \${newStatus === 'in-progress' ? 'in progress' : newStatus}\`, task.title);
+        addActivity(icons[newStatus]||'📥', `→ ${newStatus === 'in-progress' ? 'in progress' : newStatus}`, task.title);
         renderKanban();
       };
     });
