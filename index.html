@@ -794,6 +794,14 @@
   const SUPABASE_URL = 'https://arprmkukemtlhglsqgcs.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFycHJta3VrZW10bGhnbHNxZ2NzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkzMjAwNjAsImV4cCI6MjA4NDg5NjA2MH0.KpfUmYynUjCoT6WTKaqJMFXxV6V1fQ_sBJz8QFxIrjM';
 
+  // Dismiss loading screen safely (idempotent)
+  function dismissLoader() {
+    const el = document.getElementById('loading');
+    if (!el) return;
+    el.classList.add('hide');
+    setTimeout(() => { try { el.remove(); } catch(e) {} }, 400);
+  }
+
   const db = {
     async req(method, path, body) {
       const opts = { method, headers: {
@@ -805,10 +813,19 @@
         'Content-Profile': 'geoffrey',
       }};
       if (body) opts.body = JSON.stringify(body);
-      const r = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, opts);
-      if (!r.ok) return null;
-      const text = await r.text();
-      return text ? JSON.parse(text) : [];
+      // 8-second timeout per request — prevents Promise.all from hanging forever
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
+      try {
+        const r = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, { ...opts, signal: controller.signal });
+        clearTimeout(timer);
+        if (!r.ok) return null;
+        const text = await r.text();
+        return text ? JSON.parse(text) : [];
+      } catch(e) {
+        clearTimeout(timer);
+        return null; // Timeout or network error → return null, never hang
+      }
     },
     get: (p) => db.req('GET', p),
     post: (p, b) => db.req('POST', p, b),
@@ -1235,8 +1252,11 @@
 
   // ── INIT ──
   async function init() {
+    // Hard fallback: dismiss loader after 10s no matter what
+    const loaderTimeout = setTimeout(dismissLoader, 10000);
+
     try {
-      // Load all data in parallel
+      // Load all data in parallel — each request has its own 8s timeout
       const [t, id, n, p, docs] = await Promise.all([
         db.get('tasks?order=updated_at.desc&limit=200'),
         db.get('ideas?order=created_at.desc&limit=100'),
@@ -1244,18 +1264,19 @@
         db.get('pipeline?order=created_at.desc&limit=100'),
         db.get('documents?order=updated_at.desc&limit=200'),
       ]);
-      tasks    = t    || [];
-      ideas    = id   || [];
-      notes    = n    || [];
-      pipeline = p    || [];
+      clearTimeout(loaderTimeout);
+      tasks     = t    || [];
+      ideas     = id   || [];
+      notes     = n    || [];
+      pipeline  = p    || [];
       brainDocs = docs || [];
 
-      renderKanban();
-      buildActivityFromTasks();
-      renderIdeas();
-      renderNotes();
-      renderPipeline();
-      renderBrainDocs(brainDocs);
+      try { renderKanban(); } catch(e) { console.warn('renderKanban:', e); }
+      try { buildActivityFromTasks(); } catch(e) {}
+      try { renderIdeas(); } catch(e) {}
+      try { renderNotes(); } catch(e) {}
+      try { renderPipeline(); } catch(e) {}
+      try { renderBrainDocs(brainDocs); } catch(e) {}
 
       // Auto-refresh every 20s — picks up night shift activity instantly
       let lastTaskSnapshot = '';
@@ -1300,11 +1321,14 @@
 
     } catch (e) {
       console.error('Init error:', e);
-      renderKanban(); renderIdeas(); renderNotes(); renderPipeline();
+      clearTimeout(loaderTimeout);
+      try { renderKanban(); } catch(e2) {}
+      try { renderIdeas(); } catch(e2) {}
+      try { renderNotes(); } catch(e2) {}
+      try { renderPipeline(); } catch(e2) {}
     } finally {
-      const loading = document.getElementById('loading');
-      loading.classList.add('hide');
-      setTimeout(() => loading.remove(), 400);
+      clearTimeout(loaderTimeout);
+      dismissLoader();
     }
   }
 
