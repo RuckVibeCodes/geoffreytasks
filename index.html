@@ -197,6 +197,17 @@
     }
     .k-add-btn:hover { border-color: var(--gold); color: var(--gold); }
 
+    /* ── KANBAN LEGEND ── */
+    .k-legend {
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+      padding: 6px 4px 10px; font-size: 11px; color: var(--muted);
+    }
+    .k-legend-group { display: flex; align-items: center; gap: 8px; }
+    .k-legend-label { font-weight: 600; color: var(--muted); text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; margin-right: 2px; }
+    .k-legend-item  { display: flex; align-items: center; gap: 4px; }
+    .k-legend-sep   { width: 1px; height: 12px; background: var(--border); flex-shrink: 0; }
+    .k-legend-border { width: 3px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+
     /* ── KANBAN CARD ── */
     .k-card {
       background: var(--bg3);
@@ -1128,6 +1139,28 @@
         <button class="kf-btn" data-cat="personal">🧘 Personal</button>
         <button class="kf-btn" data-cat="urgent">🔥 Urgent</button>
       </div>
+      <!-- ── LEGEND ── -->
+      <div class="k-legend">
+        <span class="k-legend-group">
+          <span class="k-legend-label">Priority:</span>
+          <span class="k-legend-item"><span class="k-prio high"></span> High</span>
+          <span class="k-legend-item"><span class="k-prio medium"></span> Medium</span>
+          <span class="k-legend-item"><span class="k-prio low"></span> Low</span>
+        </span>
+        <span class="k-legend-sep"></span>
+        <span class="k-legend-group">
+          <span class="k-legend-label">Category:</span>
+          <span class="k-legend-item"><span class="k-legend-border" style="background:var(--blue)"></span> Work</span>
+          <span class="k-legend-item"><span class="k-legend-border" style="background:var(--purple)"></span> Hustle</span>
+          <span class="k-legend-item"><span class="k-legend-border" style="background:var(--green)"></span> Personal</span>
+          <span class="k-legend-item"><span class="k-legend-border" style="background:var(--red)"></span> Urgent</span>
+        </span>
+        <span class="k-legend-sep"></span>
+        <span class="k-legend-group">
+          <span class="k-legend-item"><span class="k-live-dot" style="animation:none;opacity:0.8"></span> Agent active</span>
+        </span>
+      </div>
+
       <div class="kanban-board">
         <div class="k-col backlog">
           <div class="k-col-head"><span class="label">📋 Backlog</span><span class="k-count" id="cnt-backlog">0</span></div>
