@@ -270,12 +270,13 @@
     /* Board */
     .board {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 24px;
       margin-top: 20px;
     }
 
-    @media (max-width: 1024px) { .board { grid-template-columns: 1fr; } }
+    @media (max-width: 1200px) { .board { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) { .board { grid-template-columns: 1fr; } }
 
     .column {
       background: rgba(15, 20, 35, 0.55);
@@ -320,6 +321,8 @@
     .column.todo .column-header h2 { color: var(--red); }
     .column.in-progress .column-header { border-color: var(--orange); }
     .column.in-progress .column-header h2 { color: var(--orange); }
+    .column.in-review .column-header { border-color: var(--purple); }
+    .column.in-review .column-header h2 { color: var(--purple); }
     .column.done .column-header { border-color: var(--green); }
     .column.done .column-header h2 { color: var(--green); }
 
@@ -456,6 +459,105 @@
 
     .task-actions button:hover { background: rgba(212, 175, 55, 0.15); border-color: rgba(212, 175, 55, 0.4); color: var(--gold); box-shadow: 0 0 12px rgba(212, 175, 55, 0.1); }
     .task-actions button.delete:hover { background: rgba(248, 81, 73, 0.15); border-color: rgba(248, 81, 73, 0.4); color: var(--red); }
+
+    .mark-done-btn {
+      width: 100%;
+      padding: 8px 14px;
+      margin-top: 10px;
+      background: rgba(63, 185, 80, 0.15);
+      border: 1px solid rgba(63, 185, 80, 0.3);
+      border-radius: 10px;
+      color: var(--green);
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .mark-done-btn:hover { background: rgba(63, 185, 80, 0.3); border-color: rgba(63, 185, 80, 0.5); box-shadow: 0 0 16px rgba(63, 185, 80, 0.15); }
+
+    .task-pr-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.75rem;
+      color: var(--purple);
+      text-decoration: none;
+      margin-top: 6px;
+      padding: 2px 8px;
+      background: rgba(163, 113, 247, 0.1);
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .task-pr-link:hover { background: rgba(163, 113, 247, 0.2); color: #c8a5ff; }
+
+    /* PRs View */
+    .prs-container { max-width: 900px; margin: 0 auto; }
+    .pr-config-banner {
+      background: rgba(210, 153, 34, 0.1);
+      border: 1px solid rgba(210, 153, 34, 0.3);
+      border-radius: var(--glass-radius);
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .pr-config-banner h3 { color: var(--orange); margin-bottom: 10px; }
+    .pr-config-banner input {
+      background: rgba(10, 14, 23, 0.8);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      padding: 10px 16px;
+      color: var(--text);
+      font-size: 0.9rem;
+      width: 100%;
+      max-width: 400px;
+      margin: 10px 0;
+    }
+    .pr-config-banner button {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(212, 175, 55, 0.15));
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      color: var(--gold);
+      padding: 10px 24px;
+      border-radius: var(--glass-radius-pill);
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .pr-config-banner button:hover { background: linear-gradient(135deg, rgba(212, 175, 55, 0.4), rgba(212, 175, 55, 0.25)); }
+
+    .pr-section { margin-bottom: 30px; }
+    .pr-section-header {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .pr-card {
+      background: rgba(20, 27, 45, 0.6);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--glass-radius-sm);
+      padding: 16px;
+      margin-bottom: 12px;
+      transition: all 0.2s;
+    }
+    .pr-card:hover { border-color: rgba(255, 255, 255, 0.12); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); }
+    .pr-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .pr-title { font-weight: 500; color: var(--text); }
+    .pr-title a { color: var(--blue); text-decoration: none; }
+    .pr-title a:hover { text-decoration: underline; }
+    .pr-badge {
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .pr-badge.open { background: rgba(63, 185, 80, 0.2); color: var(--green); }
+    .pr-badge.merged { background: rgba(163, 113, 247, 0.2); color: var(--purple); }
+    .pr-meta { font-size: 0.8rem; color: var(--text-muted); display: flex; gap: 16px; flex-wrap: wrap; }
+    .pr-auto-done { font-size: 0.8rem; color: var(--green); margin-top: 8px; font-weight: 500; }
 
     /* Add Task */
     .add-task-btn {
@@ -2556,6 +2658,9 @@
       <button class="main-nav-tab" data-view="pipeline" onclick="switchView('pipeline')">
         <span class="tab-emoji">📤</span> <span class="tab-label">Pipeline</span> <span class="badge" id="pipeline-badge">0</span>
       </button>
+      <button class="main-nav-tab" data-view="prs" onclick="switchView('prs')">
+        <span class="tab-emoji">🔀</span> <span class="tab-label">PRs</span> <span class="badge" id="prs-badge">0</span>
+      </button>
       <button class="main-nav-tab" data-view="today" onclick="switchView('today')">
         <span class="tab-emoji">📅</span> <span class="tab-label">Today</span>
       </button>
@@ -2613,6 +2718,14 @@
         <div class="column-header" data-tooltip="Tasks currently being worked on. Geoffrey auto-moves tasks here when he starts working.">
           <h2>⚡ In Progress</h2>
           <span class="count" data-tooltip="Active tasks" data-tooltip-pos="left">0</span>
+        </div>
+        <div class="task-list"></div>
+      </div>
+
+      <div class="column in-review" data-status="in_review">
+        <div class="column-header" data-tooltip="Tasks under code review. Auto-moves to Done when PR merges.">
+          <h2>🔍 In Review</h2>
+          <span class="count" data-tooltip="Tasks in review" data-tooltip-pos="left">0</span>
         </div>
         <div class="task-list"></div>
       </div>
@@ -2910,6 +3023,22 @@
 
     </div><!-- End Pipeline View -->
 
+    <!-- PRs View -->
+    <div id="prs-view" class="view-container">
+      <div class="prs-container">
+        <div id="pr-config-section"></div>
+        <div id="pr-merge-results"></div>
+        <div id="pr-open-section" class="pr-section">
+          <div class="pr-section-header" style="color: var(--green);">🟢 Open Pull Requests</div>
+          <div id="pr-open-list"><div class="empty-state"><div class="icon">🔄</div><p>Loading PRs...</p></div></div>
+        </div>
+        <div id="pr-merged-section" class="pr-section">
+          <div class="pr-section-header" style="color: var(--purple);">🟣 Recently Merged (7 days)</div>
+          <div id="pr-merged-list"><div class="empty-state"><div class="icon">🔄</div><p>Loading...</p></div></div>
+        </div>
+      </div>
+    </div><!-- End PRs View -->
+
     <!-- Today View -->
     <div id="today-view" class="view-container">
       <div class="today-view">
@@ -3186,6 +3315,7 @@
     const emptyStateQuotes = {
       'todo': "Nothing pending? Suspicious. Check your ambitions, sir.",
       'in-progress': "Nothing in flight? Either you're done or in denial.",
+      'in_review': "Nothing under review. Ship something and get it reviewed!",
       'done': "The accomplishment column awaits your contributions."
     };
 
@@ -3354,26 +3484,45 @@
 
     function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
 
+    function extractPRLink(title) {
+      // Match GitHub PR URLs
+      const urlMatch = title.match(/https?:\/\/github\.com\/[^\/]+\/[^\/]+\/pull\/(\d+)/);
+      if (urlMatch) return { url: urlMatch[0], number: urlMatch[1] };
+      // Match "PR #N" pattern
+      const prMatch = title.match(/PR\s*#(\d+)/i);
+      if (prMatch) return { number: prMatch[1] };
+      return null;
+    }
+
     function createTaskElement(task) {
       const div = document.createElement('div');
       div.className = 'task' + (task.status === 'done' ? ' completed' : '') + (selectedTasks.has(task.id) ? ' selected' : '');
       div.draggable = true;
       div.dataset.id = task.id;
-      
+
       const dueInfo = formatDueDate(task.due_date);
       const dueHtml = dueInfo ? `<span class="task-due ${dueInfo.className}">📅 ${dueInfo.text}</span>` : '';
       const srcIcon = { telegram: '💬', api: '🔌' }[task.source] || '🌐';
       const checkboxHtml = task.status === 'done' ? `<input type="checkbox" class="task-checkbox" ${selectedTasks.has(task.id) ? 'checked' : ''} onclick="toggleTaskSelection('${task.id}', this.checked)" title="Select for bulk action">` : '';
 
+      // PR link for review tasks
+      const prInfo = extractPRLink(task.title);
+      const prLinkHtml = (task.status === 'in_review' && prInfo) ? `<a class="task-pr-link" href="${prInfo.url || '#'}" target="_blank" rel="noopener">🔀 PR #${prInfo.number}</a>` : '';
+
+      // Mark Done button for in_review tasks
+      const markDoneHtml = task.status === 'in_review' ? `<button class="mark-done-btn" onclick="event.stopPropagation(); markReviewDone('${task.id}')">✅ Mark Done</button>` : '';
+
       div.innerHTML = `
         ${checkboxHtml}
         <div class="task-category">${getCategoryEmoji(task.category)} ${task.category}</div>
         <div class="task-title">${escapeHtml(task.title)}</div>
+        ${prLinkHtml}
         <div class="task-meta">
           ${dueHtml}
           <span class="task-priority priority-${task.priority}">${task.priority}</span>
           <span class="task-source" title="via ${task.source}">${srcIcon}</span>
         </div>
+        ${markDoneHtml}
         <div class="task-actions">
           <button onclick="editTask('${task.id}')">✏️</button>
           <button onclick="moveTask('${task.id}', 'prev')">◀️</button>
@@ -3393,8 +3542,9 @@
       document.querySelectorAll('.task-list').forEach(list => {
         const status = list.closest('.column').dataset.status;
         const statusTasks = filtered.filter(t => t.status === status);
-        list.innerHTML = statusTasks.length === 0 
-          ? `<div class="empty-state"><div class="icon">${status === 'done' ? '🏆' : '📭'}</div><p>${emptyStateQuotes[status]}</p></div>`
+        const emptyIcon = { done: '🏆', in_review: '🔍' }[status] || '📭';
+        list.innerHTML = statusTasks.length === 0
+          ? `<div class="empty-state"><div class="icon">${emptyIcon}</div><p>${emptyStateQuotes[status] || ''}</p></div>`
           : '';
         statusTasks.forEach(t => list.appendChild(createTaskElement(t)));
       });
@@ -3562,9 +3712,9 @@
     async function moveTask(id, dir) {
       const task = tasks.find(t => t.id === id);
       if (!task) return;
-      const statuses = ['todo', 'in-progress', 'done'];
+      const statuses = ['todo', 'in-progress', 'in_review', 'done'];
       const idx = statuses.indexOf(task.status);
-      const newStatus = dir === 'next' && idx < 2 ? statuses[idx + 1] : dir === 'prev' && idx > 0 ? statuses[idx - 1] : task.status;
+      const newStatus = dir === 'next' && idx < statuses.length - 1 ? statuses[idx + 1] : dir === 'prev' && idx > 0 ? statuses[idx - 1] : task.status;
       if (newStatus !== task.status) await updateTaskStatus(task, newStatus);
     }
 
@@ -3677,6 +3827,187 @@
       document.getElementById(`${view}-view`).classList.add('active');
       if (view === 'today') renderToday();
       if (view === 'brain') initBrain();
+      if (view === 'prs') loadPRs();
+    }
+
+    // ===== MARK REVIEW DONE =====
+    async function markReviewDone(id) {
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+      await updateTaskStatus(task, 'done');
+      showToast('✅', 'Moved to Done', `"${task.title}" completed from review.`);
+    }
+
+    // ===== PR SYSTEM =====
+    let prPollingInterval = null;
+    const GITHUB_ORG = 'RuckVibeCodes';
+
+    function getGitHubToken() {
+      return localStorage.getItem('geoffrey-github-token') || '';
+    }
+
+    function saveGitHubToken(token) {
+      localStorage.setItem('geoffrey-github-token', token.trim());
+    }
+
+    function githubHeaders() {
+      const token = getGitHubToken();
+      const headers = { 'Accept': 'application/vnd.github.v3+json' };
+      if (token) headers['Authorization'] = `token ${token}`;
+      return headers;
+    }
+
+    async function fetchGitHubPRs(state = 'open') {
+      const headers = githubHeaders();
+      // Fetch from all repos via search API
+      const query = `is:pr is:${state} org:${GITHUB_ORG}`;
+      const params = state === 'closed'
+        ? `q=${encodeURIComponent(query)}&sort=updated&order=desc&per_page=30`
+        : `q=${encodeURIComponent(query)}&sort=updated&order=desc&per_page=50`;
+      const resp = await fetch(`https://api.github.com/search/issues?${params}`, { headers });
+      if (!resp.ok) {
+        if (resp.status === 403) throw new Error('rate_limit');
+        throw new Error(`GitHub API: ${resp.status}`);
+      }
+      return (await resp.json()).items || [];
+    }
+
+    function renderPRConfigBanner() {
+      const token = getGitHubToken();
+      const section = document.getElementById('pr-config-section');
+      if (token) {
+        section.innerHTML = '';
+        return;
+      }
+      section.innerHTML = `
+        <div class="pr-config-banner">
+          <h3>🔑 Configure GitHub Token</h3>
+          <p style="color: var(--text-muted); margin-bottom: 10px;">Without a token, you're limited to 10 requests/minute. Add a personal access token for full access.</p>
+          <input type="password" id="gh-token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+          <br>
+          <button onclick="saveGitHubToken(document.getElementById('gh-token-input').value); loadPRs();">Save Token</button>
+          <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 8px;">Token is stored locally in your browser only.</p>
+        </div>
+      `;
+    }
+
+    function renderPRCard(pr, isMerged = false) {
+      const repo = pr.repository_url ? pr.repository_url.split('/').slice(-1)[0] : '';
+      const updatedAgo = timeAgo(new Date(pr.updated_at));
+      const badge = isMerged ? '<span class="pr-badge merged">Merged</span>' : '<span class="pr-badge open">Open</span>';
+      return `
+        <div class="pr-card">
+          <div class="pr-card-header">
+            <div class="pr-title"><a href="${pr.html_url}" target="_blank" rel="noopener">#${pr.number}</a> ${escapeHtml(pr.title)}</div>
+            ${badge}
+          </div>
+          <div class="pr-meta">
+            <span>📦 ${escapeHtml(repo)}</span>
+            <span>👤 ${escapeHtml(pr.user?.login || 'unknown')}</span>
+            <span>🕐 ${updatedAgo}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function timeAgo(date) {
+      const secs = Math.floor((Date.now() - date.getTime()) / 1000);
+      if (secs < 60) return 'just now';
+      if (secs < 3600) return `${Math.floor(secs / 60)}m ago`;
+      if (secs < 86400) return `${Math.floor(secs / 3600)}h ago`;
+      return `${Math.floor(secs / 86400)}d ago`;
+    }
+
+    async function checkMergedPRsForAutoComplete(mergedPRs) {
+      const reviewTasks = tasks.filter(t => t.status === 'in_review');
+      if (reviewTasks.length === 0 || mergedPRs.length === 0) return;
+
+      const resultsEl = document.getElementById('pr-merge-results');
+      const autoCompleted = [];
+
+      for (const pr of mergedPRs) {
+        // Only consider PRs merged in last 7 days
+        if (pr.pull_request?.merged_at) {
+          const mergedDate = new Date(pr.pull_request.merged_at);
+          const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+          if (mergedDate < sevenDaysAgo) continue;
+        }
+
+        const prNum = `#${pr.number}`;
+        const branchMatch = pr.title.toLowerCase();
+
+        for (const task of reviewTasks) {
+          const titleLower = task.title.toLowerCase();
+          const matched = titleLower.includes(prNum) ||
+            titleLower.includes(`pr ${pr.number}`) ||
+            titleLower.includes(`pr#${pr.number}`) ||
+            (pr.head?.ref && titleLower.includes(pr.head.ref.toLowerCase()));
+
+          if (matched) {
+            try {
+              await updateTaskStatus(task, 'done');
+              autoCompleted.push({ task, pr });
+              showToast('✅', `PR #${pr.number} merged`, `Task moved to Done ✅`);
+            } catch (e) {
+              console.error('Auto-complete failed:', e);
+            }
+          }
+        }
+      }
+
+      if (autoCompleted.length > 0) {
+        resultsEl.innerHTML = autoCompleted.map(({ task, pr }) => `
+          <div class="pr-auto-done" style="padding: 10px; margin-bottom: 8px; background: rgba(63, 185, 80, 0.08); border-radius: 10px; border: 1px solid rgba(63, 185, 80, 0.2);">
+            ✅ PR #${pr.number} merged — "${escapeHtml(task.title)}" moved to Done
+          </div>
+        `).join('');
+      }
+    }
+
+    async function loadPRs() {
+      renderPRConfigBanner();
+      const openList = document.getElementById('pr-open-list');
+      const mergedList = document.getElementById('pr-merged-list');
+
+      // Clear previous polling
+      if (prPollingInterval) clearInterval(prPollingInterval);
+
+      try {
+        // Fetch open PRs
+        const openPRs = await fetchGitHubPRs('open');
+        openList.innerHTML = openPRs.length === 0
+          ? '<div class="empty-state"><div class="icon">🎉</div><p>No open PRs. Everything merged, sir!</p></div>'
+          : openPRs.map(pr => renderPRCard(pr, false)).join('');
+        document.getElementById('prs-badge').textContent = openPRs.length;
+
+        // Fetch recently closed PRs (includes merged)
+        const closedPRs = await fetchGitHubPRs('closed');
+        const mergedPRs = closedPRs.filter(pr => pr.pull_request?.merged_at);
+        // Filter to last 7 days
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        const recentMerged = mergedPRs.filter(pr => new Date(pr.pull_request.merged_at) > sevenDaysAgo);
+
+        mergedList.innerHTML = recentMerged.length === 0
+          ? '<div class="empty-state"><div class="icon">📭</div><p>No recently merged PRs.</p></div>'
+          : recentMerged.map(pr => renderPRCard(pr, true)).join('');
+
+        // Auto-complete tasks matching merged PRs
+        await checkMergedPRsForAutoComplete(recentMerged);
+
+        // Poll every 2 minutes while on PRs tab
+        prPollingInterval = setInterval(async () => {
+          if (currentView !== 'prs') { clearInterval(prPollingInterval); return; }
+          try { await loadPRs(); } catch (e) { console.warn('PR poll error:', e); }
+        }, 120000);
+
+      } catch (e) {
+        console.error('PR fetch error:', e);
+        const msg = e.message === 'rate_limit'
+          ? 'GitHub rate limit reached. Add a token for higher limits.'
+          : 'Failed to fetch PRs from GitHub.';
+        openList.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>${msg}</p></div>`;
+        mergedList.innerHTML = '';
+      }
     }
 
     // ===== IDEAS FUNCTIONS =====
@@ -3768,6 +4099,7 @@
       document.getElementById('notes-badge').textContent = notes.length;
       document.getElementById('pipeline-badge').textContent = pipelineItems.filter(p => p.status !== 'published').length;
       document.getElementById('brain-badge').textContent = documents.length + notes.length;
+      // PRs badge is updated in loadPRs()
     }
 
     function openIdeaModal(id = null) {
