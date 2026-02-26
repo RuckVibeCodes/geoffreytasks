@@ -1123,7 +1123,8 @@
   <button class="nav-tab" data-view="agents" onclick="switchView('agents')">🤖 Agents</button>
   <button class="nav-tab" data-view="shifts" onclick="switchView('shifts')">🌙 Shifts</button>
   <button class="nav-tab" data-view="prs" onclick="switchView('prs')">🔀 PRs <span class="badge" id="badge-prs">0</span></button>
-  <button class="nav-cmd" id="refresh-btn" onclick="refreshAll()" title="Refresh all data"><kbd>⌘R</kbd> Refresh</button>
+  <span id="refresh-status" style="font-size:11px;color:var(--muted);margin-right:8px;font-family:'JetBrains Mono',monospace;"></span>
+  <button class="nav-cmd" id="refresh-btn" onclick="refreshAll()" title="Refresh all data (⌘R)">↻ Refresh</button>
   <button class="nav-cmd" onclick="openCmd()"><kbd>⌘K</kbd> Quick Add</button>
 </div>
 
@@ -2192,9 +2193,14 @@
   }
 
   // ── CLEAR DONE ──
-  async function refreshAll() {
+  function updateRefreshStatus() {
+    const el = document.getElementById('refresh-status');
+    if (el) el.textContent = '● live · ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  }
+
+  async function refreshAll(silent = false) {
     const btn = document.getElementById('refresh-btn');
-    if (btn) { btn.textContent = '↻ Refreshing…'; btn.disabled = true; }
+    if (!silent && btn) { btn.textContent = '↻ Syncing…'; btn.disabled = true; }
     try {
       const [t, id, n, p, docs] = await Promise.all([
         db.get('tasks?order=updated_at.desc&limit=200'),
@@ -2217,8 +2223,9 @@
       try { renderAgents(); } catch(e) {}
       try { loadShifts(); } catch(e) {}
       try { loadPRs(); } catch(e) {}
+      updateRefreshStatus();
     } catch(e) { console.warn('refreshAll error:', e); }
-    if (btn) { btn.innerHTML = '<kbd>⌘R</kbd> Refresh'; btn.disabled = false; }
+    if (!silent && btn) { btn.textContent = '↻ Refresh'; btn.disabled = false; }
   }
 
   async function clearDone() {
@@ -2629,29 +2636,9 @@
         addOp('builder', 'Task in progress', t ? t.title.slice(0,50) : '');
       }
 
-      // Auto-refresh every 20s — picks up night shift activity instantly
-      let lastTaskSnapshot = '';
-      setInterval(async () => {
-        const fresh = await db.get('tasks?order=updated_at.desc&limit=200');
-        if (!fresh) return;
-        const snap = JSON.stringify(fresh.map(t => t.id + t.status + t.updated_at));
-        if (snap === lastTaskSnapshot) return;
-        // Detect changes and log to activity feed
-        fresh.forEach(t => {
-          const old = tasks.find(o => o.id === t.id);
-          if (!old) {
-            addOp('architect', 'New task detected', t.title.slice(0,50));
-          } else if (old.status !== t.status) {
-            const op = STATUS_OPS[t.status] || { agent:'geoffrey', action:'Status changed to ' + t.status };
-            addOp(op.agent, op.action, t.title.slice(0,50));
-          }
-        });
-        lastTaskSnapshot = snap;
-        tasks = fresh;
-        renderKanban();
-        buildActivityFromTasks();
-        renderAgents();
-      }, 20000);
+      // Auto-refresh every 30s — full data sync (tasks, PRs, shifts, ideas, docs)
+      updateRefreshStatus();
+      setInterval(() => refreshAll(true), 30000);
 
       // Supabase Realtime WebSocket — instant push on task + agent_activity changes
       try {
