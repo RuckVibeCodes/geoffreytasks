@@ -1123,6 +1123,7 @@
   <button class="nav-tab" data-view="agents" onclick="switchView('agents')">🤖 Agents</button>
   <button class="nav-tab" data-view="shifts" onclick="switchView('shifts')">🌙 Shifts</button>
   <button class="nav-tab" data-view="prs" onclick="switchView('prs')">🔀 PRs <span class="badge" id="badge-prs">0</span></button>
+  <button class="nav-cmd" id="refresh-btn" onclick="refreshAll()" title="Refresh all data"><kbd>⌘R</kbd> Refresh</button>
   <button class="nav-cmd" onclick="openCmd()"><kbd>⌘K</kbd> Quick Add</button>
 </div>
 
@@ -2191,6 +2192,35 @@
   }
 
   // ── CLEAR DONE ──
+  async function refreshAll() {
+    const btn = document.getElementById('refresh-btn');
+    if (btn) { btn.textContent = '↻ Refreshing…'; btn.disabled = true; }
+    try {
+      const [t, id, n, p, docs] = await Promise.all([
+        db.get('tasks?order=updated_at.desc&limit=200'),
+        db.get('ideas?order=created_at.desc&limit=100'),
+        db.get('notes?order=created_at.desc&limit=100'),
+        db.get('pipeline?order=created_at.desc&limit=100'),
+        db.get('documents?order=updated_at.desc&limit=200'),
+      ]);
+      tasks     = t    || [];
+      ideas     = id   || [];
+      notes     = n    || [];
+      pipeline  = p    || [];
+      brainDocs = docs || [];
+      try { renderKanban(); } catch(e) {}
+      try { buildActivityFromTasks(); } catch(e) {}
+      try { renderIdeas(); } catch(e) {}
+      try { renderNotes(); } catch(e) {}
+      try { renderPipeline(); } catch(e) {}
+      try { renderBrainDocs(brainDocs); } catch(e) {}
+      try { renderAgents(); } catch(e) {}
+      try { loadShifts(); } catch(e) {}
+      try { loadPRs(); } catch(e) {}
+    } catch(e) { console.warn('refreshAll error:', e); }
+    if (btn) { btn.innerHTML = '<kbd>⌘R</kbd> Refresh'; btn.disabled = false; }
+  }
+
   async function clearDone() {
     const done = tasks.filter(t => t.status === 'done');
     if (!done.length) return;
@@ -2264,6 +2294,7 @@
   }
   document.addEventListener('keydown', e => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openCmd(); }
+    if ((e.metaKey || e.ctrlKey) && e.key === 'r') { e.preventDefault(); refreshAll(); }
     if (e.key === 'Escape') { closeCmd(); closeTaskModal(); }
   });
 
