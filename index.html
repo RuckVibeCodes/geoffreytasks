@@ -1241,9 +1241,22 @@
 
   <!-- AGENTS -->
   <div id="agents-view" class="view generic-view">
-    <div class="view-header"><h2>🤖 Agents</h2><p>Live status — Geoffrey's specialized crew working toward your mission</p></div>
+    <div class="view-header"><h2>🤖 Agents</h2><p>Live status — Geoffrey's 4-stage assembly line working toward your mission</p></div>
+
+    <!-- Assembly Line Status -->
+    <div id="assembly-line-panel" style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">🏭 Assembly Line</span>
+        <span style="font-size:10px;color:var(--muted);">Architect → Builder → Debugger → Reviewer</span>
+      </div>
+      <div id="assembly-line-tasks" style="display:flex;flex-direction:column;gap:8px;">
+        <div id="assembly-idle" style="font-size:12px;color:var(--muted);font-style:italic;padding:4px 0;">No active pipeline tasks. Add a task to the board to start.</div>
+      </div>
+    </div>
+
+    <!-- Agent Status Bar (last activity) -->
     <div id="agent-pipeline-bar" style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-      <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-right:4px;">Active Pipeline</span>
+      <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-right:4px;">Last Activity</span>
       <div id="pipeline-display" style="display:flex;gap:6px;flex:1;flex-wrap:wrap;"></div>
     </div>
     <div class="cards-grid" id="agents-grid"></div>
@@ -1688,7 +1701,84 @@
     return { status: 'idle', label: 'IDLE', op: latest };
   }
 
+  // ── ASSEMBLY LINE STATUS ──────────────────────────────────────────────────
+  const PIPELINE_STAGES = [
+    { id:'architect', icon:'🏗️', label:'Architect', color:'#3b82f6' },
+    { id:'builder',   icon:'⚒️', label:'Builder',   color:'#10b981' },
+    { id:'debugger',  icon:'🐛', label:'Debugger',  color:'#f59e0b' },
+    { id:'reviewer',  icon:'👁️', label:'Reviewer',  color:'#8b5cf6' },
+  ];
+
+  function renderAssemblyLine() {
+    const container = document.getElementById('assembly-line-tasks');
+    const idle      = document.getElementById('assembly-idle');
+    if (!container) return;
+
+    const inProg = tasks.filter(t => t.status === 'in-progress');
+    if (!inProg.length) {
+      if (idle) idle.style.display = 'block';
+      return;
+    }
+    if (idle) idle.style.display = 'none';
+
+    container.innerHTML = inProg.map(task => {
+      // Determine active stage from recent opsLog entries matching this task
+      const titleWords = (task.title || '').toLowerCase().split(' ').filter(w => w.length > 3);
+      const recent = opsLog.filter(op => {
+        const detail = (op.detail || '').toLowerCase();
+        return titleWords.some(w => detail.includes(w));
+      });
+      const latestOp = recent[0];
+      const activeStageId = latestOp ? latestOp.agent : null;
+
+      // Figure out which stages are done vs active vs pending based on op history
+      const completedStages = new Set(
+        opsLog
+          .filter(op => {
+            const detail = (op.detail || '').toLowerCase();
+            return titleWords.some(w => detail.includes(w)) && (op.action || '').includes('complete');
+          })
+          .map(op => op.agent)
+      );
+
+      const stageHtml = PIPELINE_STAGES.map((stage, i) => {
+        const isActive    = activeStageId === stage.id && !completedStages.has(stage.id);
+        const isComplete  = completedStages.has(stage.id);
+        const isPending   = !isActive && !isComplete;
+
+        const bg    = isActive  ? `${stage.color}33`
+                    : isComplete ? `${stage.color}18`
+                    : 'rgba(255,255,255,.03)';
+        const color = isActive  ? stage.color
+                    : isComplete ? stage.color + 'bb'
+                    : 'var(--muted)';
+        const border = isActive ? `1px solid ${stage.color}66` : '1px solid transparent';
+
+        return `<div style="display:flex;align-items:center;gap:3px;">
+          <div style="padding:3px 9px;border-radius:5px;font-size:10px;font-weight:700;
+            background:${bg};color:${color};border:${border};white-space:nowrap;transition:all .3s;">
+            ${isComplete ? '✓ ' : isActive ? '● ' : ''}${stage.icon} ${stage.label}
+          </div>
+          ${i < PIPELINE_STAGES.length-1 ? `<span style="color:var(--border2);font-size:9px;margin:0 1px">→</span>` : ''}
+        </div>`;
+      }).join('');
+
+      const ago = latestOp ? `· ${relTime(latestOp.time)} ago` : '';
+      const activeLabel = latestOp
+        ? `${latestOp.action || 'Working'}${latestOp.detail ? ' — ' + latestOp.detail.slice(0,40) : ''}`
+        : 'Queued';
+
+      return `<div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;padding:10px 12px;">
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
+          title="${escHtml(task.title)}">${escHtml(task.title.slice(0, 55))}${task.title.length > 55 ? '…' : ''}</div>
+        <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">${stageHtml}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:7px;">${escHtml(activeLabel)} ${ago}</div>
+      </div>`;
+    }).join('');
+  }
+
   function renderAgents() {
+    renderAssemblyLine();
     const grid = document.getElementById('agents-grid');
     if (!grid) return;
     const inProg  = tasks.filter(t => t.status === 'in-progress');
