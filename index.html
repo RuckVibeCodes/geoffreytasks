@@ -28,7 +28,7 @@
       --col-prog:  #f59e0b;
       --col-done:  #10b981;
       --col-backlog: #64748b;
-      --col-review:  #ec4899;
+      --col-review:  #8b5cf6;
     }
 
     html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; }
@@ -522,6 +522,13 @@
     .k-card-agent-pill.debugger  { background:rgba(245,158,11,.15);  color:#fbbf24; }
     .k-card-agent-pill.geoffrey  { background:rgba(212,175,55,.15);  color:#d4af37; }
     .k-card-agent-label { font-size: 10px; color: var(--muted); }
+    .k-mark-done-row { display: flex; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.05); }
+    .k-mark-done-btn {
+      background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.25);
+      border-radius: 6px; padding: 3px 10px; font-size: 11px; cursor: pointer; font-weight: 600;
+      transition: background .15s, transform .1s;
+    }
+    .k-mark-done-btn:hover { background: rgba(16,185,129,0.25); transform: scale(1.03); }
 
     /* In-Progress column header agent line */
     .prog-agent-line {
@@ -1186,9 +1193,9 @@
           <div class="k-add"><button class="k-add-btn" onclick="openCmd('in-progress')">+ Add task</button></div>
         </div>
         <div class="k-col review">
-          <div class="k-col-head"><span class="label">👀 Review</span><span class="k-count" id="cnt-review">0</span></div>
+          <div class="k-col-head"><span class="label">🔍 In Review</span><span class="k-count" id="cnt-review">0</span></div>
           <div class="k-cards" id="col-review"></div>
-          <div class="k-add"><button class="k-add-btn" onclick="openCmd('review')">+ Add task</button></div>
+          <div class="k-add"><button class="k-add-btn" onclick="openCmd('in_review')">+ Add task</button></div>
         </div>
         <div class="k-col done">
           <div class="k-col-head"><span class="label">✅ Done</span><span class="k-count" id="cnt-done">0</span></div>
@@ -1494,7 +1501,7 @@
         else cols.todo.push(t);
       } else if (t.status === 'in-progress') {
         cols['in-progress'].push(t);
-      } else if (t.status === 'review') {
+      } else if (t.status === 'review' || t.status === 'in_review') {
         cols.review.push(t);
       } else if (t.status === 'done') {
         cols.done.push(t);
@@ -1552,7 +1559,7 @@
         let newStatus = 'todo';
         let conceptualStage = 'todo';
         if (colId === 'col-prog')    { newStatus = 'in-progress'; conceptualStage = 'in-progress'; }
-        else if (colId === 'col-review') { newStatus = 'in-progress'; conceptualStage = 'review'; }
+        else if (colId === 'col-review') { newStatus = 'in_review'; conceptualStage = 'review'; }
         else if (colId === 'col-done')   { newStatus = 'done'; conceptualStage = 'done'; }
         else if (colId === 'col-backlog'){ newStatus = 'todo'; task.priority = 'low'; conceptualStage = 'backlog'; }
         else if (colId === 'col-todo')   { newStatus = 'todo'; if (task.priority === 'low') task.priority = 'medium'; }
@@ -1560,7 +1567,7 @@
         task.status = newStatus;
         task.updated_at = new Date().toISOString();
         await db.patch(`tasks?id=eq.${task.id}`, { status: newStatus, priority: task.priority, updated_at: task.updated_at });
-        const icons = { 'todo': '📥', 'in-progress': '🔄', 'done': '✅' };
+        const icons = { 'todo': '📥', 'in-progress': '🔄', 'in_review': '🔍', 'done': '✅' };
         const dropOp = STATUS_OPS[conceptualStage] || STATUS_OPS[newStatus] || { agent:'geoffrey', action:'Moved to ' + newStatus };
         addOp(dropOp.agent, dropOp.action, task.title.slice(0, 50));
         renderKanban(); renderAgents();
@@ -1599,6 +1606,11 @@
             <div class="k-live-dot"></div>
             <span class="k-card-agent-label" style="color:var(--muted)">in progress</span>
           </div>` : '');
+        const isReview = t.status === 'in_review' || t.status === 'review';
+        const reviewRow = isReview ? `
+          <div class="k-mark-done-row">
+            <button class="k-mark-done-btn" onclick="event.stopPropagation();markReviewDone('${t.id}')">✅ Mark Done</button>
+          </div>` : '';
         card.innerHTML = `
           <div class="k-card-title">${escHtml(t.title)}</div>
           <div class="k-card-meta">
@@ -1607,7 +1619,7 @@
             ${agent ? `<span class="k-agent">🤖 ${escHtml(agent)}</span>` : ''}
             <span class="k-prio ${t.priority || 'medium'}"></span>
           </div>
-          ${agentRow}`;
+          ${agentRow}${reviewRow}`;
         card.addEventListener('click', () => openTaskModal(t));
         card.addEventListener('dragstart', e => {
           e.dataTransfer.setData('text/plain', t.id);
@@ -1926,6 +1938,33 @@
         prsLoaded = true;
       }
     } catch(e) { console.error('PR load failed', e); }
+    // Detect recently merged PRs and auto-move matching in_review tasks to done
+    try {
+      const mergedRes = await fetch(`${TOUCHGRASS_API}/api/github/prs?state=closed`, { cache: 'no-store' });
+      if (mergedRes.ok) {
+        const mergedData = await mergedRes.json();
+        const mergedPRs = (mergedData.prs || []).filter(pr => {
+          if (!pr.mergedAt) return false;
+          const mergedDate = new Date(pr.mergedAt);
+          const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+          return mergedDate > weekAgo;
+        });
+        for (const pr of mergedPRs) {
+          const prNum = String(pr.number);
+          const matched = tasks.filter(t =>
+            (t.status === 'in_review' || t.status === 'review') &&
+            (t.title.includes(`#${prNum}`) || t.title.includes(`PR ${prNum}`) || t.title.includes(`pr-${prNum}`))
+          );
+          for (const task of matched) {
+            task.status = 'done';
+            task.updated_at = new Date().toISOString();
+            await db.patch(`tasks?id=eq.${task.id}`, { status: 'done', updated_at: task.updated_at });
+            addOp('reviewer', 'PR merged → done', `#${prNum} ${task.title.slice(0, 40)}`);
+            toast('🎉', 'PR merged!', `#${prNum} → task done`);
+          }
+        }
+      }
+    } catch(e) { console.error('Merged PR detection skipped', e); }
     renderPRs();
   }
 
@@ -2118,9 +2157,9 @@
   function buildActivityFromTasks() {
     const recent = [...tasks].sort((a,b) => new Date(b.updated_at||b.created_at) - new Date(a.updated_at||a.created_at)).slice(0, 20);
     activityLog = recent.map(t => ({
-      icon: t.status === 'done' ? '✅' : t.status === 'in-progress' ? '🔄' : '📥',
+      icon: t.status === 'done' ? '✅' : t.status === 'in-progress' ? '🔄' : t.status === 'in_review' ? '🔍' : '📥',
       strong: t.title.length > 26 ? t.title.slice(0,26)+'…' : t.title,
-      text: `→ ${t.status === 'in-progress' ? 'in progress' : t.status}`,
+      text: `→ ${t.status === 'in-progress' ? 'in progress' : t.status === 'in_review' ? 'in review' : t.status}`,
       time: t.updated_at || t.created_at,
       isAgent: t.source === 'api' || t.source === 'telegram',
       source: t.source,
@@ -2154,6 +2193,7 @@
     const moves = [];
     if (task.status !== 'todo') moves.push({ label: '📥 Todo', status: 'todo', cls: '' });
     if (task.status !== 'in-progress') moves.push({ label: '🔄 In Progress', status: 'in-progress', cls: 'primary' });
+    if (task.status !== 'in_review') moves.push({ label: '🔍 In Review', status: 'in_review', cls: '' });
     if (task.status !== 'done') moves.push({ label: '✅ Done', status: 'done', cls: 'success' });
     moves.push({ label: '🗑️ Delete', status: 'delete', cls: 'danger' });
     actions.innerHTML = moves.map(m => `<button class="btn ${m.cls}" onclick="handleTaskAction('${m.status}')">${m.label}</button>`).join('');
@@ -2166,6 +2206,7 @@
     'backlog':     { agent:'architect', action:'Added to backlog'     },
     'in-progress': { agent:'builder',   action:'Started building'     },
     'review':      { agent:'reviewer',  action:'Sent for review'      },
+    'in_review':   { agent:'reviewer',  action:'Sent for review'      },
     'debug':       { agent:'debugger',  action:'Sent for debugging'   },
     'done':        { agent:'reviewer',  action:'Approved & done'      },
   };
@@ -2186,9 +2227,20 @@
       task.updated_at = new Date().toISOString();
       const op = STATUS_OPS[action];
       if (op) addOp(op.agent, op.action, shortTitle);
-      const icons = { 'todo': '📥', 'in-progress': '🔄', 'done': '✅' };
-      toast(icons[action]||'📋', `Moved to ${action === 'in-progress' ? 'In Progress' : action}`);
+      const icons = { 'todo': '📥', 'in-progress': '🔄', 'in_review': '🔍', 'done': '✅' };
+      toast(icons[action]||'📋', `Moved to ${action === 'in-progress' ? 'In Progress' : action === 'in_review' ? 'In Review' : action}`);
     }
+    renderKanban(); renderAgents();
+  }
+
+  async function markReviewDone(taskId) {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+    task.status = 'done';
+    task.updated_at = new Date().toISOString();
+    await db.patch(`tasks?id=eq.${task.id}`, { status: 'done', updated_at: task.updated_at });
+    addOp('reviewer', 'Approved & done', task.title.slice(0, 50));
+    toast('✅', 'Marked done', task.title.slice(0, 30));
     renderKanban(); renderAgents();
   }
 
