@@ -2,6 +2,10 @@
 
 > *"A task delayed is a task that haunts one's afternoon tea."* — Geoffrey
 
+⚡ **TL;DR:** Open index.html or visit geoffrey-task-board.vercel.app → add tasks → drag to done
+
+---
+
 Butler-themed task management for Master Matt. Built with Claude Code.
 
 ## Features
@@ -27,6 +31,13 @@ Butler-themed task management for Master Matt. Built with Claude Code.
 Add tasks via Telegram by messaging Geoffrey:
 - "Add task: Review landing page copy"
 - "Geoffrey, remind me to ship the feature"
+
+## 🚀 Quick Start
+
+```bash
+# Just open index.html in browser
+# Or deploy to Vercel (drag & drop or git)
+```
 
 ## Database Setup
 
